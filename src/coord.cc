@@ -56,12 +56,6 @@ namespace coordConv {
         _setCache();
         _vel.setZero();
     }
-    
-    double Coord::angularSeparation(Coord const &coord) const {
-        double crossMag = _pos.cross(coord.getVecPos()).norm();
-        double dotProd = _pos.dot(coord.getVecPos());
-        return atan2d(crossMag, dotProd);
-    }
 
     double Coord::getParallax() const {
         return _atInfinity ? 0 : AUPerParsec / _dist;
@@ -124,6 +118,22 @@ namespace coordConv {
         double const KMPerSec_per_AUPerYear = KmPerAU / (DaysPerYear * SecPerDay);
         return (_pos / _dist).dot(_vel) * KMPerSec_per_AUPerYear;
 //        return _atInfinity ? 0 : _pos.dot(_vel) * KMPerSec_per_AUPerYear / _dist;
+    }
+    
+    double Coord::angularSeparation(Coord const &coord) const {
+        double crossMag = _pos.cross(coord.getVecPos()).norm();
+        double dotProd = _pos.dot(coord.getVecPos());
+        return atan2d(crossMag, dotProd);
+    }
+    
+    double Coord::angleTo(Coord const &coord) const {
+        Eigen::Vector3d fromUnitPos = _pos / _dist;
+        Eigen::Vector3d toPos = coord.getVecPos();
+        
+        double sinVal = (toPos(1) * fromUnitPos(0)) - (toPos(0) * fromUnitPos(1));
+        double cosVal = (toPos(2) * ((fromUnitPos(0) * fromUnitPos(0)) + (fromUnitPos(1) * fromUnitPos(1))))
+                      - (fromUnitPos(2) * ((toPos(0) * fromUnitPos(0)) + (toPos(1) * fromUnitPos(1))));
+        return (sinVal != 0.0 || cosVal != 0.0) ? wrapCtr(90 - atan2d(sinVal, cosVal)) : DoubleNaN;
     }
 
     void Coord::_setPosFromSph(double equatAng, double polarAng, double parallax) {

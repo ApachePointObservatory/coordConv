@@ -137,6 +137,17 @@ namespace coordConv {
         @return angular separation (deg)
         */
         double angularSeparation(Coord const &coord) const;
+
+        /**
+        Compute the angle of a great circle offset to another coord
+        
+        In detail: computes the orientation at this point of a great circle connecting this coord
+        to another coord. The orientation is 0 if the great circle lies along the direction of
+        increasing equatorial angle, 90 if it lies along the direction increasing polar angle.
+        
+        @return orientation (deg), or NaN if the two coords are too close together
+        */
+        double angleTo(Coord const &coord) const;
     
     private:
         Eigen::Vector3d _pos;

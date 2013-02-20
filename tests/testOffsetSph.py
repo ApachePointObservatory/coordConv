@@ -33,6 +33,7 @@ class TestOffsetSph(unittest.TestCase):
                         srcCoord = Coord(srcLong, srcLat)
                         destCoord = Coord(destLong, destLat)
                         self.assertAlmostEqual(dist, srcCoord.angularSeparation(destCoord))
+                        self.assertAlmostEqual(srcAng, srcCoord.angleTo(destCoord))
 
     def testWideRange(self):
         """Test over a wide range of angles
@@ -57,6 +58,7 @@ class TestOffsetSph(unittest.TestCase):
                         srcCoord = Coord(srcLong, srcLat)
                         destCoord = Coord(destLong, destLat)
                         self.assertAlmostEqual(dist, srcCoord.angularSeparation(destCoord))
+                        self.assertAlmostEqual(srcAng, srcCoord.angleTo(destCoord))
         
                         
 def processOutput(outputVec):
