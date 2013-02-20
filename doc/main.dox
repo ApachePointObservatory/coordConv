@@ -1,0 +1,37 @@
+/**
+\mainpage coordConv: Astronomical Coordinate Conversions
+
+\section coordConv_introduction Introduction
+
+This package provides astronomical coordinate conversions to an accuracy of a small fraction of an arcsecond. It is intended to be suitable for controlling large research telescopes.
+
+The highest-level subroutines are sph::coordConv (for spherical positions, e.g. RA, Dec) and vec::coordConv (for cartesian vector positions). These will convert between any two supported coordinate systems (see coordSys.h for the list).
+
+This package is divided into several parts:
+* sph: routines that use spherical position (e.g. RA, Dec), in degrees. Also includes routines to convert between spherical position and cartesian vector position.
+* vec: routines that use cartesian vectors, with length typically in astronomical units. Includes a set of routines to convert between specific coordinate systems (e.g. appGeoFromICRS).
+* time: the minimum time support required for the above.
+* physConst.h: various physical constants.
+
+The user must provide information about the observatory and current earth orientation data (using the IERS Earth Orientation bulletin if maximum accuracy is wanted) in the Site object described in site.h.
+
+\section coordConv_conventions Conventions
+
+* Spherical positions are in degrees (even RA). The first axis is the equatorial angle (e.g. RA or longitude); the second axis is the polar angle (e.g. Dec or latitude).
+* Cartesian positions are in astronomical units.
+* Proper motion is arcsec/century; the equatorial component is dEquatAng/dt, so it may be large near the pole
+* Radial velocity is km/sec, positive receding (but it rarely matters)
+* All coordinate systems are right-handed, so azimuth os 0 south (which is unusual), 90 east
+* TAI is MJD, seconds (not days)
+
+\section coordConv_requirements Requirements
+
+The following packages are required:
+* Eigen: C++ vector library
+* ndarray: adds python support to Eigen. I use the LSST version, which requires:
+* boost
+* daf_base (an LSST package)
+* sconsUtils (an LSST package that supports easy building of packages)
+
+The simplest way to build this package is to install the minimal LSST software stack <https://dev.lsstcorp.org/trac/wiki/Installing>, which includes ndarray, then use eups to setup this package up and build it using "scons" and/or "scons install".
+*/

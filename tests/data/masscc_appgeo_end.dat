@@ -1,0 +1,24 @@
+!+
+! Data for Conversion to Current Apparent Geocentric Place
+!-
+! TimeStamp	TAI at which data was computed (MJD, in seconds)
+   4868036342.94000     
+!   PMSpan	time over which to correct for prop. mo. (Julian years)
+   13.1376142394859     
+!   BCPos(3)	barycentric position of Earth (au)
+ -0.868645993829650       0.432803086268513       0.187588676703532     
+!   HCDir(3)	heliocentric position of Earth (unit vector)
+ -0.877500709699094       0.440004980459249       0.190756708004313     
+!   GravRad	grav. rad. of sun * 2 / sun-earth distance
+  1.996554483083599E-008
+!   BCBeta(3)	barycentric velocity of the Earth (c)
+ -4.919731345256016E-005 -8.034411522485706E-005 -3.482758998862905E-005
+!   GammaI	SQRT (1 - BCBeta**2)
+  0.999999994955743     
+!   PNMat(3,3)	precession/nutation matrix
+  0.999994637079254      -3.003748008010958E-003 -1.305109434480275E-003
+  3.003783100051487E-003  0.999995488322641       2.492889166441007E-005
+  1.305028666138909E-003 -2.884902363578821E-005  0.999999148033594     
+!+
+! End Data for Conversion to Current Apparent Geocentric Place
+!-

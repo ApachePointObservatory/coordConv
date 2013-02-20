@@ -1,0 +1,13 @@
+.scon*
+config.log
+doc/*.tag
+doc/doxygen.conf
+doc/html
+*.dylib
+*.so
+*.os
+*.o
+python/coordConv/coordConvLib.py
+python/coordConv/coordConvLib_wrap.cc
+examples/convertOne
+tests/.tests

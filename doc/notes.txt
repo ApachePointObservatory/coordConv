@@ -1,0 +1,4 @@
+To do:
+
+- Check math for FK4 precession. I suspect I'm using the wrong units for velocity.
+- In particular, what are the units of fictitious velocity in icrsFromZPMFK4?
