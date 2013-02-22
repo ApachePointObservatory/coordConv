@@ -148,6 +148,30 @@ namespace coordConv {
         @return orientation (deg), or NaN if the two coords are too close together
         */
         double angleTo(Coord const &coord) const;
+        
+        /**
+        Compute a new coord offset from this coord along the arc of a great circle
+        
+        @param[out] toOrient: orientation of offset arc at offset position (deg)
+        @param[in] fromOrient: orientation of offset arc at this position (deg)
+        @param[in] dist: offset distance as the length of the arc of a great circle (deg)
+        @return offset coord
+
+        @raise runtime_error if this coord or the offset coord is too near a pole
+    
+        This diagram may help:
+
+                                                                .
+                                                          .      ⎞ toOrient
+                                                   *--------------> dir. of increasing equatorial angle at offset coord
+                                           .    offset coord
+                                  .
+                        .
+               .         ⎞ fromOrient
+         *----------------> dir. of increasing equatorial angle at this coord
+        this coord
+        */
+        Coord offset(double &toOrient, double fromOrient, double dist) const;
     
     private:
         Eigen::Vector3d _pos;

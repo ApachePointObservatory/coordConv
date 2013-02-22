@@ -59,7 +59,7 @@ for fromSysCode in coordSysList:
                                     fromRadVelList = [0] # see Subtleties above
                                 for fromParlax in fromParlaxList:
                                     for fromRadVel in fromRadVelList:
-                                        for fromDir in (0,): # (0, 45, -90) use a list once the new code supports dir and scale
+                                        for fromDir in (0, 45, -90):
                                             for refCoA in refCoAList:
                                                 for refCoB in refCoBList:
                                                     print fromSysCode, fromDate, fromPos1, fromPos2, fromPM1, fromPM2, \

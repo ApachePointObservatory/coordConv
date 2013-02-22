@@ -4,7 +4,6 @@
 #include "coordConv/mathUtils.h"
 #include "coordConv/time.h"
 #include "coordConv/angSideAng.h"
-#include "coordConv/offsetSph.h"
 #include "coordConv/rotEqPol.h"
 #include "coordConv/rotXY.h"
 #include "coordConv/site.h"

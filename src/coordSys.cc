@@ -9,6 +9,16 @@ namespace coordConv {
         Coord icrsCoord = fromCoordSys.toICRS(fromCoord, site);
         return fromICRS(icrsCoord, site);
     }
+
+    Coord CoordSys::convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const {
+        Coord toCoord = convertFrom(fromCoordSys, fromCoord, site);
+
+        double const FromDist = 1e-3;
+        Coord offFromCoord = fromCoord.offset(toDir, fromDir, FromDist);
+        Coord offToCoord = convertFrom(fromCoordSys, offFromCoord, site);
+        scaleChange = toCoord.angularSeparation(offToCoord) / FromDist;
+        return toCoord;
+    }
     
     std::string CoordSys::asString() const {
         std::ostringstream os;

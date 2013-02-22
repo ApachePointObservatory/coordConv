@@ -11,38 +11,88 @@ namespace coordConv {
     
     /**
     Abstract base class for coordinate systems
+    
+    Subclasses must define fromICRS and toICRS, and should override setDate if information cached based on date.
     */
     class CoordSys {
     public:
-        ///< construct a CoordSys
+        /**
+        Construct a CoordSys given a name and date
+        */
         explicit CoordSys(std::string const &name, double date) : _name(name), _date() { setDate(date); };
         
-        ///< destructor
+        ///< Destructor
         virtual ~CoordSys() { };
         
-        ///< return a copy with the same date
+        /**
+        Return a copy with the same date
+        */
         virtual boost::shared_ptr<CoordSys> clone() const = 0;
         
-        ///< return a copy with a specified date
+        /**
+        Return a copy with a specified date
+        */
         virtual boost::shared_ptr<CoordSys> clone(double date) const = 0;
 
-        ///< get the name of this coordinate system
+        /**
+        Get the name of this coordinate system (all lowercase)
+        */
         std::string getName() const { return _name; };
         
-        ///< get the date of this coordinate system
-        virtual double getDate() const { return _date; };
+        /**
+        Get the date of this coordinate system
         
-        ///< set the date of this coordinate system
+        The units depend on the specific coordinate system
+        */
+        double getDate() const { return _date; };
+        
+        /**
+        Set the date of this coordinate system
+        
+        The units depend on the specific coordinate system
+        */
         virtual void setDate(double date) { _date = date; };
         
-        ///< convert a coordinate to ICRS at date of observation 2000.0 from this system at this date
+        /**
+        Convert a coordinate to ICRS at date of observation J2000 from this coordinate system at this date
+        
+        @param[in] coord: position in this coordinate system at this date
+        @param[in] site: site information
+        @return position in ICRS coordinates at date of observation J2000
+        */
         virtual Coord toICRS(Coord const &coord, Site const &site) const = 0;
         
-        ///< convert a coordinate from ICRS at date of observation J2000 to this system at this date
+        /**
+        Convert a coordinate from ICRS at date of observation J2000 to this system at this date
+        
+        @param[in] coord: position in ICRS coordinates at date of observation J2000
+        @param[in] site: site information
+        @return position in this coordinate system at this date
+        */
         virtual Coord fromICRS(Coord const &coord, Site const &site) const = 0;
         
-        ///< convert a coordinate from another coordinate system to this system
+        /**
+        Convert a coordinate from another coordinate system to this system
+        
+        @param[in] fromCoordSys: initial coordinate system and date
+        @param[in] fromCoord: initial position
+        @param[in] site: site information
+        @return position in this coordinate system at this date
+        */
         virtual Coord convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site) const;
+        
+        /**
+        Convert a coordinate from another coordinate system to this system, including orientation
+        
+        @param[out] toDir: orientation in this coordinate system (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
+        @param[out] scaleChange: change in scale: output delta sky/input delta sky, measured along the specified direction
+        @param[in] fromCoordSys: initial coordinate system
+        @param[in] fromCoord: initial position
+        @param[in] fromDir: initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
+        @param[in] site: site information
+        @return position in this coordinate system
+        */
+        virtual Coord convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const;
         
         ///< get string representation
         virtual std::string asString() const;

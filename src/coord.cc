@@ -2,6 +2,7 @@
 #include <sstream>
 #include "coordConv/mathUtils.h"
 #include "coordConv/physConst.h"
+#include "coordConv/angSideAng.h"
 #include "coordConv/coordSys.h"
 
 namespace coordConv {
@@ -134,6 +135,22 @@ namespace coordConv {
         double cosVal = (toPos(2) * ((fromUnitPos(0) * fromUnitPos(0)) + (fromUnitPos(1) * fromUnitPos(1))))
                       - (fromUnitPos(2) * ((toPos(0) * fromUnitPos(0)) + (toPos(1) * fromUnitPos(1))));
         return (sinVal != 0.0 || cosVal != 0.0) ? wrapCtr(90 - atan2d(sinVal, cosVal)) : DoubleNaN;
+    }
+    
+    Coord Coord::offset(double &toOrient, double fromOrient, double dist) const {
+        double fromEquatAng, fromPolarAng;
+        getSphPos(fromEquatAng, fromPolarAng);
+        double sideA = 90.0 - fromPolarAng;
+        double angB = 90.0 - fromOrient;
+        double sideC = dist;
+        double angA, sideB, angC;
+        if (angSideAng(angA, sideB, angC, sideA, angB, sideC)) {
+            throw std::runtime_error("Cannot compute");
+        }
+        double toEquatAng = fromEquatAng + angC;
+        double toPolarAng = 90.0 - sideB;
+        toOrient = angA - 90.0;
+        return Coord(toEquatAng, toPolarAng);
     }
 
     void Coord::_setPosFromSph(double equatAng, double polarAng, double parallax) {

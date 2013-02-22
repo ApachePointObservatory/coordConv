@@ -90,7 +90,7 @@ class TestCoordConv(unittest.TestCase):
                 site.refCoB = refCoB
         
                 try:
-                    toCoord = toCoordSys.convertFrom(fromCoordSys, fromCoord, site)
+                    toCoord, toDir, scaleChange = toCoordSys.convertFrom(fromCoordSys, fromCoord, fromDir, site)
                 except Exception:
                     print "Failed on line %s: %s\n" % (lineInd + 1, line)
                     raise
@@ -118,6 +118,8 @@ class TestCoordConv(unittest.TestCase):
                         atol = 1e-4
                     self.assertLess(toCoord.angularSeparation(refToCoord), atol)
                     self.assertTrue(numpy.allclose(predList, refList, atol=atol))
+                    self.assertAlmostEqual(refToDir, toDir, places=3)
+                    self.assertAlmostEqual(refScaleChange, scaleChange)
                 except Exception:
                     print "Failed on line %s: %s" % (lineInd + 1, line)
                     print "fromCoordSys=(%s, %s); toCoordSys=(%s, %s)" % (fromCoordSys.getName(), fromCoordSys.getDate(), toCoordSys.getName(), toCoordSys.getDate())
