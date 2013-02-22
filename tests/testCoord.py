@@ -2,7 +2,7 @@
 import unittest
 import math
 import numpy
-from coordConv import Coord, sind, cosd, tand, atan2d, wrapCtr, wrapPos, angSideAng, \
+from coordConv import Coord, sind, cosd, wrapPos, wrapNear, angSideAng, \
     DoubleEpsilon, MinParallax, AUPerParsec, RadPerDeg, ArcsecPerDeg, SecPerDay, DaysPerYear, KmPerAU
 
 class TestCoord(unittest.TestCase):
@@ -141,16 +141,17 @@ class TestCoord(unittest.TestCase):
                         if abs(dist) < 0.0001:
                             orientPlaces = 4
                         else:
-                            orientPlaces = 5
+                            orientPlaces = 7
                         self.assertAlmostEqual(toEquatAng, predEquatAng, places=places)
                         self.assertAlmostEqual(toPolarAng, predPolarAng, places=places)
                         fromCoord = Coord(fromEquatAng, fromPolarAng)
                         toCoord = Coord(toEquatAng, toPolarAng)
                         self.assertAlmostEqual(dist, fromCoord.angularSeparation(toCoord))
                         self.assertAlmostEqual(fromOrient, fromCoord.angleTo(toCoord), places=orientPlaces)
+                        self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.angleTo(fromCoord), toOrient), places=orientPlaces)
 
     def testOffset(self):
-        """Test offset, angularSeparation and angleTo for small offsets over a wide range of angles
+        """Test offset, angularSeparation and angleTo for offsets over a wide range of angles
         """
         for fromPolarAng in (-87.1, -25.5, 0.43, 36.7, 87.0):
             for fromEquatAng in (0, 41.0): # should not matter
@@ -175,6 +176,7 @@ class TestCoord(unittest.TestCase):
                         toCoord = Coord(toEquatAng, toPolarAng)
                         self.assertAlmostEqual(dist, fromCoord.angularSeparation(toCoord))
                         self.assertAlmostEqual(fromOrient, fromCoord.angleTo(toCoord))
+                        self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.angleTo(fromCoord), toOrient))
 
 
 if __name__ == '__main__':

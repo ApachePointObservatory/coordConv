@@ -14,9 +14,11 @@ namespace coordConv {
         Coord toCoord = convertFrom(fromCoordSys, fromCoord, site);
 
         double const FromDist = 1e-3;
-        Coord offFromCoord = fromCoord.offset(toDir, fromDir, FromDist);
+        double dumDir;
+        Coord offFromCoord = fromCoord.offset(dumDir, fromDir, FromDist);
         Coord offToCoord = convertFrom(fromCoordSys, offFromCoord, site);
         scaleChange = toCoord.angularSeparation(offToCoord) / FromDist;
+        toDir = toCoord.angleTo(offToCoord);
         return toCoord;
     }
     

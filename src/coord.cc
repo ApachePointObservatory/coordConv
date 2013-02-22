@@ -138,19 +138,49 @@ namespace coordConv {
     }
     
     Coord Coord::offset(double &toOrient, double fromOrient, double dist) const {
-        double fromEquatAng, fromPolarAng;
-        getSphPos(fromEquatAng, fromPolarAng);
-        double sideA = 90.0 - fromPolarAng;
-        double angB = 90.0 - fromOrient;
-        double sideC = dist;
-        double angA, sideB, angC;
-        if (angSideAng(angA, sideB, angC, sideA, angB, sideC)) {
-            throw std::runtime_error("Cannot compute");
+        if (atPole()) {
+            throw std::runtime_error("cannot offset; at pole");
         }
-        double toEquatAng = fromEquatAng + angC;
-        double toPolarAng = 90.0 - sideB;
-        toOrient = angA - 90.0;
-        return Coord(toEquatAng, toPolarAng);
+
+        // code is a minor adaptation of LSST afw Coord::offset
+
+        // We must transofmr
+        // To do the rotation, compute a rotation matrix based on axis of rotation.
+        // The axis of rotation is given by _pos x v,
+        // where:
+        // - _pos is the vector position of this coord
+        // - v is a unit vector in the direction of the great circle offset (tangent to the sphere at _pos),
+        // computed as follows:
+        // let u = unit vector lying on a parallel of declination
+        // let w = unit vector along line of longitude = r x u
+        // the vector v must satisfy the following:
+        // r . v = 0
+        // u . v = cos(fromOrient)
+        // w . v = sin(fromOrient)
+
+        // v is a linear combination of u and w
+        // v = cos(fromOrient)*u + sin(fromOrient)*w
+    
+        // Thus, we must:
+        // - create u vector
+        // - solve w vector (r cross u)
+        // - compute v
+        Eigen::Vector3d uloc;
+        double equatAng, polarAng;
+        getSphPos(equatAng, polarAng);
+        uloc << -sind(equatAng), cosd(equatAng), 0.0;
+        Eigen::Vector3d wloc = (_pos / _dist).cross(uloc);
+        Eigen::Vector3d vloc = cosd(fromOrient)*uloc + sind(fromOrient)*wloc;
+
+        // take r x vloc to get the axis
+        Eigen::Vector3d axisVector = (_pos / _dist).cross(vloc);
+        Eigen::Matrix3d rotMat;
+        computeRotationMatrix(rotMat, axisVector, dist);
+        Eigen::Vector3d toPos = rotMat * _pos;
+        Eigen::Vector3d toVel = rotMat * _vel;
+        Coord toCoord(toPos, toVel);
+        toOrient = wrapCtr(180 + toCoord.angleTo(*this));
+        return toCoord;
     }
 
     void Coord::_setPosFromSph(double equatAng, double polarAng, double parallax) {

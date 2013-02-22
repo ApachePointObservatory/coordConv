@@ -111,5 +111,13 @@ namespace coordConv {
     @param[in] theta: angle of vector from x axis (degrees)
     */
     void xyFromPolar(double &x, double &y, double r, double theta);
-
+        
+    /**
+    Compute a rotation matrix given an axis and rotation angle
+    
+    @param[out] rotMat: rotation matrix
+    @param[in] axis: axis of rotation (magnitude is ignored, but must be finite and nonzero)
+    @param[in] rotAngle: rotation angle (deg)
+    */
+    void computeRotationMatrix(Eigen::Matrix3d &rotMat, Eigen::Vector3d const &axis, double rotAngle);
 }
