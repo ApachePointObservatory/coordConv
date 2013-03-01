@@ -122,10 +122,13 @@ class TestCoordConv(unittest.TestCase):
                     self.assertLess(toCoord.angularSeparation(refToCoord), atol)
                     self.assertTrue(numpy.allclose(predList, refList, atol=atol))
                     self.assertAlmostEqual(refToDir, coordConv.wrapNear(toDir, refToDir), places=3)
-# scale change bears very little resemblance between old and new. Does this have anything to do with
-# handling proper motion differently (removing it before computing things in the old TCC,
-# keeping it around in the new code)?
+# scale change bears very little resemblance between old and new.
+# I believe this is a bug in the old TCC, since mean->mean should be 1.0
+# and the new code is significantly closer to 1.0 than the old code.
+# However, if it is a bug in the TCC I would like to find it.
 #                    self.assertAlmostEqual(refScaleChange, scaleChange, places=5)
+                    if (fromSysCode > 0) and (toSysCode > 0):
+                        self.assertAlmostEqual(scaleChange, 1.0, places=5)
                 except Exception:
                     print "Failed on line %s: %s" % (lineInd + 1, line)
                     print "fromCoordSys=(%s, %s); toCoordSys=(%s, %s)" % (fromCoordSys.getName(), fromCoordSys.getDate(), toCoordSys.getName(), toCoordSys.getDate())
