@@ -26,6 +26,7 @@ namespace coordConv {
     const double MJD_UnixTime = 40587 * SecPerDay;  // MJD (seconds) - unix time
         // unix time is 0 at 1970-01-01 00:00:00; unix time = JD − 2,440,587.5 (days)
         // MJD is 0 at 1858-11-17 00:00:00;             MJD = JD − 2,400,000.5 (days)
+    const double MJDJ2000 = 51544.5;            // Modified Julian Date at epoch J2000.0 noon (days)
     const double AngstromsPerMicron = 1.0e4;
     const double PascalsPerMillibar = 100.0;
 

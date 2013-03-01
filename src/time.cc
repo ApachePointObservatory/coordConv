@@ -20,11 +20,11 @@ namespace coordConv {
     
     double julianEpochFromMJDSec(double mjdSec) {
         double mjdDays = mjdSec / SecPerDay;
-        return 2000.0 + ((mjdDays - 51544.5) / DaysPerYear);
+        return 2000.0 + ((mjdDays - MJDJ2000) / DaysPerYear);
     }
     
     double mjdSecFromJulianEpoch(double julianEpoch) {
-        double mjdDays = 51544.5 + ((julianEpoch - 2000) * DaysPerYear);
+        double mjdDays = MJDJ2000 + ((julianEpoch - 2000) * DaysPerYear);
         return mjdDays * SecPerDay;
     }
         
