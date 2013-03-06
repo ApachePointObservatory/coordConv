@@ -3,6 +3,7 @@
 #include <limits>
 #include <map>
 #include <string>
+#include "Eigen/Dense"
 
 namespace coordConv {
     
@@ -125,11 +126,11 @@ namespace coordConv {
         Eigen::Vector3d const getVecPos() const { return _pos; }
 
         /**
-        Get the cartesian velocity
+        Get the cartesian proper motion and radial velocity
         
-        @return cartesian velocity (AU/year)
+        @return cartesian proper motion and radial velocity (AU/year)
         */
-        Eigen::Vector3d const getVecVel() const { return _vel; }
+        Eigen::Vector3d const getVecPM() const { return _pm; }
 
         /**
         Compute the angular separation from another coord
@@ -174,11 +175,11 @@ namespace coordConv {
         Coord offset(double &toOrient, double fromOrient, double dist) const;
     
     private:
-        Eigen::Vector3d _pos;
-        Eigen::Vector3d _vel;
-        double _dist;
-        bool _atInfinity;
-        bool _atPole;
+        Eigen::Vector3d _pos;   // vector position (AU)
+        Eigen::Vector3d _pm;    // vector proper motion and radial velocity (AU/year)
+        double _dist;           // distance (AU); a cache of _pos.norm()
+        bool _atInfinity;       // true if distance far enough; a cached value
+        bool _atPole;           // true if very near the pole; a cached value
         
         /**
         Set _pos from spherical position; used by several constructors
@@ -187,14 +188,14 @@ namespace coordConv {
         @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
         @param[in] parallax: parallax (arcsec)
 
-        @warning Does not set _vel
+        @warning Does not set _pm
         */
         void _setPosFromSph(double equatAng, double polarAng, double parallax);
         
         /**
         Set various cached information
         
-        _pos must be set before you call this; _vel need not be set.
+        _pos must be set before you call this; _pm need not be set.
         */
         void _setCache();
     };

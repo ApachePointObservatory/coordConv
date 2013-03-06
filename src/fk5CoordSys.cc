@@ -41,15 +41,15 @@ namespace coordConv {
         double const toDate = this->_date;
         
         Eigen::Vector3d fk5J2000Pos = coord.getVecPos();
-        Eigen::Vector3d fk5J2000Vel = coord.getVecVel();
+        Eigen::Vector3d fk5J2000PM = coord.getVecPM();
         
         // correct for velocity (proper motion and radial velocity)
-        Eigen::Vector3d tempPos = fk5J2000Pos + (fk5J2000Vel * (toDate - fromDate));
+        Eigen::Vector3d tempPos = fk5J2000Pos + (fk5J2000PM * (toDate - fromDate));
 
         // precess position and velocity
         Eigen::Vector3d fk5Pos, fk5Vel;
         fk5Pos = _to2000PrecMat.transpose() * tempPos;
-        fk5Vel = _to2000PrecMat.transpose() * fk5J2000Vel;
+        fk5Vel = _to2000PrecMat.transpose() * fk5J2000PM;
         
         return Coord(fk5Pos, fk5Vel);
     };
@@ -60,17 +60,17 @@ namespace coordConv {
         double const toDate = 2000.0;
         
         Eigen::Vector3d fk5Pos = coord.getVecPos();
-        Eigen::Vector3d fk5Vel = coord.getVecVel();
+        Eigen::Vector3d fk5Vel = coord.getVecPM();
         
         // correct for velocity (proper motion and radial velocity)
         Eigen::Vector3d tempPos = fk5Pos + (fk5Vel * (toDate - fromDate));
 
         // precess position and velocity
-        Eigen::Vector3d fk5J2000Pos, fk5J2000Vel;
+        Eigen::Vector3d fk5J2000Pos, fk5J2000PM;
         fk5J2000Pos = _to2000PrecMat * tempPos;
-        fk5J2000Vel = _to2000PrecMat * fk5Vel;
+        fk5J2000PM = _to2000PrecMat * fk5Vel;
         
-        return Coord(fk5J2000Pos, fk5J2000Vel);
+        return Coord(fk5J2000Pos, fk5J2000PM);
     };
 
 }

@@ -33,15 +33,15 @@ namespace coordConv {
         
         // adjust space velocity
         Eigen::Vector3d fk5J2000Pos = coord.getVecPos();
-        Eigen::Vector3d fk5J2000Vel = coord.getVecVel();
-        Eigen::Vector3d adjIcrsPos = fk5J2000Pos + (fk5J2000Vel * (toDate - fromDate));
+        Eigen::Vector3d fk5J2000PM = coord.getVecPM();
+        Eigen::Vector3d adjIcrsPos = fk5J2000Pos + (fk5J2000PM * (toDate - fromDate));
     
         // convert position to galactic coordinates
-        Eigen::Vector3d galPos, galVel;
+        Eigen::Vector3d galPos, galPM;
         galPos =  _fromFK5J2000RotMat * adjIcrsPos;
-        galVel =  _fromFK5J2000RotMat * fk5J2000Vel;
+        galPM =  _fromFK5J2000RotMat * fk5J2000PM;
         
-        return Coord(galPos, galVel);
+        return Coord(galPos, galPM);
     }
     
     Coord GalCoordSys::toFK5J2000(Coord const &coord, Site const &site) const {
@@ -50,15 +50,15 @@ namespace coordConv {
 
         // correct for velocity (proper motion and radial velocity)
         Eigen::Vector3d galPos = coord.getVecPos();
-        Eigen::Vector3d galVel = coord.getVecVel();
-        Eigen::Vector3d adjGalPos = galPos + (galVel * (toDate - fromDate));
+        Eigen::Vector3d galPM = coord.getVecPM();
+        Eigen::Vector3d adjGalPos = galPos + (galPM * (toDate - fromDate));
 
         // convert position to J2000 coordinates (by INVERSE rotation)
-        Eigen::Vector3d fk5J2000Pos, fk5J2000Vel;
+        Eigen::Vector3d fk5J2000Pos, fk5J2000PM;
         fk5J2000Pos = _fromFK5J2000RotMat.transpose() * adjGalPos;
-        fk5J2000Vel = _fromFK5J2000RotMat.transpose() * galVel;
+        fk5J2000PM = _fromFK5J2000RotMat.transpose() * galPM;
         
-        return Coord(fk5J2000Pos, fk5J2000Vel);
+        return Coord(fk5J2000Pos, fk5J2000PM);
     }
 
 }

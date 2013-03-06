@@ -8,4 +8,6 @@
 #include "coordConv/rotXY.h"
 #include "coordConv/site.h"
 #include "coordConv/coord.h"
+#include "coordConv/pvt.h"
+#include "coordConv/pvtCoord.h"
 #include "coordConv/coordSys.h"

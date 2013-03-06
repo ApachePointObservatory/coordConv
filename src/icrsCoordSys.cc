@@ -24,12 +24,12 @@ namespace coordConv {
         double const toDate = this->_date;
         
         Eigen::Vector3d fromPos = coord.getVecPos();
-        Eigen::Vector3d fromVel = coord.getVecVel();
+        Eigen::Vector3d fromPM = coord.getVecPM();
         
         // correct for velocity (proper motion and radial velocity)
-        Eigen::Vector3d toPos = fromPos + (fromVel * (toDate - fromDate));
+        Eigen::Vector3d toPos = fromPos + (fromPM * (toDate - fromDate));
         
-        return Coord(toPos, fromVel);
+        return Coord(toPos, fromPM);
     };
     
     Coord ICRSCoordSys::toFK5J2000(Coord const &coord, Site const &site) const {
@@ -38,12 +38,12 @@ namespace coordConv {
         double const toDate = 2000.0;
         
         Eigen::Vector3d fromPos = coord.getVecPos();
-        Eigen::Vector3d fromVel = coord.getVecVel();
+        Eigen::Vector3d fromPM = coord.getVecPM();
         
         // correct for velocity (proper motion and radial velocity)
-        Eigen::Vector3d toPos = fromPos + (fromVel * (toDate - fromDate));
+        Eigen::Vector3d toPos = fromPos + (fromPM * (toDate - fromDate));
         
-        return Coord(toPos, fromVel);
+        return Coord(toPos, fromPM);
     };
     
 }

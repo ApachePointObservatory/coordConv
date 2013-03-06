@@ -53,10 +53,10 @@ namespace coordConv {
     Coord AppGeoCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
         
         Eigen::Vector3d fk5J2000Pos = coord.getVecPos();
-        Eigen::Vector3d fk5J2000Vel = coord.getVecVel();
+        Eigen::Vector3d fk5J2000PM = coord.getVecPM();
 
         // correct for velocity and Earth's offset from the barycenter
-        Eigen::Vector3d pos1 = fk5J2000Pos + (fk5J2000Vel * _pmSpan) - _bcPos;
+        Eigen::Vector3d pos1 = fk5J2000Pos + (fk5J2000PM * _pmSpan) - _bcPos;
 
         // here is where the correction for sun's gravity belongs
         Eigen::Vector3d pos2 = pos1;

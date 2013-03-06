@@ -6,6 +6,7 @@
 #include "boost/shared_ptr.hpp"
 #include "coordConv/site.h"
 #include "coordConv/coord.h"
+#include "coordConv/pvtCoord.h"
 
 namespace coordConv {
     
@@ -88,6 +89,16 @@ namespace coordConv {
         virtual Coord convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site) const;
         
         /**
+        Convert a PVTCoord from another coordinate system to this system
+        
+        @param[in] fromCoordSys: initial coordinate system and date
+        @param[in] fromPVTCoord: initial PVTCoord
+        @param[in] site: site information
+        @return PVTCoord in this coordinate system at this date
+        */
+        virtual PVTCoord convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site) const;
+        
+        /**
         Convert a coordinate from another coordinate system to this system, including orientation
         
         @param[out] toDir: orientation in this coordinate system (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
@@ -99,6 +110,19 @@ namespace coordConv {
         @return position in this coordinate system
         */
         virtual Coord convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const;
+        
+        /**
+        Convert a PVTCoord from another coordinate system to this system, including orientation
+        
+        @param[out] toDir: orientation in this coordinate system (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
+        @param[out] scaleChange: change in scale: output delta sky/input delta sky, measured along the specified direction
+        @param[in] fromCoordSys: initial coordinate system
+        @param[in] fromCoord: initial position
+        @param[in] fromDir: initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
+        @param[in] site: site information
+        @return position in this coordinate system
+        */
+        virtual PVTCoord convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site) const;
         
         /**
         Convert TAI (MJD, seconds) to a suitable date for this coordinate system

@@ -17,7 +17,7 @@ namespace coordConv {
     Coord MeanCoordSys::removePM(Coord const &coord, double tai) const {
         double epoch = dateFromTAI(tai);
 
-        Eigen::Vector3d corrPos = coord.getVecPos() + ((epoch - this->_date) * coord.getVecVel());
+        Eigen::Vector3d corrPos = coord.getVecPos() + ((epoch - this->_date) * coord.getVecPM());
         return Coord(corrPos);
     }
 

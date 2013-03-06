@@ -10,7 +10,7 @@ namespace coordConv {
     Coord::Coord(double equatAng, double polarAng, double parallax) {
         _setPosFromSph(equatAng, polarAng, parallax);
         _setCache();
-        _vel.setZero();
+        _pm.setZero();
     }
 
     Coord::Coord(double equatAng, double polarAng, double parallax, double equatPM, double polarPM, double radVel) {
@@ -35,7 +35,7 @@ namespace coordConv {
 //        const double radVelAUPerYear = _atInfinity ? 0 : radVel * AUPerYear_per_KmPerSec;
 
         // compute velocity vector in au/year
-        _vel <<
+        _pm <<
             - (pmAUPerYear2 * sinPolar * cosEquat) - (pmAUPerYear1 * cosPolar * sinEquat) + (radVelAUPerYear * cosPolar * cosEquat),
             - (pmAUPerYear2 * sinPolar * sinEquat) + (pmAUPerYear1 * cosPolar * cosEquat) + (radVelAUPerYear * cosPolar * sinEquat),
             + (pmAUPerYear2 * cosPolar)                                                   + (radVelAUPerYear * sinPolar);
@@ -44,16 +44,16 @@ namespace coordConv {
     Coord::Coord(Eigen::Vector3d const &pos)
     :
         _pos(pos),
-        _vel()
+        _pm()
     {
         _setCache();
-        _vel.setZero();
+        _pm.setZero();
     }
 
     Coord::Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &vel)
     :
         _pos(pos),
-        _vel(vel)
+        _pm(vel)
     {
         _setCache();
     }
@@ -84,9 +84,9 @@ namespace coordConv {
         double x  = _pos(0);
         double y  = _pos(1);
         double z  = _pos(2);
-        double vX = _vel(0);
-        double vY = _vel(1);
-        double vZ = _vel(2);
+        double vX = _pm(0);
+        double vY = _pm(1);
+        double vZ = _pm(2);
     
         // now that radial velocity has been computed
         // handle the "at pole" case
@@ -117,8 +117,8 @@ namespace coordConv {
     double Coord::getRadVel() const {
         // compute radial velocity in (au/year) and convert to (km/s)
         double const KMPerSec_per_AUPerYear = KmPerAU / (DaysPerYear * SecPerDay);
-        return (_pos / _dist).dot(_vel) * KMPerSec_per_AUPerYear;
-//        return _atInfinity ? 0 : _pos.dot(_vel) * KMPerSec_per_AUPerYear / _dist;
+        return (_pos / _dist).dot(_pm) * KMPerSec_per_AUPerYear;
+//        return _atInfinity ? 0 : _pos.dot(_pm) * KMPerSec_per_AUPerYear / _dist;
     }
     
     double Coord::angularSeparation(Coord const &coord) const {
@@ -177,7 +177,7 @@ namespace coordConv {
         Eigen::Matrix3d rotMat;
         computeRotationMatrix(rotMat, axisVector, dist);
         Eigen::Vector3d toPos = rotMat * _pos;
-        Eigen::Vector3d toVel = rotMat * _vel;
+        Eigen::Vector3d toVel = rotMat * _pm;
         Coord toCoord(toPos, toVel);
         toOrient = wrapCtr(180 + toCoord.angleTo(*this));
         return toCoord;

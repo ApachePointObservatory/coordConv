@@ -49,8 +49,8 @@ class TestCoord(unittest.TestCase):
                                 )
                                 self.assertTrue(numpy.allclose(predVecPos, vecPos))
                                 
-                                # check vector velocity
-                                vecVel = coord.getVecVel()
+                                # check vector proper motion
+                                vecPM = coord.getVecPM()
                                 RadPerYear_per_ArcsecPerCentury = RadPerDeg / (ArcsecPerDeg * 100.0)
                                 SecPerYear = SecPerDay * DaysPerYear
                                 AUPerYear_per_KmPerSec = SecPerYear / KmPerAU
@@ -67,12 +67,12 @@ class TestCoord(unittest.TestCase):
                                 # change units of radial velocity from km/sec to au/year
                                 radVelAUPerYear = radVel * AUPerYear_per_KmPerSec
                                 
-                                predVecVel = (
+                                predVecPM = (
                                     - (pmAUPerYear2 * sinPolar * cosEquat) - (pmAUPerYear1 * cosPolar * sinEquat) + (radVelAUPerYear * cosPolar * cosEquat),
                                     - (pmAUPerYear2 * sinPolar * sinEquat) + (pmAUPerYear1 * cosPolar * cosEquat) + (radVelAUPerYear * cosPolar * sinEquat),
                                     + (pmAUPerYear2 * cosPolar)                                                   + (radVelAUPerYear * sinPolar),
                                 )
-                                self.assertTrue(numpy.allclose(predVecVel, vecVel))
+                                self.assertTrue(numpy.allclose(predVecPM, vecPM))
 
                                 # check round trip
                                 atPole, destEquatAng, destPolarAng = coord.getSphPos()

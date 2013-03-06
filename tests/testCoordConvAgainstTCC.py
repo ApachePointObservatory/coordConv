@@ -154,8 +154,8 @@ class TestCoordConv(unittest.TestCase):
                     print "pred parallax, PM and radVel=", predList
                     print "ref  parallax, PM and radVel=", refList
                     print "from parallax, PM and radVel=", (fromParallax, fromPM1, fromPM2, fromRadVel)
-                    print "from vec pos, vel=", fromCoord.getVecPos(), fromCoord.getVecVel()
-                    print "to   vec pos, vel=", toCoord.getVecPos(),  toCoord.getVecVel()
+                    print "from vec pos, vel=", fromCoord.getVecPos(), fromCoord.getVecPM()
+                    print "to   vec pos, vel=", toCoord.getVecPos(),  toCoord.getVecPM()
                     raise
         duration = time.time() - startTime
         print "Tested %d conversions in %0.2f seconds: %0.0f conversions/second" % \

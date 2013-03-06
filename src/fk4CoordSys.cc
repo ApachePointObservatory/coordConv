@@ -106,18 +106,18 @@ namespace coordConv {
 
     Coord FK4CoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
         Eigen::Vector3d fk5J2000Pos = coord.getVecPos();
-        Eigen::Vector3d fk5J2000Vel = coord.getVecVel();
+        Eigen::Vector3d fk5J2000PM = coord.getVecPM();
 
         // convert position and velocity from J2000.0 to B1950
-        Eigen::Vector3d b1950Pos = (fromFK5J2000PP * fk5J2000Pos) + (fromFK5J2000PV * fk5J2000Vel);
-        Eigen::Vector3d b1950Vel = (fromFK5J2000VP * fk5J2000Pos) + (fromFK5J2000VV * fk5J2000Vel);
+        Eigen::Vector3d b1950Pos = (fromFK5J2000PP * fk5J2000Pos) + (fromFK5J2000PV * fk5J2000PM);
+        Eigen::Vector3d b1950Vel = (fromFK5J2000VP * fk5J2000Pos) + (fromFK5J2000VV * fk5J2000PM);
 
         // correct position for velocity (PM and rad. vel.) from 1950 to date
         Eigen::Vector3d tempPos = b1950Pos + ((this->_date - 1950.0) * b1950Vel);
 
         // precess position and velocity from 1950 to date
         Eigen::Vector3d meanToPos = _From1950PrecMat * tempPos;
-        Eigen::Vector3d fk4Vel    = _From1950PrecMat * b1950Vel;
+        Eigen::Vector3d fk4PM     = _From1950PrecMat * b1950Vel;
 
         // add e-terms to mean position, iterating thrice (should be plenty!)
         // to get mean catalog place. As a minor approximation,
@@ -128,19 +128,19 @@ namespace coordConv {
             fk4Pos = meanToPos + (magPos * _eTerms);
         }
         
-        return Coord(fk4Pos, fk4Vel);
+        return Coord(fk4Pos, fk4PM);
     };
      
     Coord FK4CoordSys::toFK5J2000(Coord const &coord, Site const &site) const {
         // use the excellent approximation that ICRS = FK4 J2000
         Eigen::Vector3d fk4Pos = coord.getVecPos();
-        Eigen::Vector3d fk4Vel = coord.getVecVel();
+        Eigen::Vector3d fk4PM = coord.getVecPM();
 
         // subtract e-terms from position
         double magPos = fk4Pos.norm();
         Eigen::Vector3d meanFK4Pos = fk4Pos - (magPos * _eTerms);
         
-        if ((fk4Vel.array() == 0.0).all()) {
+        if ((fk4PM.array() == 0.0).all()) {
             // object is fixed on the sky; handle FK4 fictitious proper motion
             
             // precess position and velocity to B1950
@@ -160,17 +160,17 @@ namespace coordConv {
             // proper motion specified
 
             // correct position for velocity (proper motion and radial velocity) to B1950
-            Eigen::Vector3d corrPos = meanFK4Pos + (1950.0 - this->_date) * fk4Vel;
+            Eigen::Vector3d corrPos = meanFK4Pos + (1950.0 - this->_date) * fk4PM;
 
             // precess position and velocity to B1950
             Eigen::Vector3d fk41950Pos = _To1950PrecMat * corrPos;
-            Eigen::Vector3d fk41950Vel = _To1950PrecMat * fk4Vel;
+            Eigen::Vector3d fk41950Vel = _To1950PrecMat * fk4PM;
 
             // convert position and velocity to J2000.0
             Eigen::Vector3d fk5J2000Pos = (toFK5J2000PP * fk41950Pos) + (toFK5J2000PV * fk41950Vel);
-            Eigen::Vector3d fk5J2000Vel = (toFK5J2000VP * fk41950Pos) + (toFK5J2000VV * fk41950Vel);
+            Eigen::Vector3d fk5J2000PM = (toFK5J2000VP * fk41950Pos) + (toFK5J2000VV * fk41950Vel);
 
-            return Coord(fk5J2000Pos, fk5J2000Vel);
+            return Coord(fk5J2000Pos, fk5J2000PM);
         }
     };
    

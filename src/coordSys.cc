@@ -3,11 +3,23 @@
 #include "boost/make_shared.hpp"
 #include "coordConv/coordSys.h"
 
+namespace {
+    const double DeltaT = 0.01;
+}
+
 namespace coordConv {
     
     Coord CoordSys::convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site) const {
         Coord icrsCoord = fromCoordSys.toFK5J2000(fromCoord, site);
         return fromFK5J2000(icrsCoord, site);
+    }
+
+    PVTCoord CoordSys::convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site) const {
+        double const tai0 = fromPVTCoord.getTAI();
+        double const tai1 = tai0 + DeltaT;
+        Coord coord0 = this->convertFrom(fromCoordSys, fromPVTCoord.getCoord(tai0), site);
+        Coord coord1 = this->convertFrom(fromCoordSys, fromPVTCoord.getCoord(tai1), site);
+        return PVTCoord(coord0, coord1, tai0, DeltaT);
     }
 
     Coord CoordSys::convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const {
@@ -20,6 +32,16 @@ namespace coordConv {
         scaleChange = toCoord.angularSeparation(offToCoord) / FromDist;
         toDir = toCoord.angleTo(offToCoord);
         return toCoord;
+    }
+
+    PVTCoord CoordSys::convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site) const {
+        double const tai0 = fromPVTCoord.getTAI();
+        double const tai1 = tai0 + DeltaT;
+        double toDirPair[2], dumScaleCh;
+        Coord coord0 = this->convertFrom(toDirPair[0], scaleChange, fromCoordSys, fromPVTCoord.getCoord(tai0), fromDir.getPos(tai0), site);
+        Coord coord1 = this->convertFrom(toDirPair[1], dumScaleCh,  fromCoordSys, fromPVTCoord.getCoord(tai1), fromDir.getPos(tai1), site);
+        toDir.setFromAnglePair(toDirPair, tai0, DeltaT);
+        return PVTCoord(coord0, coord1, tai0, DeltaT);
     }
     
     std::string CoordSys::asString() const {
