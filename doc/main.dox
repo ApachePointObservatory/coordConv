@@ -3,17 +3,19 @@
 
 \section coordConv_introduction Introduction
 
-This package provides astronomical coordinate conversions to an accuracy of a small fraction of an arcsecond. It is intended to be suitable for controlling large research telescopes.
+This package provides astronomical coordinate conversions to an accuracy of a small fraction of an arcsecond. It is intended to be suitable for controlling large research telescopes. As such, it can compute velocity as well as position.
 
-The highest-level subroutines are sph::coordConv (for spherical positions, e.g. RA, Dec) and vec::coordConv (for cartesian vector positions). These will convert between any two supported coordinate systems (see coordSys.h for the list).
-
-This package is divided into several parts:
-* sph: routines that use spherical position (e.g. RA, Dec), in degrees. Also includes routines to convert between spherical position and cartesian vector position.
-* vec: routines that use cartesian vectors, with length typically in astronomical units. Includes a set of routines to convert between specific coordinate systems (e.g. appGeoFromICRS).
-* time: the minimum time support required for the above.
-* physConst.h: various physical constants.
-
-The user must provide information about the observatory and current earth orientation data (using the IERS Earth Orientation bulletin if maximum accuracy is wanted) in the Site object described in site.h.
+Contents include:
+* Coord: represents a position on the sky, with proper motion and radial velocity; provides easy access to spherical and cartesian position.
+* Coordinate systems, including ICRSCoordSys, FK5CoordSys, AppGeoCoordSys, AppTopoCoordSys and ObsCoordSys (refracted apparent topocentric). To convert a position from one coordinate system to another:
+  * Construct a Site object (see below)
+  * Construct the from Coord
+  * Construct the from coordinate system (e.g. ICRSCoord)
+  * Constrct the to coordinate system
+  * toCoord = toCoordSys.convertFrom(fromCoordSys, fromCoord, site)
+* PVTCoord: a Coord with velocity
+* Site: information about the observatory, current earth orientation data (using the IERS Earth Orientation bulletin if maximum accuracy is wanted) and refraction coefficients. The contents are required for conversions involving apparent coordinates and are ignored otherwise.
+* PVT: an object representing a position, velocity and time
 
 \section coordConv_conventions Conventions
 
