@@ -10,14 +10,14 @@ namespace coordConv {
 
     AppTopoCoordSys::AppTopoCoordSys(double date)
     :
-        CoordSys("apptopo", date)
+        ApparentCoordSys("apptopo", date)
     {
         setDate(date);
     };
     
     void AppTopoCoordSys::setDate(double date, bool freezeCache) {
         this->_date = date;
-        double ttEpoch = julianEpochFromMJDSec(date + TT_TAI);
+        double ttEpoch = _appGeoCoordSys.dateFromTAI(date);
         if (!freezeCache) {
             _appGeoCoordSys.setDate(ttEpoch);
         } else if (std::abs(_appGeoCoordSys.getDate() - ttEpoch) > (_appGeoCoordSys.getMaxAge() * 2)) {
@@ -33,14 +33,14 @@ namespace coordConv {
         return boost::shared_ptr<CoordSys>(new AppTopoCoordSys(date));
     };
 
-    Coord AppTopoCoordSys::fromICRS(Coord const &coord, Site const &site) const {
-        Coord appGeoCoord = _appGeoCoordSys.fromICRS(coord, site);
+    Coord AppTopoCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
+        Coord appGeoCoord = _appGeoCoordSys.fromFK5J2000(coord, site);
         return fromAppGeo(appGeoCoord, site);
     };
 
-    Coord AppTopoCoordSys::toICRS(Coord const &coord, Site const &site) const {
+    Coord AppTopoCoordSys::toFK5J2000(Coord const &coord, Site const &site) const {
         Coord appGeoCoord = toAppGeo(coord, site);
-        return _appGeoCoordSys.toICRS(appGeoCoord, site);
+        return _appGeoCoordSys.toFK5J2000(appGeoCoord, site);
     };
 
     Coord AppTopoCoordSys::fromAppGeo(Coord const &coord, Site const &site) const {

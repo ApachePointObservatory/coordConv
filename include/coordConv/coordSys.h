@@ -12,14 +12,15 @@ namespace coordConv {
     /**
     Abstract base class for coordinate systems
     
-    Subclasses must define fromICRS and toICRS, and should override setDate if information cached based on date.
+    Subclasses must define fromFK5J2000 and toFK5J2000, and should override setDate if information cached based on date.
     */
     class CoordSys {
     public:
         /**
         Construct a CoordSys given a name and date
         */
-        explicit CoordSys(std::string const &name, double date) : _name(name), _date() { setDate(date); };
+        explicit CoordSys(std::string const &name, bool isMean, double date) :
+            _name(name), _isMean(isMean), _date() { setDate(date); };
         
         ///< Destructor
         virtual ~CoordSys() { };
@@ -40,6 +41,11 @@ namespace coordConv {
         std::string getName() const { return _name; };
         
         /**
+        Return true for a mean coordinate system, false for an apparent coordinate system
+        */
+        bool isMean() const { return _isMean; };
+        
+        /**
         Get the date of this coordinate system
         
         The units depend on the specific coordinate system
@@ -54,22 +60,22 @@ namespace coordConv {
         virtual void setDate(double date) { _date = date; };
         
         /**
-        Convert a coordinate to ICRS at date of observation J2000 from this coordinate system at this date
+        Convert a coordinate to FK5 at date of observation J2000 from this coordinate system at this date
         
         @param[in] coord: position in this coordinate system at this date
         @param[in] site: site information
         @return position in ICRS coordinates at date of observation J2000
         */
-        virtual Coord toICRS(Coord const &coord, Site const &site) const = 0;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const = 0;
         
         /**
-        Convert a coordinate from ICRS at date of observation J2000 to this system at this date
+        Convert a coordinate from FK5 at date of observation J2000 to this system at this date
         
         @param[in] coord: position in ICRS coordinates at date of observation J2000
         @param[in] site: site information
         @return position in this coordinate system at this date
         */
-        virtual Coord fromICRS(Coord const &coord, Site const &site) const = 0;
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const = 0;
         
         /**
         Convert a coordinate from another coordinate system to this system
@@ -94,18 +100,54 @@ namespace coordConv {
         */
         virtual Coord convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const;
         
+        /**
+        Convert TAI (MJD, seconds) to a suitable date for this coordinate system
+        
+        @param[in] tai: TAI date (MJD, seconds)
+        @return date in appropriate units for this coordinate system
+        */
+        virtual double dateFromTAI(double tai) const = 0;
+        
+        /**
+        Remove proper motion and radial velocity to the specified TAI date
+        
+        @param[in] tai: TAI date (MJD, seconds)
+        @return coord with proper motion and radial velocity removed
+        
+        @warning: for apparent coordinate systems it is a null operation; it zeros out PM and radial velocity,
+        but those are ignored for coordinate conversions.
+        */
+        virtual Coord removePM(Coord const &coord, double tai) const = 0;
+        
         ///< get string representation
         virtual std::string asString() const;
     
     protected:
         std::string _name;  /// name of coordinate system
+        bool _isMean;       /// true for mean coordinate systems
         double _date;       /// date of coordinate system (units depend on coordinate system)
+    };
+    
+    class MeanCoordSys: public CoordSys {
+    public:
+        explicit MeanCoordSys(std::string const &name, double date);
+        virtual ~MeanCoordSys() {};
+        virtual double dateFromTAI(double tai) const;
+        virtual Coord removePM(Coord const &coord, double tai) const;
+    };
+    
+    class ApparentCoordSys: public CoordSys {
+    public:
+        explicit ApparentCoordSys(std::string const &name, double date);
+        virtual ~ApparentCoordSys() {};
+        virtual double dateFromTAI(double tai) const;
+        virtual Coord removePM(Coord const &coord, double tai) const;
     };
 
     /**
     ICRS RA, Dec; date is Julian years
     */
-    class ICRSCoordSys: public CoordSys {
+    class ICRSCoordSys: public MeanCoordSys {
     public:
         /**
         Construct an ICRSCoordSys
@@ -116,14 +158,14 @@ namespace coordConv {
         virtual ~ICRSCoordSys() {};
         virtual boost::shared_ptr<CoordSys> clone() const;
         virtual boost::shared_ptr<CoordSys> clone(double date) const;
-        virtual Coord fromICRS(Coord const &coord, Site const &site) const;
-        virtual Coord toICRS(Coord const &coord, Site const &site) const;
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
     };
     
     /**
     FK5 RA, Dec; date is Julian years, and is both the date of observation and the date of equinox
     */
-    class FK5CoordSys: public CoordSys {
+    class FK5CoordSys: public MeanCoordSys {
     public:
         /**
         Construct an FK5CoordSys
@@ -135,8 +177,8 @@ namespace coordConv {
         virtual boost::shared_ptr<CoordSys> clone() const;
         virtual boost::shared_ptr<CoordSys> clone(double date) const;
         virtual void setDate(double date);
-        virtual Coord fromICRS(Coord const &coord, Site const &site) const;
-        virtual Coord toICRS(Coord const &coord, Site const &site) const;
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
 
     private:
         Eigen::Matrix3d _to2000PrecMat; /// precession matrix from date to J2000.0
@@ -150,7 +192,7 @@ namespace coordConv {
     If any component of propoer motion or radial velocity is nonzero, then all components are treated
     as correct. Thus it is usually safest not to specify radial velocity for FK4 targets.
     */
-    class FK4CoordSys: public CoordSys {
+    class FK4CoordSys: public MeanCoordSys {
     public:
         /**
         Construct an FK4CoordSys
@@ -162,8 +204,10 @@ namespace coordConv {
         virtual boost::shared_ptr<CoordSys> clone() const;
         virtual boost::shared_ptr<CoordSys> clone(double date) const;
         virtual void setDate(double date);
-        virtual Coord fromICRS(Coord const &coord, Site const &site) const;
-        virtual Coord toICRS(Coord const &coord, Site const &site) const;
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual double dateFromTAI(double tai) const;
+        virtual Coord removePM(Coord const &coord, double tai) const;
 
     private:
         Eigen::Vector3d _eTerms;
@@ -177,7 +221,7 @@ namespace coordConv {
       P.T. Wallace, slaEqGal, a SLALIB subroutine; Starlink, RGO
       Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
     */
-    class GalCoordSys: public CoordSys {
+    class GalCoordSys: public MeanCoordSys {
     public:
         /**
         Construct a GalCoordSys
@@ -188,8 +232,8 @@ namespace coordConv {
         virtual ~GalCoordSys() {};
         virtual boost::shared_ptr<CoordSys> clone() const;
         virtual boost::shared_ptr<CoordSys> clone(double date) const;
-        virtual Coord fromICRS(Coord const &coord, Site const &site) const;
-        virtual Coord toICRS(Coord const &coord, Site const &site) const;
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
     };
 
     /**
@@ -207,7 +251,7 @@ namespace coordConv {
     - No correction is applied for the bending of light by sun's gravity.
     This introduces errors on the order of 0.02" at a distance of 20 degrees from the sun (Wallace, 1986)
     */    
-    class AppGeoCoordSys: public CoordSys {
+    class AppGeoCoordSys: public ApparentCoordSys {
     public:
         /**
         Construct an AppGeoCoordSys
@@ -220,11 +264,12 @@ namespace coordConv {
         virtual boost::shared_ptr<CoordSys> clone() const;
         virtual boost::shared_ptr<CoordSys> clone(double date) const;
         virtual void setDate(double date);
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual double dateFromTAI(double tai) const;
         
         /// return maximum delta date (years) before setDate will update the internal cache
         virtual double getMaxAge() const { return _maxAge; };
-        virtual Coord fromICRS(Coord const &coord, Site const &site) const;
-        virtual Coord toICRS(Coord const &coord, Site const &site) const;
 
     private:
         double _maxAge;             ///< maximum date differential to reuse cache (years)
@@ -241,7 +286,7 @@ namespace coordConv {
     /**
     Apparent Topocentric Az,Alt; date is TAI (MJD, seconds)
     */
-    class AppTopoCoordSys: public CoordSys {
+    class AppTopoCoordSys: public ApparentCoordSys {
     public:
         /**
         Construct an AppTopoCoordSys
@@ -253,6 +298,9 @@ namespace coordConv {
         virtual boost::shared_ptr<CoordSys> clone() const;
         virtual boost::shared_ptr<CoordSys> clone(double date) const;
         virtual void setDate(double date) { setDate(date, false); };
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+
         /**
         Set the date and optionally freeze cached apparent geocentric data
         
@@ -263,13 +311,29 @@ namespace coordConv {
         Set freezeCache true for the second computation to avoid an unexpected cache update causing
         a mis-computation of velocity.
         
+        @note The standard setDate, with no freezeCache, argument does not freeze the cache.
+        
         @raise std::runtime_error if freezeCache true and delta date > AppGeoCoordSys's default MaxAge * 2;
         this is only intended to catch gross errors
         */
         virtual void setDate(double date, bool freezeCache);
-        virtual Coord fromICRS(Coord const &coord, Site const &site) const;
-        virtual Coord toICRS(Coord const &coord, Site const &site) const;
+
+        /**
+        Convert from apparent geocentric coordinates at this date
+
+        @param[in] coord: initial position
+        @param[in] site: site information
+        @return position in this coordinate system at this date
+        */
         virtual Coord fromAppGeo(Coord const &coord, Site const &site) const;
+
+        /**
+        Convert to apparent geocentric coordinates at this date
+
+        @param[in] coord: initial position
+        @param[in] site: site information
+        @return position in apparent geocentric coordinates at this date
+        */
         virtual Coord toAppGeo(Coord const &coord, Site const &site) const;
 
     private:
@@ -279,7 +343,7 @@ namespace coordConv {
     /**
     Observed Az,Alt (Apparent Topocentric with atmospheric refraction); date is TAI (MJD, seconds)
     */
-    class ObsCoordSys: public CoordSys {
+    class ObsCoordSys: public ApparentCoordSys {
     public:
         /**
         Construct an ObsCoordSys
@@ -290,6 +354,12 @@ namespace coordConv {
         virtual ~ObsCoordSys() {};
         virtual boost::shared_ptr<CoordSys> clone() const;
         virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual void setDate(double date) { setDate(date, false); };
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord fromAppTopo(Coord const &coord, Site const &site) const;
+        virtual Coord toAppTopo(Coord const &coord, Site const &site) const;
+
         /**
         Set the date and optionally freeze cached apparent geocentric data
         
@@ -300,15 +370,12 @@ namespace coordConv {
         Set freezeCache true for the second computation to avoid an unexpected cache update causing
         a mis-computation of velocity.
         
+        @note The standard setDate, with no freezeCache, argument does not freeze the cache.
+        
         @raise std::runtime_error if freezeCache true and delta date > AppGeoCoordSys's default MaxAge * 2;
         this is only intended to catch gross errors
         */
-        virtual void setDate(double date) { setDate(date, false); };
         virtual void setDate(double date, bool freezeCache);
-        virtual Coord fromICRS(Coord const &coord, Site const &site) const;
-        virtual Coord toICRS(Coord const &coord, Site const &site) const;
-        virtual Coord fromAppTopo(Coord const &coord, Site const &site) const;
-        virtual Coord toAppTopo(Coord const &coord, Site const &site) const;
 
     private:
         AppTopoCoordSys _appTopoCoordSys;

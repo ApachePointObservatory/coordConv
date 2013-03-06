@@ -41,21 +41,21 @@ namespace coordConv {
             + (pmAUPerYear2 * cosPolar)                                                   + (radVelAUPerYear * sinPolar);
     }
 
-    Coord::Coord(Eigen::Vector3d &pos, Eigen::Vector3d &vel)
-    :
-        _pos(pos),
-        _vel(vel)
-    {
-        _setCache();
-    }
-
-    Coord::Coord(Eigen::Vector3d &pos)
+    Coord::Coord(Eigen::Vector3d const &pos)
     :
         _pos(pos),
         _vel()
     {
         _setCache();
         _vel.setZero();
+    }
+
+    Coord::Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &vel)
+    :
+        _pos(pos),
+        _vel(vel)
+    {
+        _setCache();
     }
 
     double Coord::getParallax() const {

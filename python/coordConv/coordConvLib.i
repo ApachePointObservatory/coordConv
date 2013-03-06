@@ -58,6 +58,8 @@
 }
 
 %shared_ptr(coordConv::CoordSys);
+%shared_ptr(coordConv::MeanCoordSys);
+%shared_ptr(coordConv::ApparentCoordSys);
 %shared_ptr(coordConv::ICRSCoordSys);
 %shared_ptr(coordConv::FK5CoordSys);
 %shared_ptr(coordConv::FK4CoordSys);

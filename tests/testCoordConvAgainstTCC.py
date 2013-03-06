@@ -129,6 +129,22 @@ class TestCoordConv(unittest.TestCase):
 #                    self.assertAlmostEqual(refScaleChange, scaleChange, places=5)
                     if (fromSysCode > 0) and (toSysCode > 0):
                         self.assertAlmostEqual(scaleChange, 1.0, places=5)
+                
+                    if (fromSysCode > 0) and (toSysCode < -1):
+                        zpmFromCoord = fromCoordSys.removePM(fromCoord, tai)
+                        altToCoord, altToDir, altScaleChange = toCoordSys.convertFrom(fromCoordSys, zpmFromCoord, fromDir, site)
+                        altAtPole, altToPos1, altToPos2 = altToCoord.getSphPos()
+                        altAtPole, zpmToPM1, zpmToPM2 = toCoord.getPM()
+                        zpmToRadVel = toCoord.getRadVel()
+                        
+                        self.assertEqual(atPole, altAtPole)
+                        self.assertAlmostEqual(toDir, altToDir, places=4)
+                        self.assertAlmostEqual(scaleChange, altScaleChange)
+                        self.assertLess(toCoord.angularSeparation(altToCoord), 1e-7)
+                        self.assertAlmostEqual(zpmToPM1, 0)
+                        self.assertAlmostEqual(zpmToPM2, 0)
+                        self.assertAlmostEqual(zpmToRadVel, 0)
+
                 except Exception:
                     print "Failed on line %s: %s" % (lineInd + 1, line)
                     print "fromCoordSys=(%s, %s); toCoordSys=(%s, %s)" % (fromCoordSys.getName(), fromCoordSys.getDate(), toCoordSys.getName(), toCoordSys.getDate())

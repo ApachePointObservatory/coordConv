@@ -44,23 +44,23 @@ namespace coordConv {
         Coord(double equatAng, double polarAng, double parallax, double equatPM, double polarPM, double radVel);
         
         /**
+        Construct a Coord from cartesian position
+        
+        @param[in] pos: cartesian position (AU)
+        @warning: distance is not constrained
+        */
+        Coord(Eigen::Vector3d const &pos);
+        
+        /**
         Construct a Coord from cartesian position and velocity
         
         @param[in] pos: cartesian position (AU)
         @param[in] vel: cartesian velocity (AU/year)
         @warning: distance is not constrained
         */
-        Coord(Eigen::Vector3d &pos, Eigen::Vector3d &vel);
+        Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &vel);
         
         ~Coord() {};
-        
-        /**
-        Construct a Coord from cartesian position
-        
-        @param[in] pos: cartesian position (AU)
-        @warning: distance is not constrained
-        */
-        Coord(Eigen::Vector3d &pos);
     
         /**
         Return true if object is so far away that it is considered to be at infinity
@@ -122,14 +122,14 @@ namespace coordConv {
         
         @return cartesian position (AU)
         */
-        Eigen::Vector3d getVecPos() const { return _pos; }
+        Eigen::Vector3d const getVecPos() const { return _pos; }
 
         /**
         Get the cartesian velocity
         
         @return cartesian velocity (AU/year)
         */
-        Eigen::Vector3d getVecVel() const { return _vel; }
+        Eigen::Vector3d const getVecVel() const { return _vel; }
 
         /**
         Compute the angular separation from another coord

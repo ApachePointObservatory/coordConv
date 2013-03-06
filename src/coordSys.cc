@@ -6,8 +6,8 @@
 namespace coordConv {
     
     Coord CoordSys::convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site) const {
-        Coord icrsCoord = fromCoordSys.toICRS(fromCoord, site);
-        return fromICRS(icrsCoord, site);
+        Coord icrsCoord = fromCoordSys.toFK5J2000(fromCoord, site);
+        return fromFK5J2000(icrsCoord, site);
     }
 
     Coord CoordSys::convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const {

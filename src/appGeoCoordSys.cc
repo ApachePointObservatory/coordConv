@@ -3,13 +3,14 @@
 #include "slalib.h"
 #include "coordConv/mathUtils.h"
 #include "coordConv/physConst.h"
+#include "coordConv/time.h"
 #include "coordConv/coordSys.h"
 
 namespace coordConv {
 
     AppGeoCoordSys::AppGeoCoordSys(double date, double maxAge)
     :
-        CoordSys("appgeo", date),
+        ApparentCoordSys("appgeo", date),
         _maxAge(maxAge),
         _cachedDate(DoubleNaN)
     {
@@ -49,13 +50,13 @@ namespace coordConv {
         }
     }
 
-    Coord AppGeoCoordSys::fromICRS(Coord const &coord, Site const &site) const {
+    Coord AppGeoCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
         
-        Eigen::Vector3d icrsPos = coord.getVecPos();
-        Eigen::Vector3d icrsVel = coord.getVecVel();
+        Eigen::Vector3d fk5J2000Pos = coord.getVecPos();
+        Eigen::Vector3d fk5J2000Vel = coord.getVecVel();
 
         // correct for velocity and Earth's offset from the barycenter
-        Eigen::Vector3d pos1 = icrsPos + (icrsVel * _pmSpan) - _bcPos;
+        Eigen::Vector3d pos1 = fk5J2000Pos + (fk5J2000Vel * _pmSpan) - _bcPos;
 
         // here is where the correction for sun's gravity belongs
         Eigen::Vector3d pos2 = pos1;
@@ -72,11 +73,11 @@ namespace coordConv {
     };
 
     /**
-    Perform the inverse transform of fromICRS.
+    Perform the inverse transform of fromFK5J2000.
     
     Unfortunately, some of the equations (e.g. annual aberration) are not invertable,
     so they have been solved by iteration. To make the code easier to follow, the symbols used here
-    are identical to those used in fromICRS.
+    are identical to those used in fromFK5J2000.
 
     The convergence criterion is set by the magic numbers MaxIter and Accuracy.
 
@@ -88,7 +89,7 @@ namespace coordConv {
       "The Astronomical Almanac" for 1978, U.S. Naval Observatory
       *these use physical units instead of direction cosines
     */    
-    Coord AppGeoCoordSys::toICRS(Coord const &coord, Site const &site) const {
+    Coord AppGeoCoordSys::toFK5J2000(Coord const &coord, Site const &site) const {
         Eigen::Vector3d appGeoPos = coord.getVecPos();
 
         /// if the number of iterations exceeds "MaxIter" before converging, raise an exception
@@ -129,9 +130,13 @@ namespace coordConv {
         Eigen::Vector3d pos1 = pos2;
 
         // correct for Earth's offset from the barycenter
-        Eigen::Vector3d icrsPos = pos1 + _bcPos;
+        Eigen::Vector3d fk5J2000Pos = pos1 + _bcPos;
         
-        return Coord(icrsPos);
+        return Coord(fk5J2000Pos);
+    }
+
+    double AppGeoCoordSys::dateFromTAI(double tai) const {
+        return julianEpochFromMJDSec(tai + TT_TAI);
     }
 
 }

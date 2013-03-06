@@ -7,7 +7,7 @@ namespace coordConv {
 
     ICRSCoordSys::ICRSCoordSys(double date)
     :
-        CoordSys("icrs", date)
+        MeanCoordSys("icrs", date)
     {};
 
     boost::shared_ptr<CoordSys> ICRSCoordSys::clone() const {
@@ -18,7 +18,7 @@ namespace coordConv {
         return boost::shared_ptr<CoordSys>(new ICRSCoordSys(date));
     };
 
-    Coord ICRSCoordSys::fromICRS(Coord const &coord, Site const &site) const {
+    Coord ICRSCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
         // use the excellent approximation that ICRS = ICRS J2000
         double const fromDate = 2000.0;
         double const toDate = this->_date;
@@ -32,7 +32,7 @@ namespace coordConv {
         return Coord(toPos, fromVel);
     };
     
-    Coord ICRSCoordSys::toICRS(Coord const &coord, Site const &site) const {
+    Coord ICRSCoordSys::toFK5J2000(Coord const &coord, Site const &site) const {
         // use the excellent approximation that ICRS = ICRS J2000
         double const fromDate = this->_date;
         double const toDate = 2000.0;

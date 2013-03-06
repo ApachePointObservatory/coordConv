@@ -8,7 +8,7 @@ namespace coordConv {
 
     FK5CoordSys::FK5CoordSys(double date)
     :
-        CoordSys("fk5", date),
+        MeanCoordSys("fk5", date),
         _to2000PrecMat()
     {
         setDate(date);
@@ -35,26 +35,26 @@ namespace coordConv {
         return boost::shared_ptr<CoordSys>(new FK5CoordSys(date));
     };
 
-    Coord FK5CoordSys::fromICRS(Coord const &coord, Site const &site) const {
+    Coord FK5CoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
         // use the excellent approximation that ICRS = FK5 J2000
         double const fromDate = 2000.0;
         double const toDate = this->_date;
         
-        Eigen::Vector3d icrsPos = coord.getVecPos();
-        Eigen::Vector3d icrsVel = coord.getVecVel();
+        Eigen::Vector3d fk5J2000Pos = coord.getVecPos();
+        Eigen::Vector3d fk5J2000Vel = coord.getVecVel();
         
         // correct for velocity (proper motion and radial velocity)
-        Eigen::Vector3d tempPos = icrsPos + (icrsVel * (toDate - fromDate));
+        Eigen::Vector3d tempPos = fk5J2000Pos + (fk5J2000Vel * (toDate - fromDate));
 
         // precess position and velocity
         Eigen::Vector3d fk5Pos, fk5Vel;
         fk5Pos = _to2000PrecMat.transpose() * tempPos;
-        fk5Vel = _to2000PrecMat.transpose() * icrsVel;
+        fk5Vel = _to2000PrecMat.transpose() * fk5J2000Vel;
         
         return Coord(fk5Pos, fk5Vel);
     };
      
-    Coord FK5CoordSys::toICRS(Coord const &coord, Site const &site) const {
+    Coord FK5CoordSys::toFK5J2000(Coord const &coord, Site const &site) const {
         // use the excellent approximation that ICRS = FK5 J2000
         double const fromDate = this->_date;
         double const toDate = 2000.0;
@@ -66,11 +66,11 @@ namespace coordConv {
         Eigen::Vector3d tempPos = fk5Pos + (fk5Vel * (toDate - fromDate));
 
         // precess position and velocity
-        Eigen::Vector3d icrsPos, icrsVel;
-        icrsPos = _to2000PrecMat * tempPos;
-        icrsVel = _to2000PrecMat * fk5Vel;
+        Eigen::Vector3d fk5J2000Pos, fk5J2000Vel;
+        fk5J2000Pos = _to2000PrecMat * tempPos;
+        fk5J2000Vel = _to2000PrecMat * fk5Vel;
         
-        return Coord(icrsPos, icrsVel);
+        return Coord(fk5J2000Pos, fk5J2000Vel);
     };
 
 }

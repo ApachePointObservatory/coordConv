@@ -7,7 +7,7 @@ namespace coordConv {
 
     ObsCoordSys::ObsCoordSys(double date)
     :
-        CoordSys("obs", date),
+        ApparentCoordSys("obs", date),
         _appTopoCoordSys()
     {
         setDate(date);
@@ -26,14 +26,14 @@ namespace coordConv {
         return boost::shared_ptr<CoordSys>(new ObsCoordSys(date));
     };
 
-    Coord ObsCoordSys::fromICRS(Coord const &coord, Site const &site) const {
-        Coord appTopoCoord = _appTopoCoordSys.fromICRS(coord, site);
+    Coord ObsCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
+        Coord appTopoCoord = _appTopoCoordSys.fromFK5J2000(coord, site);
         return fromAppTopo(appTopoCoord, site);
     }
 
-    Coord ObsCoordSys::toICRS(Coord const &coord, Site const &site) const {
+    Coord ObsCoordSys::toFK5J2000(Coord const &coord, Site const &site) const {
         Coord appTopoCoord = toAppTopo(coord, site);
-        return _appTopoCoordSys.toICRS(appTopoCoord, site);
+        return _appTopoCoordSys.toFK5J2000(appTopoCoord, site);
     }
 
     Coord ObsCoordSys::fromAppTopo(Coord const &coord, Site const &site) const {
@@ -165,6 +165,6 @@ namespace coordConv {
             rxymag * tand(90.0 - zdu);
         return Coord(appTopoPos);
     }
-    
+
 }
 
