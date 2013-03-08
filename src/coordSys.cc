@@ -15,7 +15,7 @@ namespace coordConv {
     }
 
     PVTCoord CoordSys::convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site) const {
-        double const tai0 = fromPVTCoord.getTAI();
+        double const tai0 = fromPVTCoord.getInitialTAI();
         double const tai1 = tai0 + DeltaT;
         Coord coord0 = this->convertFrom(fromCoordSys, fromPVTCoord.getCoord(tai0), site);
         Coord coord1 = this->convertFrom(fromCoordSys, fromPVTCoord.getCoord(tai1), site);
@@ -30,12 +30,12 @@ namespace coordConv {
         Coord offFromCoord = fromCoord.offset(dumDir, fromDir, FromDist);
         Coord offToCoord = convertFrom(fromCoordSys, offFromCoord, site);
         scaleChange = toCoord.angularSeparation(offToCoord) / FromDist;
-        toDir = toCoord.angleTo(offToCoord);
+        toDir = toCoord.orientationTo(offToCoord);
         return toCoord;
     }
 
     PVTCoord CoordSys::convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site) const {
-        double const tai0 = fromPVTCoord.getTAI();
+        double const tai0 = fromPVTCoord.getInitialTAI();
         double const tai1 = tai0 + DeltaT;
         double toDirPair[2], dumScaleCh;
         Coord coord0 = this->convertFrom(toDirPair[0], scaleChange, fromCoordSys, fromPVTCoord.getCoord(tai0), fromDir.getPos(tai0), site);

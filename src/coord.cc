@@ -127,7 +127,7 @@ namespace coordConv {
         return atan2d(crossMag, dotProd);
     }
     
-    double Coord::angleTo(Coord const &coord) const {
+    double Coord::orientationTo(Coord const &coord) const {
         Eigen::Vector3d fromUnitPos = _pos / _dist;
         Eigen::Vector3d toPos = coord.getVecPos();
         
@@ -179,7 +179,7 @@ namespace coordConv {
         Eigen::Vector3d toPos = rotMat * _pos;
         Eigen::Vector3d toVel = rotMat * _pm;
         Coord toCoord(toPos, toVel);
-        toOrient = wrapCtr(180 + toCoord.angleTo(*this));
+        toOrient = wrapCtr(180 + toCoord.orientationTo(*this));
         return toCoord;
     }
 

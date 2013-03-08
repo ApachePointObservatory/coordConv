@@ -117,7 +117,7 @@ class TestCoord(unittest.TestCase):
                 self.assertEqual(predAtInf, coord.atInfinity())
 
     def testOffsetSmall(self):
-        """Test offset, angularSeparation and angleTo for small offsets not too near the pole
+        """Test offset, angularSeparation and orientationTo for small offsets not too near the pole
         
         In this regime delta-long = dist along long / cos(lat) is a reasonable approximation
         but I have no simple way to compute toOrient
@@ -147,11 +147,11 @@ class TestCoord(unittest.TestCase):
                         fromCoord = Coord(fromEquatAng, fromPolarAng)
                         toCoord = Coord(toEquatAng, toPolarAng)
                         self.assertAlmostEqual(dist, fromCoord.angularSeparation(toCoord))
-                        self.assertAlmostEqual(fromOrient, fromCoord.angleTo(toCoord), places=orientPlaces)
-                        self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.angleTo(fromCoord), toOrient), places=orientPlaces)
+                        self.assertAlmostEqual(fromOrient, fromCoord.orientationTo(toCoord), places=orientPlaces)
+                        self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.orientationTo(fromCoord), toOrient), places=orientPlaces)
 
     def testOffset(self):
-        """Test offset, angularSeparation and angleTo for offsets over a wide range of angles
+        """Test offset, angularSeparation and orientationTo for offsets over a wide range of angles
         """
         for fromPolarAng in (-87.1, -25.5, 0.43, 36.7, 87.0):
             for fromEquatAng in (0, 41.0): # should not matter
@@ -175,8 +175,8 @@ class TestCoord(unittest.TestCase):
                         fromCoord = Coord(fromEquatAng, fromPolarAng)
                         toCoord = Coord(toEquatAng, toPolarAng)
                         self.assertAlmostEqual(dist, fromCoord.angularSeparation(toCoord))
-                        self.assertAlmostEqual(fromOrient, fromCoord.angleTo(toCoord))
-                        self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.angleTo(fromCoord), toOrient))
+                        self.assertAlmostEqual(fromOrient, fromCoord.orientationTo(toCoord))
+                        self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.orientationTo(fromCoord), toOrient))
 
 
 if __name__ == '__main__':

@@ -7,3 +7,19 @@ To do:
   - PVTCoord.angleTo (argument is PVTCoord; result is PVT)
   Perhaps wait until I have a need for these?
 - Figure out how to make a PVT & argument a return value in SWIG
+
+- How to apply an arc offset to a coord? One technique is:
+  - PVTCoord.offset(equatPVT, polarPVT, tai), or make a PVTPair to hold offsets and feed that in
+
+
+
+
+- The main driver is that I want it to be easy to:
+  - Convert a PVT coord to another coordinate system
+  - Add a PVT great circle offset to a PVT coord
+
+but the TCC only does this in a few places, so it is not worth a huge amount of overhead.
+Is it necessary to create PVTCoord? PVTPair or some such offset?
+How fancy does PVTCoord have to be to make this work? Should it support great circle offsets?
+
+- What will the obj block look like once I figure this out?

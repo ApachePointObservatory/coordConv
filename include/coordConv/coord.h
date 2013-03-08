@@ -140,7 +140,7 @@ namespace coordConv {
         double angularSeparation(Coord const &coord) const;
 
         /**
-        Compute the angle of a great circle offset to another coord
+        Compute the orientation of a great circle offset to another coord
         
         In detail: computes the orientation at this point of a great circle connecting this coord
         to another coord. The orientation is 0 if the great circle lies along the direction of
@@ -148,7 +148,7 @@ namespace coordConv {
         
         @return orientation (deg), or NaN if the two coords are too close together
         */
-        double angleTo(Coord const &coord) const;
+        double orientationTo(Coord const &coord) const;
         
         /**
         Compute a new coord offset from this coord along the arc of a great circle
