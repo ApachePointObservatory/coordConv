@@ -12,10 +12,4 @@ namespace coordConv {
         return tai;
     }
 
-    // warning: simply zeros the velocity component (uninteresting)
-    Coord ApparentCoordSys::removePM(Coord const &coord, double tai) const {
-        Coord zpmCoord = Coord(coord.getVecPos());
-        return zpmCoord;
-    }
-
 }

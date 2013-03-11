@@ -178,19 +178,4 @@ namespace coordConv {
         return slaEpb((tai + TT_TAI) / SecPerDay); // slaEpb converts MJD days to Besselian epoch
     }
 
-    Coord FK4CoordSys::removePM(Coord const &coord, double tai) const {
-        if ((coord.getVecPos().array() == 0.0).all()) {
-            // no proper motion to correct; return the coord unchanged
-            return coord;
-        }
-        Site site(10, 10, 10); // the values are ignored
-        // the user specified PM or radial velocity, so the object is not fixed on the sky;
-        // return a coord that includes fictitious proper motion,
-        // so that later conversions with this coord do not assume the object is fixed on the sky
-        FK4CoordSys toSys(dateFromTAI(tai));
-        Coord toCoord = toSys.convertFrom(*this, coord, site);
-        Coord zpmToCoord(toCoord.getVecPos()); // includes fictitious proper motion at to date
-        return this->convertFrom(toSys, zpmToCoord, site);
-    }
-
 }

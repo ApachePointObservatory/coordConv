@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <vector>
 #include "coordConv/pvtCoord.h"
 
 static const double DeltaT = 0.01;
@@ -32,13 +33,6 @@ namespace coordConv {
         return _coord.offset(newOrient, _orient, dist);
     }    
 
-//     PVTCoord PVTCoord::getPVTCoord(double tai) const {
-//         double dist = _vel * (tai - _tai);
-//         double newOrient;
-//         Coord newCoord = _coord.offset(newOrient, _orient, dist);
-//         return PVTCoord(newCoord, newOrient, _vel, tai);
-//     }    
-
     bool PVTCoord::getSphPVT(PVT &equatPVT, PVT &polarPVT) const {
         double equatPos[2], polarPos[2];
         Coord laterCoord = getCoord(_tai + DeltaT);
@@ -48,6 +42,18 @@ namespace coordConv {
         equatPVT.setFromAnglePair(equatPos, _tai, DeltaT);
         polarPVT.setFromAnglePair(polarPos, _tai, DeltaT);
         return atPole;
+    }
+
+    PVTCoord PVTCoord::offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const {
+        std::vector<Coord> coordArr;
+        double toOrientArr[2];
+        for (int i = 0; i < 2; ++i) {
+            double tempTAI = tai + (i * DeltaT);
+            Coord unoffCoord = getCoord(tempTAI);
+            coordArr.push_back(unoffCoord.offset(toOrientArr[i], fromOrient.getPos(tempTAI), dist.getPos(tempTAI)));
+        }
+        toOrient.setFromAnglePair(toOrientArr, tai, DeltaT);
+        return PVTCoord(coordArr[0], coordArr[1], tai, DeltaT);
     }
 
 }

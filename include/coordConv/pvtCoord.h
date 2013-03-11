@@ -61,6 +61,20 @@ namespace coordConv {
         @return atPole: true if so near the pole that equatorial angle could not be computed.
         */
         virtual bool getSphPVT(PVT &equatPVT, PVT &polarPVT) const;
+        
+        /**
+        Offset a PVTCoord; see Coord::offset for a full explanation.
+
+        @param[out] toOrient: orientation of offset arc at offset position (deg)
+        @param[in] fromOrient: orientation of offset arc at this position (deg)
+        @param[in] dist: offset distance as the length of the arc of a great circle (deg)
+        @return offset coord
+        
+        @note The result is PVTCoord at tai, offset by dist at tai in direction fromOrient at tai.
+
+        @raise runtime_error if this coord is too near a pole
+        */
+        virtual PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const;
     
     private:
         Coord _coord;   // coordinate at initial time

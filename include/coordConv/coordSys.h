@@ -132,17 +132,6 @@ namespace coordConv {
         */
         virtual double dateFromTAI(double tai) const = 0;
         
-        /**
-        Remove proper motion and radial velocity to the specified TAI date
-        
-        @param[in] tai: TAI date (MJD, seconds)
-        @return coord with proper motion and radial velocity removed
-        
-        @warning: for apparent coordinate systems it is a null operation; it zeros out PM and radial velocity,
-        but those are ignored for coordinate conversions.
-        */
-        virtual Coord removePM(Coord const &coord, double tai) const = 0;
-        
         ///< get string representation
         virtual std::string asString() const;
     
@@ -157,6 +146,13 @@ namespace coordConv {
         explicit MeanCoordSys(std::string const &name, double date);
         virtual ~MeanCoordSys() {};
         virtual double dateFromTAI(double tai) const;
+        
+        /**
+        Remove the effects of proper motion and radial velocity to the specified TAI date
+        
+        @param[in] tai: TAI date (MJD, seconds)
+        @return coord with proper motion and radial velocity (but not parallax) removed
+        */
         virtual Coord removePM(Coord const &coord, double tai) const;
     };
     
@@ -165,7 +161,6 @@ namespace coordConv {
         explicit ApparentCoordSys(std::string const &name, double date);
         virtual ~ApparentCoordSys() {};
         virtual double dateFromTAI(double tai) const;
-        virtual Coord removePM(Coord const &coord, double tai) const;
     };
 
     /**
@@ -231,7 +226,6 @@ namespace coordConv {
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual double dateFromTAI(double tai) const;
-        virtual Coord removePM(Coord const &coord, double tai) const;
 
     private:
         Eigen::Vector3d _eTerms;

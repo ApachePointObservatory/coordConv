@@ -11,6 +11,12 @@ To do:
 - How to apply an arc offset to a coord? One technique is:
   - PVTCoord.offset(equatPVT, polarPVT, tai), or make a PVTPair to hold offsets and feed that in
 
+What is the result of offsetting a PVTCoord by a PVT? I don't think it is practical for this to be the true sum (as obtained by adding the two at any later time), since it is likely not a great circle and if so cannot be represented by a PVTCoord. I suggest computing the PVTCoord that is correct at the desired instant in time.
+
+(However, I should verify that the results are indeed not along a great circle; this is easy to do: just compute the points at various times and compare).
+
+This suggests that PVTCoord need not be a true great circle thing, and indeed could be greatly simplified by not having "tai" be an input for, e.g., getCoord. On the other hand, it is fundamentally important to be able to compute a coord at a slightly later time -- either by a small amount or by an offset along a great circle.
+
 
 
 

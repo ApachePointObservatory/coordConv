@@ -24,6 +24,7 @@ namespace coordConv {
     */
     double hypot(double x, double y);
 
+    /// Return true if value is finite
     inline bool isFinite(double val) {
         return ((val > std::numeric_limits<double>::min()) && (val < std::numeric_limits<double>::max()));
     }
@@ -100,7 +101,7 @@ namespace coordConv {
     @param[in] y: y component of vector (same units as "x")
     @return true if |r| is so small that theta cannot be computed and sets theta to 0
     */
-    bool polarFromXY (double &r, double &theta, double x, double y);
+    bool polarFromXY(double &r, double &theta, double x, double y);
 
     /**
     Convert polar coordinates to cartesian coordinates.

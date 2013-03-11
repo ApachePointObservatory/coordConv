@@ -11,7 +11,7 @@ namespace coordConv {
         return vec.norm();
     }
 
-    bool polarFromXY (double &r, double &theta, double x, double y) {
+    bool polarFromXY(double &r, double &theta, double x, double y) {
         r = hypot(x, y);
 
         bool atOrig;

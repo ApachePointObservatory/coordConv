@@ -80,7 +80,7 @@ namespace coordConv {
         Get distance in AU
         
         @return distance, in AU; if atInfinity() then the value is not inf, but will often be approximately
-        AUPerArcSec/MinParallax.
+        AUPerParsec/MinParallax.
         */
         double getDist() const { return _dist; }
         
