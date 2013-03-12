@@ -67,6 +67,8 @@
 %shared_ptr(coordConv::AppGeoCoordSys);
 %shared_ptr(coordConv::AppTopoCoordSys);
 %shared_ptr(coordConv::ObsCoordSys);
+%shared_ptr(coordConv::NoneCoordSys);
+%shared_ptr(coordConv::MountCoordSys);
 
 %declareNumPyConverters(Eigen::Vector2d);
 %declareNumPyConverters(Eigen::Vector3d);

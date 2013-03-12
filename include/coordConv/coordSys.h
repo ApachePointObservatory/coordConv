@@ -94,9 +94,10 @@ namespace coordConv {
         @param[in] fromCoordSys: initial coordinate system and date
         @param[in] fromPVTCoord: initial PVTCoord
         @param[in] site: site information
+        @param[in] tai at which to evaluate PVTs (MJD, sec)
         @return PVTCoord in this coordinate system at this date
         */
-        virtual PVTCoord convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site) const;
+        virtual PVTCoord convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site, double tai) const;
         
         /**
         Convert a coordinate from another coordinate system to this system, including orientation
@@ -120,9 +121,10 @@ namespace coordConv {
         @param[in] fromCoord: initial position
         @param[in] fromDir: initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
         @param[in] site: site information
+        @param[in] tai at which to evaluate PVTs (MJD, sec)
         @return position in this coordinate system
         */
-        virtual PVTCoord convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site) const;
+        virtual PVTCoord convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site, double tai) const;
         
         /**
         Convert TAI (MJD, seconds) to a suitable date for this coordinate system
@@ -399,5 +401,58 @@ namespace coordConv {
         AppTopoCoordSys _appTopoCoordSys;
     };
     
+    /**
+    None coordinates
+    
+    This coordinate system always converts to NaN. Date is TAI (MJD, seconds)
+    */
+    class NoneCoordSys: public ApparentCoordSys {
+    public:
+        /**
+        Construct a NoneCoordSys
+        
+        @param[in] date: date as TAI (MJD, seconds)
+        */
+        explicit NoneCoordSys(double date=0);
+        virtual ~NoneCoordSys() {};
+        virtual boost::shared_ptr<CoordSys> clone() const;
+        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual void setDate(double date) { setDate(date); };
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+    };
+    
+    /**
+    Mount coordinates
+    
+    This is a placeholder for mount coordinates, for those writing telescope control
+    systems and who need a place to store user-requested mount coordinates.
+    
+    Like NoneCoordSys it returns Coord() for any coordinate conversion.
+    */
+    class MountCoordSys: public ApparentCoordSys {
+    public:
+        /**
+        Construct a MountCoordSys
+        
+        @param[in] date: date as TAI (MJD, seconds)
+        */
+        explicit MountCoordSys(double date=0);
+        virtual ~MountCoordSys() {};
+        virtual boost::shared_ptr<CoordSys> clone() const;
+        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual void setDate(double date) { setDate(date); };
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+    };
+    
+    /**
+    Return a coordinate system given its name
+    
+    @param[in] name: name of coordinate system (case matters)
+    @param[in] date: date of coordinate system (units depend on the coordinate system)
+    @return the specified coordinate system at the specified date
+    @raise std::runtime_error if the name is not recognized
+    */
     boost::shared_ptr<CoordSys> makeCoordSys(std::string const &name, double date);
 }

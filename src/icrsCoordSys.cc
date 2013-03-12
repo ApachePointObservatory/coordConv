@@ -10,6 +10,8 @@ namespace coordConv {
         MeanCoordSys("icrs", date)
     {};
 
+    // note: I tried only defining clone() in CoordSys but SWIG would not recognize clone()
+    // in any inherited coordinate system.
     boost::shared_ptr<CoordSys> ICRSCoordSys::clone() const {
         return clone(getDate());
     }

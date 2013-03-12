@@ -9,11 +9,11 @@ Contents include:
 * Coord: represents a position on the sky, with proper motion and radial velocity; provides easy access to spherical and cartesian position.
 * Coordinate systems, including ICRSCoordSys, FK5CoordSys, AppGeoCoordSys, AppTopoCoordSys and ObsCoordSys (refracted apparent topocentric). To convert a position from one coordinate system to another:
   * Construct a Site object (see below)
-  * Construct the from Coord
-  * Construct the from coordinate system (e.g. ICRSCoord)
-  * Constrct the to coordinate system
+  * Construct the "from" Coord
+  * Construct the "from" coordinate system (e.g. ICRSCoord)
+  * Constrct the "to" coordinate system
   * toCoord = toCoordSys.convertFrom(fromCoordSys, fromCoord, site)
-* PVTCoord: a Coord with velocity
+* PVTCoord: a Coord with velocity along the arc of a great circle
 * Site: information about the observatory, current earth orientation data (using the IERS Earth Orientation bulletin if maximum accuracy is wanted) and refraction coefficients. The contents are required for conversions involving apparent coordinates and are ignored otherwise.
 * PVT: an object representing a position, velocity and time
 
