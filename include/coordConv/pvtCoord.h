@@ -30,6 +30,11 @@ namespace coordConv {
         @param[in] deltaT: TAI of coord1 - TAI of coord0
         */
         explicit PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT);
+        
+        /**
+        Construct a PVTCoord with all NaN data
+        */
+        explicit PVTCoord();
 
         virtual ~PVTCoord() {};
         

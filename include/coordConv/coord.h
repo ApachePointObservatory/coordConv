@@ -29,7 +29,7 @@ namespace coordConv {
         @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
         @param[in] parallax: parallax (arcsec)
         */
-        Coord(double equatAng, double polarAng, double parallax=0);
+        explicit Coord(double equatAng, double polarAng, double parallax=0);
 
         /**
         Construct a Coord from spherical position and proper motion
@@ -42,7 +42,7 @@ namespace coordConv {
         @param[in] polarPM: polar proper motion (arcsec/century)
         @param[in] radVel: radial velocity (km/sec, positive receding)
         */
-        Coord(double equatAng, double polarAng, double parallax, double equatPM, double polarPM, double radVel);
+        explicit Coord(double equatAng, double polarAng, double parallax, double equatPM, double polarPM, double radVel);
         
         /**
         Construct a Coord from cartesian position
@@ -50,7 +50,7 @@ namespace coordConv {
         @param[in] pos: cartesian position (AU)
         @warning: distance is not constrained
         */
-        Coord(Eigen::Vector3d const &pos);
+        explicit Coord(Eigen::Vector3d const &pos);
         
         /**
         Construct a Coord from cartesian position and velocity
@@ -59,7 +59,12 @@ namespace coordConv {
         @param[in] vel: cartesian velocity (AU/year)
         @warning: distance is not constrained
         */
-        Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &vel);
+        explicit Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &vel);
+        
+        /**
+        Construct a Coord with unknown position and proper motion
+        */
+        explicit Coord();
         
         ~Coord() {};
     

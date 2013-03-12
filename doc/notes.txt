@@ -1,31 +1,10 @@
 To do:
 - Add unit tests for PVTCoord and CoordSys.convertFrom variants that use PVTCoord.
+- Add unit tests for untested PVT functionality, such as polarFromXY and xyFromPolar
+- Consider having PVT be included by mathUtils, so that the scalar and PVT flavors of functions can be defined in the same file.
 - Add more methods that work with PVTCoord, once I figure out what is required.
   Candidates include:
-  - PVTCoord.offset (fromOrient and toOrient are PVTs)
   - PVTCoord.angularSeparation (arguments are PVTCoords; result is PVT)
   - PVTCoord.angleTo (argument is PVTCoord; result is PVT)
   Perhaps wait until I have a need for these?
 - Figure out how to make a PVT & argument a return value in SWIG
-
-- How to apply an arc offset to a coord? One technique is:
-  - PVTCoord.offset(equatPVT, polarPVT, tai), or make a PVTPair to hold offsets and feed that in
-
-What is the result of offsetting a PVTCoord by a PVT? I don't think it is practical for this to be the true sum (as obtained by adding the two at any later time), since it is likely not a great circle and if so cannot be represented by a PVTCoord. I suggest computing the PVTCoord that is correct at the desired instant in time.
-
-(However, I should verify that the results are indeed not along a great circle; this is easy to do: just compute the points at various times and compare).
-
-This suggests that PVTCoord need not be a true great circle thing, and indeed could be greatly simplified by not having "tai" be an input for, e.g., getCoord. On the other hand, it is fundamentally important to be able to compute a coord at a slightly later time -- either by a small amount or by an offset along a great circle.
-
-
-
-
-- The main driver is that I want it to be easy to:
-  - Convert a PVT coord to another coordinate system
-  - Add a PVT great circle offset to a PVT coord
-
-but the TCC only does this in a few places, so it is not worth a huge amount of overhead.
-Is it necessary to create PVTCoord? PVTPair or some such offset?
-How fancy does PVTCoord have to be to make this work? Should it support great circle offsets?
-
-- What will the obj block look like once I figure this out?

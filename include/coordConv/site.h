@@ -46,9 +46,8 @@ namespace coordConv {
             refCoB(0),
             azCorr(0),
             diurAbMag(0),
-            pos()
+            pos(Eigen::Vector3d::Constant(0.0))
         {
-            pos.setZero();
             setPoleWander(0.0, 0.0);
         }
         

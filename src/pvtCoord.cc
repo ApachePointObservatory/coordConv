@@ -26,6 +26,13 @@ namespace coordConv {
         _vel = dist / deltaT;
         _orient = coord0.orientationTo(coord1);
     }
+
+    PVTCoord::PVTCoord() :
+        _coord(Coord()),
+        _orient(DoubleNaN),
+        _vel(DoubleNaN),
+        _tai(DoubleNaN)
+    { };
     
     Coord PVTCoord::getCoord(double tai) const {
         double dist = _vel * (tai - _tai);

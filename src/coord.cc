@@ -44,16 +44,23 @@ namespace coordConv {
     Coord::Coord(Eigen::Vector3d const &pos)
     :
         _pos(pos),
-        _pm()
+        _pm(Eigen::Vector3d::Constant(0.0))
     {
         _setCache();
-        _pm.setZero();
     }
 
     Coord::Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &vel)
     :
         _pos(pos),
         _pm(vel)
+    {
+        _setCache();
+    }
+    
+    Coord::Coord()
+    :
+        _pos(Eigen::Vector3d::Constant(DoubleNaN)),
+        _pm(Eigen::Vector3d::Constant(DoubleNaN))
     {
         _setCache();
     }
