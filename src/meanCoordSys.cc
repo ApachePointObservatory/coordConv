@@ -25,7 +25,7 @@ namespace coordConv {
         }
 
         double dateAtTAI = dateFromTAI(tai);
-        boost::shared_ptr<CoordSys> coordSysAtTAIPtr = this->clone(dateAtTAI);
+        CoordSys::Ptr coordSysAtTAIPtr = this->clone(dateAtTAI);
         Site site(10, 10, 10); // values are irrelevant for mean to mean coordinate conversions
         Coord coordAtTAI = coordSysAtTAIPtr->convertFrom(*this, coord, site);
         Eigen::Vector3d posAtTAI = coordAtTAI.getVecPos();

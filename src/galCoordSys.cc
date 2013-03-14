@@ -19,12 +19,12 @@ namespace coordConv {
         MeanCoordSys("gal", date)
     {}
 
-    boost::shared_ptr<CoordSys> GalCoordSys::clone() const {
+    CoordSys::Ptr GalCoordSys::clone() const {
         return clone(getDate());
     }
 
-    boost::shared_ptr<CoordSys> GalCoordSys::clone(double date) const {
-        return boost::shared_ptr<CoordSys>(new GalCoordSys(date));
+    CoordSys::Ptr GalCoordSys::clone(double date) const {
+        return CoordSys::Ptr(new GalCoordSys(date));
     };
 
     Coord GalCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {

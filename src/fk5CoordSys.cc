@@ -27,12 +27,12 @@ namespace coordConv {
         }
     }
 
-    boost::shared_ptr<CoordSys> FK5CoordSys::clone() const {
+    CoordSys::Ptr FK5CoordSys::clone() const {
         return clone(getDate());
     }
 
-    boost::shared_ptr<CoordSys> FK5CoordSys::clone(double date) const {
-        return boost::shared_ptr<CoordSys>(new FK5CoordSys(date));
+    CoordSys::Ptr FK5CoordSys::clone(double date) const {
+        return CoordSys::Ptr(new FK5CoordSys(date));
     };
 
     Coord FK5CoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {

@@ -25,12 +25,12 @@ namespace coordConv {
         }
     }
     
-    boost::shared_ptr<CoordSys> AppTopoCoordSys::clone() const {
+    CoordSys::Ptr AppTopoCoordSys::clone() const {
         return clone(getDate());
     }
 
-    boost::shared_ptr<CoordSys> AppTopoCoordSys::clone(double date) const {
-        return boost::shared_ptr<CoordSys>(new AppTopoCoordSys(date));
+    CoordSys::Ptr AppTopoCoordSys::clone(double date) const {
+        return CoordSys::Ptr(new AppTopoCoordSys(date));
     };
 
     Coord AppTopoCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {

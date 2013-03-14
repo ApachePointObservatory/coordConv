@@ -29,6 +29,16 @@ namespace coordConv {
             t(t)
         { };
         
+        /**
+        Construct a null PVT
+        */
+        explicit PVT()
+        :
+            pos(DoubleNaN),
+            vel(DoubleNaN),
+            t(DoubleNaN)
+        { };
+        
         virtual ~PVT() {};
         
         /// Return the position at the specified time; return NaN if unknown
@@ -110,6 +120,10 @@ namespace coordConv {
             PVT retVal(*this);
             retVal /= rhs;
             return retVal;
+        }
+        
+        PVT operator-() const {
+            return PVT(-pos, -vel, t);
         }
         
         /**

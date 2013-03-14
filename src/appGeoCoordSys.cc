@@ -17,12 +17,12 @@ namespace coordConv {
         setDate(date);
     };
 
-    boost::shared_ptr<CoordSys> AppGeoCoordSys::clone() const {
+    CoordSys::Ptr AppGeoCoordSys::clone() const {
         return clone(getDate());
     }
 
-    boost::shared_ptr<CoordSys> AppGeoCoordSys::clone(double date) const {
-        return boost::shared_ptr<CoordSys>(new AppGeoCoordSys(date));
+    CoordSys::Ptr AppGeoCoordSys::clone(double date) const {
+        return CoordSys::Ptr(new AppGeoCoordSys(date));
     };
     
     void AppGeoCoordSys::setDate(double date) {

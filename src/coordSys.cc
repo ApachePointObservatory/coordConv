@@ -48,7 +48,7 @@ namespace coordConv {
         return os.str();
     }
 
-    boost::shared_ptr<coordConv::CoordSys> makeCoordSys(std::string const &name, double date) {
+    CoordSys::Ptr makeCoordSys(std::string const &name, double date) {
         if (name == "icrs") {
             return boost::make_shared<coordConv::ICRSCoordSys>(date);
         } else if (name == "fk5") {

@@ -12,12 +12,12 @@ namespace coordConv {
 
     // note: I tried only defining clone() in CoordSys but SWIG would not recognize clone()
     // in any inherited coordinate system.
-    boost::shared_ptr<CoordSys> ICRSCoordSys::clone() const {
+    CoordSys::Ptr ICRSCoordSys::clone() const {
         return clone(getDate());
     }
 
-    boost::shared_ptr<CoordSys> ICRSCoordSys::clone(double date) const {
-        return boost::shared_ptr<CoordSys>(new ICRSCoordSys(date));
+    CoordSys::Ptr ICRSCoordSys::clone(double date) const {
+        return CoordSys::Ptr(new ICRSCoordSys(date));
     };
 
     Coord ICRSCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {

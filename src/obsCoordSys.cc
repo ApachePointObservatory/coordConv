@@ -18,12 +18,12 @@ namespace coordConv {
         _appTopoCoordSys.setDate(date, freezeCache);
     }
     
-    boost::shared_ptr<CoordSys> ObsCoordSys::clone() const {
+    CoordSys::Ptr ObsCoordSys::clone() const {
         return clone(getDate());
     }
 
-    boost::shared_ptr<CoordSys> ObsCoordSys::clone(double date) const {
-        return boost::shared_ptr<CoordSys>(new ObsCoordSys(date));
+    CoordSys::Ptr ObsCoordSys::clone(double date) const {
+        return CoordSys::Ptr(new ObsCoordSys(date));
     };
 
     Coord ObsCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {

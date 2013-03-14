@@ -17,6 +17,9 @@ namespace coordConv {
     */
     class CoordSys {
     public:
+        typedef boost::shared_ptr<CoordSys> Ptr;
+        typedef boost::shared_ptr<const CoordSys> ConstPtr;
+
         /**
         Construct a CoordSys given a name and date
         */
@@ -29,12 +32,12 @@ namespace coordConv {
         /**
         Return a copy with the same date
         */
-        virtual boost::shared_ptr<CoordSys> clone() const = 0;
+        virtual CoordSys::Ptr clone() const = 0;
         
         /**
         Return a copy with a specified date
         */
-        virtual boost::shared_ptr<CoordSys> clone(double date) const = 0;
+        virtual CoordSys::Ptr clone(double date) const = 0;
 
         /**
         Get the name of this coordinate system (all lowercase)
@@ -177,8 +180,8 @@ namespace coordConv {
         */
         explicit ICRSCoordSys(double date=2000.0);
         virtual ~ICRSCoordSys() {};
-        virtual boost::shared_ptr<CoordSys> clone() const;
-        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
     };
@@ -195,8 +198,8 @@ namespace coordConv {
         */
         explicit FK5CoordSys(double date=2000.0);
         virtual ~FK5CoordSys() {};
-        virtual boost::shared_ptr<CoordSys> clone() const;
-        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
         virtual void setDate(double date);
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
@@ -222,8 +225,8 @@ namespace coordConv {
         */
         explicit FK4CoordSys(double date=1950.0);
         virtual ~FK4CoordSys() {};
-        virtual boost::shared_ptr<CoordSys> clone() const;
-        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
         virtual void setDate(double date);
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
@@ -250,8 +253,8 @@ namespace coordConv {
         */
         explicit GalCoordSys(double date=2000.0);
         virtual ~GalCoordSys() {};
-        virtual boost::shared_ptr<CoordSys> clone() const;
-        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
     };
@@ -281,8 +284,8 @@ namespace coordConv {
         */
         explicit AppGeoCoordSys(double date=std::numeric_limits<double>::quiet_NaN(), double maxAge=1.5e-5);
         virtual ~AppGeoCoordSys() {};
-        virtual boost::shared_ptr<CoordSys> clone() const;
-        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
         virtual void setDate(double date);
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
@@ -315,8 +318,8 @@ namespace coordConv {
         */
         explicit AppTopoCoordSys(double date=std::numeric_limits<double>::quiet_NaN());
         virtual ~AppTopoCoordSys() {};
-        virtual boost::shared_ptr<CoordSys> clone() const;
-        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
         virtual void setDate(double date) { setDate(date, false); };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
@@ -372,8 +375,8 @@ namespace coordConv {
         */
         explicit ObsCoordSys(double date=std::numeric_limits<double>::quiet_NaN());
         virtual ~ObsCoordSys() {};
-        virtual boost::shared_ptr<CoordSys> clone() const;
-        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
         virtual void setDate(double date) { setDate(date, false); };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
@@ -415,8 +418,8 @@ namespace coordConv {
         */
         explicit NoneCoordSys(double date=0);
         virtual ~NoneCoordSys() {};
-        virtual boost::shared_ptr<CoordSys> clone() const;
-        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
         virtual void setDate(double date) { setDate(date); };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
@@ -439,8 +442,8 @@ namespace coordConv {
         */
         explicit MountCoordSys(double date=0);
         virtual ~MountCoordSys() {};
-        virtual boost::shared_ptr<CoordSys> clone() const;
-        virtual boost::shared_ptr<CoordSys> clone(double date) const;
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
         virtual void setDate(double date) { setDate(date); };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
@@ -454,5 +457,5 @@ namespace coordConv {
     @return the specified coordinate system at the specified date
     @raise std::runtime_error if the name is not recognized
     */
-    boost::shared_ptr<CoordSys> makeCoordSys(std::string const &name, double date);
+    CoordSys::Ptr makeCoordSys(std::string const &name, double date);
 }

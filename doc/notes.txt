@@ -1,6 +1,8 @@
 To do:
 - Add unit tests for PVTCoord and CoordSys.convertFrom variants that use PVTCoord.
-- Add unit tests for untested PVT functionality, such as polarFromXY and xyFromPolar
+- Add unit tests for untested PVT functionality, such as polarFromXY, xyFromPolar and unary minus
+- Unit test NoneCoordSys and MountCoordSys
+- Unit test makeCoordSys
 - Add more methods that work with PVTCoord, once I figure out what is required.
   Candidates include:
   - PVTCoord.angularSeparation (arguments are PVTCoords; result is PVT)

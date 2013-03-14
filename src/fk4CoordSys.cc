@@ -78,12 +78,12 @@ namespace coordConv {
         setDate(date);
     };
 
-    boost::shared_ptr<CoordSys> FK4CoordSys::clone() const {
+    CoordSys::Ptr FK4CoordSys::clone() const {
         return clone(getDate());
     }
 
-    boost::shared_ptr<CoordSys> FK4CoordSys::clone(double date) const {
-        return boost::shared_ptr<CoordSys>(new FK4CoordSys(date));
+    CoordSys::Ptr FK4CoordSys::clone(double date) const {
+        return CoordSys::Ptr(new FK4CoordSys(date));
     };
     
     void FK4CoordSys::setDate(double date) {
