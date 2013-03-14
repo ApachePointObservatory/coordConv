@@ -39,7 +39,7 @@ namespace coordConv {
         virtual ~PVTCoord() {};
         
         /**
-        Get orientation at initial time
+        Get orientation at initial TAI date
         */
         virtual double getOrient() const { return _orient; };
         
@@ -49,12 +49,19 @@ namespace coordConv {
         virtual double getVel() const { return _vel; };
         
         /**
-        Get the TAI date at initial time
+        Get initial TAI date
         */
-        virtual double getInitialTAI() const { return _tai; };
+        virtual double getTAI() const { return _tai; };
         
         /**
-        Compute the coord at a specified time
+        Return Coord at initial TAI date
+        */
+        virtual Coord getCoord() const { return _coord; };
+        
+        /**
+        Compute the coord at a specified TAI date
+        
+        @param[in] tai: TAI date at which to compute coord (MJD, sec)
         */
         virtual Coord getCoord(double tai) const;
         

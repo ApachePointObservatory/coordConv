@@ -128,6 +128,29 @@ namespace coordConv {
         @return position in this coordinate system
         */
         virtual PVTCoord convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site, double tai) const;
+
+        /**
+        Remove the effects of proper motion and radial velocity to the specified TAI date
+        
+        @warning This is a no-op for apparent coordinate systems.
+        
+        @param[in] coord: coordinate from which to remove proper motion and radial velocity
+        @param[in] tai: TAI date to which to remove proper motion and radial velocity (MJD, seconds)
+        @return coord with proper motion and radial velocity removed
+        */
+        virtual Coord removePM(Coord const &coord, double tai) const = 0;
+
+        /**
+        Remove the effects of proper motion and radial velocity to the specified TAI date
+        
+        @warning This is a no-op for apparent coordinate systems.
+        
+        @param[in] pvtCoord: PVT coordinate from which to remove proper motion and radial velocity
+        @param[in] tai: TAI date to which to remove proper motion and radial velocity (MJD, seconds)
+        @return PVTCoord with proper motion and radial velocity removed;
+            the date of the returned PVTCoord matches the input PVTCoord, not the tai argument.
+        */
+        virtual PVTCoord removePM(PVTCoord const &coord, double tai);
         
         /**
         Convert TAI (MJD, seconds) to a suitable date for this coordinate system
@@ -151,13 +174,6 @@ namespace coordConv {
         explicit MeanCoordSys(std::string const &name, double date);
         virtual ~MeanCoordSys() {};
         virtual double dateFromTAI(double tai) const;
-        
-        /**
-        Remove the effects of proper motion and radial velocity to the specified TAI date
-        
-        @param[in] tai: TAI date (MJD, seconds)
-        @return coord with proper motion and radial velocity (but not parallax) removed
-        */
         virtual Coord removePM(Coord const &coord, double tai) const;
     };
     
@@ -166,6 +182,7 @@ namespace coordConv {
         explicit ApparentCoordSys(std::string const &name, double date);
         virtual ~ApparentCoordSys() {};
         virtual double dateFromTAI(double tai) const;
+        virtual Coord removePM(Coord const &coord, double tai) const { return coord; };
     };
 
     /**

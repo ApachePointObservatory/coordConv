@@ -41,6 +41,12 @@ namespace coordConv {
         toDir.setFromAnglePair(toDirPair, tai, DeltaT);
         return PVTCoord(coord0, coord1, tai, DeltaT);
     }
+
+    PVTCoord CoordSys::removePM(PVTCoord const &coord, double tai) {
+        Coord zpmCoord = removePM(coord.getCoord(), tai);
+        return PVTCoord(zpmCoord, coord.getOrient(), coord.getVel(), coord.getTAI());
+    }
+
     
     std::string CoordSys::asString() const {
         std::ostringstream os;

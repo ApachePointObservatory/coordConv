@@ -32,8 +32,10 @@ namespace coordConv {
     /**
     Rotate a 2-dimensional vector by a given angle.
 
-    @param[out] rotVec: rotated vector
-    @param[in]  vec: vector to rotate
+    @param[out] rotX: rotated x value
+    @param[out] rotY: rotated y value
+    @param[in]  x: unrotated x value
+    @param[in]  y: unrotated y value
     @param[in]  ang: angle by which to rotate (rad)
 
     Changing coordinate systems:
@@ -43,7 +45,13 @@ namespace coordConv {
     then P_B_xy, the position of P in coordinate system B is:
         P_B_xy = (P_A_xy - B_A_xy) rotated by -B_A_ang
     */
-//    inline void rot2D(Eigen::Vector2d &rotVec, Eigen::Vector2d const &vec, double ang);
+    inline void rot2D(double &rotX, double &rotY, double x, double y, double ang) {
+        double sinAng = std::sin(ang);
+        double cosAng = std::cos(ang);
+
+        rotX = cosAng * x - sinAng * y;
+        rotY = sinAng * x + cosAng * y;
+    }
 
     /**
     Compute angle wrapped into range: 0 <= wrapped ang < 360 deg
