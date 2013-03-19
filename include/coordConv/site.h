@@ -10,12 +10,15 @@ namespace coordConv {
     class Site {
     public:
     
-        double _meanLong;   ///< site longitude, ignoring pole wander (deg, positive eastward)
-        double _meanLat;    ///< site latitude, ignoring pole wander (deg)
+        double meanLong;    ///< site longitude, ignoring pole wander (deg, positive eastward)
+        double meanLat;     ///< site latitude, ignoring pole wander (deg)
         double elev;        ///< geodetic elevation (meters above reference spheroid)
         double ut1_tai;     ///< UT1-TAI (seconds) at date of coordinate conversion
+        double utc_tai;     ///< UTC-TAI (seconds) at date of coordinate conversion
+            ///< not used by coordConv, but often useful and easily computed at the same time as ut1_tai
         double corrLong;    ///< longitude corrected for pole wander (deg)
         double corrLat;     ///< latitude corrected for pole wander (deg)
+        double wavelen;     ///< wavelength for which to compute refraction coefficients (Angstroms)
         double refCoA, refCoB;  ///< A, B refraction coefficients (radians!), where:
             ///< zdSpace = refCoA tan zdEarth + refCoB tan^3 zdEarth
             ///< zdEarth is the zenith distance of an object as observed through the atmosphere (radians)
@@ -36,12 +39,14 @@ namespace coordConv {
         */
         Site(double meanLong, double meanLat, double elev)
         :
-            _meanLong(meanLong),
-            _meanLat(meanLat),
+            meanLong(meanLong),
+            meanLat(meanLat),
             elev(elev),
             ut1_tai(0),
+            utc_tai(0),
             corrLong(0),
             corrLat(0),
+            wavelen(0),
             refCoA(0),
             refCoB(0),
             azCorr(0),

@@ -8,9 +8,7 @@ namespace coordConv {
     MountCoordSys::MountCoordSys(double date)
     :
         ApparentCoordSys("mount", date)
-    {
-        setDate(date);
-    };
+    {};
     
     CoordSys::Ptr MountCoordSys::clone() const {
         return clone(getDate());

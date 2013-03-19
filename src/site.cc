@@ -7,8 +7,8 @@ namespace coordConv {
     void Site::setPoleWander(double x, double y) {
         double corrLongRad, corrLatRad, azCorrRad;
         slaPolmo(
-            _meanLong * RadPerDeg,
-            _meanLat * RadPerDeg,
+            meanLong * RadPerDeg,
+            meanLat * RadPerDeg,
             x * RadPerDeg,
             y * RadPerDeg,
             &corrLongRad,

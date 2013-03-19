@@ -437,7 +437,6 @@ namespace coordConv {
         virtual ~NoneCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
-        virtual void setDate(double date) { setDate(date); };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
     };
@@ -461,7 +460,6 @@ namespace coordConv {
         virtual ~MountCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
-        virtual void setDate(double date) { setDate(date); };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
     };
