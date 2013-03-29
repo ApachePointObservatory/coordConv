@@ -4,7 +4,6 @@
 #include <limits>
 #include "Eigen/Dense"
 #include "coordConv/physConst.h"
-#include "coordConv/mathUtils.cc"
 /*
 Math utilities
 */
@@ -26,7 +25,7 @@ namespace coordConv {
 
     /// Return true if value is finite
     inline bool isFinite(double val) {
-        return ((val > std::numeric_limits<double>::min()) && (val < std::numeric_limits<double>::max()));
+        return (std::fabs(val) <= std::numeric_limits<double>::max());
     }
 
     /**
@@ -36,7 +35,7 @@ namespace coordConv {
     @param[out] rotY: rotated y value
     @param[in]  x: unrotated x value
     @param[in]  y: unrotated y value
-    @param[in]  ang: angle by which to rotate (rad)
+    @param[in]  ang: angle by which to rotate (deg)
 
     Changing coordinate systems:
     Given a point P whose position in coordinate system A is P_A_xy
@@ -45,13 +44,7 @@ namespace coordConv {
     then P_B_xy, the position of P in coordinate system B is:
         P_B_xy = (P_A_xy - B_A_xy) rotated by -B_A_ang
     */
-    inline void rot2D(double &rotX, double &rotY, double x, double y, double ang) {
-        double sinAng = std::sin(ang);
-        double cosAng = std::cos(ang);
-
-        rotX = cosAng * x - sinAng * y;
-        rotY = sinAng * x + cosAng * y;
-    }
+    void rot2D(double &rotX, double &rotY, double x, double y, double ang);
 
     /**
     Compute angle wrapped into range: 0 <= wrapped ang < 360 deg
@@ -130,3 +123,4 @@ namespace coordConv {
     */
     void computeRotationMatrix(Eigen::Matrix3d &rotMat, Eigen::Vector3d const &axis, double rotAngle);
 }
+#include "coordConv/mathUtils.cc"

@@ -5,6 +5,14 @@
 Define inline math utilities
 */
 namespace coordConv {
+    
+    inline void rot2D(double &rotX, double &rotY, double x, double y, double ang) {
+        double sinAng = sind(ang);
+        double cosAng = cosd(ang);
+
+        rotX = cosAng * x - sinAng * y;
+        rotY = sinAng * x + cosAng * y;
+    }
 
     inline double wrapPos(double ang) {
         // put angle into range (-360, 360), then finish the job
