@@ -13,6 +13,8 @@ namespace coordConv {
         double meanLong;    ///< site longitude, ignoring pole wander (deg, positive eastward)
         double meanLat;     ///< site latitude, ignoring pole wander (deg)
         double elev;        ///< geodetic elevation (meters above reference spheroid)
+        double poleX;       ///< pole wander, X (deg)
+        double poleY;       ///< pole wander, Y (deg)
         double ut1_tai;     ///< UT1-TAI (seconds) at date of coordinate conversion
         double utc_tai;     ///< UTC-TAI (seconds) at date of coordinate conversion
             ///< not used by coordConv, but often useful and easily computed at the same time as ut1_tai
@@ -42,6 +44,8 @@ namespace coordConv {
             meanLong(meanLong),
             meanLat(meanLat),
             elev(elev),
+            poleX(0),
+            poleY(0),
             ut1_tai(0),
             utc_tai(0),
             corrLong(0),

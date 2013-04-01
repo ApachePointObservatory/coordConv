@@ -5,6 +5,8 @@
 namespace coordConv {
 
     void Site::setPoleWander(double x, double y) {
+        poleX = x;
+        poleY = y;
         double corrLongRad, corrLatRad, azCorrRad;
         slaPolmo(
             meanLong * RadPerDeg,
