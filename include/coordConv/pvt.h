@@ -7,9 +7,10 @@ namespace coordConv {
     /**
     Position, velocity and time
     
-    Time is TAI (MJD seconds)
-    
-    These are designed to hold angles (in deg), though this is only assumed in a few cases.
+    Requirements:
+    * position is in degrees (though that is only required by setFromAnglePair).
+    * velocity is in degrees/unit of time.
+    However, as used within this package, time is always TAI (MJD, seconds).
     */
     class PVT {
     public:
@@ -41,14 +42,31 @@ namespace coordConv {
         
         virtual ~PVT() {};
         
+        /// Return a copy
+        PVT copy() const {
+            return PVT(pos, vel, t);
+        }
+        
+        /// Return a copy with a specified time
+        PVT copy(double t) const {
+            return PVT(getPos(t), vel, t);
+        }
+        
         /// Return the position at the specified time; return NaN if unknown
-        double getPos(double tai) const {
-            return pos + (vel * (tai - t));
+        double getPos(double t) const {
+            return pos + (vel * (t - this->t));
+        }
+        
+        /// Set PVT invalid at the specified time (which defaults to NaN)
+        void invalidate(double t = DoubleNaN) {
+            pos = DoubleNaN;
+            vel = DoubleNaN;
+            this->t = t;
         }
         
         /// Is this PVT valid? (Does it have finite pos, vel and t)?
         bool isValid() const {
-            return std::isfinite(t) && std::isfinite(vel) && std::isfinite(pos);
+            return std::isfinite(pos) &&  std::isfinite(vel) && std::isfinite(t);
         }
 
         PVT & operator+=(PVT const &rhs) {
@@ -127,22 +145,21 @@ namespace coordConv {
         }
         
         /**
-        Set from a pair of angles (in deg) computed at different times
+        Set from a pair of angles (in degrees) computed at different times
         
-        It matters that these are angles because velocity is computed using
+        It matters that these are angles in degrees, because velocity is computed using
         anglePair[1] - anglePair[0] wrapped into the range [-180, 180)
     
-        @param[out] pvt: PVT to set
         @param[in] anglePair: pair of positions (angles in degrees), where:
-            anglePair[0] is computed at time tai
-            anglePair[1] is computed at time tai + deltaTAI
-        @param[in] tai: TAI date (MJD sec)
-        @param[in] deltaTAI: time difference (sec)
+            anglePair[0] is computed at time t
+            anglePair[1] is computed at time t + deltaT
+        @param[in] t: time at which anglePair[0] is computed
+        @param[in] deltaT: time difference between the two angles
         */
-        void setFromAnglePair(double anglePair[2], double tai, double deltaTAI) {
+        void setFromAnglePair(double anglePair[2], double t, double deltaT) {
             pos = anglePair[0];
-            vel = coordConv::wrapCtr(anglePair[1] - anglePair[0]) / deltaTAI;
-            t = tai;
+            vel = coordConv::wrapCtr(anglePair[1] - anglePair[0]) / deltaT;
+            this->t = t;
         }
     };
 

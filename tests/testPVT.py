@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 import numpy
-from coordConv import PVT
+from coordConv import PVT, isFinite
 
 def predPos(pvt, t):
     return pvt.pos + (pvt.vel * (t - pvt.t))
@@ -14,6 +14,26 @@ class TestPVT(unittest.TestCase):
         self.assertEquals(pvt.pos, 1.0)
         self.assertEquals(pvt.vel, 2.0)
         self.assertEquals(pvt.t, 3.0)
+    
+    def testCopy(self):
+        """Test PVT.copy() and PVT.copy(t)
+        """
+        pvt1 = PVT(1.0, -2.0, 3.0)
+        pvt2 = pvt1.copy()
+        pvt3 = pvt1.copy(5.0)
+
+        pvt1 *= 2 # modify pvt1 and make sure pvt2 and pvt3 are not affected
+        self.assertAlmostEqual(pvt1.pos, 2.0)
+        self.assertAlmostEqual(pvt1.vel, -4.0)
+        self.assertEqual(pvt1.t, 3.0)
+
+        self.assertEqual(pvt2.pos, 1.0)
+        self.assertEqual(pvt2.vel, -2.0)
+        self.assertEqual(pvt2.t, 3.0)
+
+        self.assertEqual(pvt3.pos, -3.0)
+        self.assertEqual(pvt3.vel, -2.0)
+        self.assertEqual(pvt3.t, 5.0)
     
     def testAddPVT(self):
         """Test pvt + pvt
@@ -132,6 +152,24 @@ class TestPVT(unittest.TestCase):
         self.assertFalse(pvt.isValid())
         pvt.t = 0.0
         self.assertTrue(pvt.isValid())
+    
+    def testInvalidate(self):
+        """Test pvt.invalidate
+        """
+        pvt = PVT(1, 2, 3)
+        self.assertTrue(pvt.isValid())
+        pvt.invalidate()
+        self.assertFalse(pvt.isValid())
+        self.assertFalse(isFinite(pvt.pos))
+        self.assertFalse(isFinite(pvt.vel))
+        self.assertFalse(isFinite(pvt.t))
+
+        pvt2 = PVT(-2, -4, 6)
+        pvt.invalidate(5)
+        self.assertFalse(pvt.isValid())
+        self.assertFalse(isFinite(pvt.pos))
+        self.assertFalse(isFinite(pvt.vel))
+        self.assertEqual(pvt.t, 5.0)
 
 if __name__ == '__main__':
     unittest.main()
