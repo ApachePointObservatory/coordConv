@@ -67,6 +67,8 @@ namespace coordConv {
         @param[in] y: y correction (deg)
         
         Updates the following fields:
+        - poleX
+        - poleY
         - corrLong
         - corrLat
         - azCorr
