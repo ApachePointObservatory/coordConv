@@ -57,19 +57,6 @@
     }
 }
 
-%shared_ptr(coordConv::CoordSys);
-%shared_ptr(coordConv::MeanCoordSys);
-%shared_ptr(coordConv::ApparentCoordSys);
-%shared_ptr(coordConv::ICRSCoordSys);
-%shared_ptr(coordConv::FK5CoordSys);
-%shared_ptr(coordConv::FK4CoordSys);
-%shared_ptr(coordConv::GalCoordSys);
-%shared_ptr(coordConv::AppGeoCoordSys);
-%shared_ptr(coordConv::AppTopoCoordSys);
-%shared_ptr(coordConv::ObsCoordSys);
-%shared_ptr(coordConv::NoneCoordSys);
-%shared_ptr(coordConv::MountCoordSys);
-
 %declareNumPyConverters(Eigen::Vector2d);
 %declareNumPyConverters(Eigen::Vector3d);
 %declareNumPyConverters(Eigen::Matrix3d);
@@ -85,6 +72,6 @@
 %include "coordConv/rotXY.h"
 %include "coordConv/site.h"
 %include "coordConv/time.h"
-%include "coordConv/coord.h"
+%include "coordConv/coord.i"
 %include "coordConv/pvtCoord.h"
-%include "coordConv/coordSys.h"
+%include "coordSys.i"

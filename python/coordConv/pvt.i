@@ -2,7 +2,7 @@
 
 %extend coordConv::PVT {
     %pythoncode {
-        def __str__(self):
+        def __repr__(self):
             return "PVT(%s, %s, %s)" % (self.pos, self.vel, self.t)
     }
 }
