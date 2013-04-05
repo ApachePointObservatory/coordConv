@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stdexcept>
 #include <sstream>
 #include "slalib.h"
@@ -16,7 +17,7 @@ namespace coordConv {
     
     void FK5CoordSys::setDate(double date) {
         this->_date = date;
-        if (isFinite(date)) {
+        if (std::isfinite(date)) {
             double precMatCArr[3][3];
             slaPrec(date, 2000.0, precMatCArr);
             for (int i = 0; i < 3; ++i) {

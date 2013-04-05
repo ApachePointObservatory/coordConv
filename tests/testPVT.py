@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 import numpy
-from coordConv import PVT, isFinite
+from coordConv import PVT
 
 def predPos(pvt, t):
     return pvt.pos + (pvt.vel * (t - pvt.t))
@@ -160,15 +160,15 @@ class TestPVT(unittest.TestCase):
         self.assertTrue(pvt.isValid())
         pvt.invalidate()
         self.assertFalse(pvt.isValid())
-        self.assertFalse(isFinite(pvt.pos))
-        self.assertFalse(isFinite(pvt.vel))
-        self.assertFalse(isFinite(pvt.t))
+        self.assertFalse(numpy.isfinite(pvt.pos))
+        self.assertFalse(numpy.isfinite(pvt.vel))
+        self.assertFalse(numpy.isfinite(pvt.t))
 
         pvt2 = PVT(-2, -4, 6)
         pvt.invalidate(5)
         self.assertFalse(pvt.isValid())
-        self.assertFalse(isFinite(pvt.pos))
-        self.assertFalse(isFinite(pvt.vel))
+        self.assertFalse(numpy.isfinite(pvt.pos))
+        self.assertFalse(numpy.isfinite(pvt.vel))
         self.assertEqual(pvt.t, 5.0)
 
 if __name__ == '__main__':

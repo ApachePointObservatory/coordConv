@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stdexcept>
 #include <vector>
 #include "coordConv/pvtCoord.h"
@@ -49,6 +50,10 @@ namespace coordConv {
         equatPVT.setFromAnglePair(equatPos, _tai, DeltaT);
         polarPVT.setFromAnglePair(polarPos, _tai, DeltaT);
         return atPole;
+    }
+    
+    bool PVTCoord::isfinite() const {
+        return _coord.isfinite() && std::isfinite(_orient) && std::isfinite(_vel) && std::isfinite(_tai);
     }
 
     PVTCoord PVTCoord::offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const {

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stdexcept>
 #include <sstream>
 #include "slalib.h"
@@ -88,7 +89,7 @@ namespace coordConv {
     
     void FK4CoordSys::setDate(double date) {
         this->_date = date;
-        if (isFinite(date)) {
+        if (std::isfinite(date)) {
             // note: slaEtrms and slaPrebn both want Besselian date
             double eTermsCArr[3], from1950PrecCArr[3][3], to1950PrecCArr[3][3];
             slaEtrms(date, eTermsCArr);

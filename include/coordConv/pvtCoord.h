@@ -64,6 +64,11 @@ namespace coordConv {
         @param[in] tai: TAI date at which to compute coord (MJD, sec)
         */
         virtual Coord getCoord(double tai) const;
+    
+        /**
+        Return True if all values are finite
+        */
+        bool isfinite() const;
         
         /**
         Retrieve spherical position

@@ -23,11 +23,6 @@ namespace coordConv {
     */
     double hypot(double x, double y);
 
-    /// Return true if value is finite
-    inline bool isFinite(double val) {
-        return (std::fabs(val) <= std::numeric_limits<double>::max());
-    }
-
     /**
     Rotate a 2-dimensional vector by a given angle.
 

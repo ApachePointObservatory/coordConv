@@ -39,19 +39,6 @@ class TestMathUtils(unittest.TestCase):
             for y in (0, -2e-45, -3.3, 234.32):
                 self.assertTrue(numpy.allclose([coordConv.hypot(x, y)], [math.hypot(x, y)]))
     
-    def testIsFinite(self):
-        """Test isFinite
-        """
-        for x, isFinite in (
-            (0, True),
-            (coordConv.DoubleMax, True),
-            (-coordConv.DoubleMax, True),
-            (numpy.nan, False),
-            (numpy.inf, False), 
-            (-numpy.inf, False),
-        ):
-            self.assertEqual(coordConv.isFinite(x), isFinite)
-    
     def testTrig(self):
         """Test degrees-based trig functions
         """

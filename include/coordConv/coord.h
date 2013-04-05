@@ -136,6 +136,11 @@ namespace coordConv {
         @return cartesian proper motion and radial velocity (AU/year)
         */
         Eigen::Vector3d const getVecPM() const { return _pm; }
+        
+        /**
+        Test if all values are finite
+        */
+        bool isfinite() const;
 
         /**
         Compute the angular separation from another coord

@@ -128,6 +128,15 @@ namespace coordConv {
 //        return _atInfinity ? 0 : _pos.dot(_pm) * KMPerSec_per_AUPerYear / _dist;
     }
     
+    bool Coord::isfinite() const {
+        for (int i = 0; i < 3; ++i) {
+            if (!std::isfinite(_pos(i))) return false;
+            if (!std::isfinite(_pm(i))) return false;
+        }
+        if (!std::isfinite(_dist)) return false;
+        return true;
+    }
+    
     double Coord::angularSeparation(Coord const &coord) const {
         double crossMag = _pos.cross(coord.getVecPos()).norm();
         double dotProd = _pos.dot(coord.getVecPos());

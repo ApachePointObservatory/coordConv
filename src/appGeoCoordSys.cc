@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stdexcept>
 #include <sstream>
 #include "slalib.h"
@@ -27,7 +28,7 @@ namespace coordConv {
     
     void AppGeoCoordSys::setDate(double date) {
         this->_date = date;
-        if (isFinite(date)) {
+        if (std::isfinite(date)) {
             if (std::abs(date - _cachedDate) < _maxAge) {
                 return;
             }
