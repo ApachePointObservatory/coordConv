@@ -64,8 +64,8 @@ namespace coordConv {
             this->t = t;
         }
         
-        /// Is this PVT valid? (Does it have finite pos, vel and t)?
-        bool isValid() const {
+        /// Are all values finite? (Does it have finite pos, vel and t)?
+        bool isfinite() const {
             return std::isfinite(pos) &&  std::isfinite(vel) && std::isfinite(t);
         }
 

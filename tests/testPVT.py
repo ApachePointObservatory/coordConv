@@ -133,40 +133,40 @@ class TestPVT(unittest.TestCase):
             self.assertAlmostEqual(pvt.getPos(newt), predPos(pvt, newt))
     
     def testIsValid(self):
-        """Test pvt.isValid
+        """Test pvt.isfinite
         """
         pvt = PVT(1, 2, 3)
         
-        self.assertTrue(pvt.isValid())
+        self.assertTrue(pvt.isfinite())
         pvt.pos = numpy.nan
-        self.assertFalse(pvt.isValid())
+        self.assertFalse(pvt.isfinite())
         pvt.pos = 1.0
-        self.assertTrue(pvt.isValid())
+        self.assertTrue(pvt.isfinite())
 
         pvt.vel = numpy.nan
-        self.assertFalse(pvt.isValid())
+        self.assertFalse(pvt.isfinite())
         pvt.vel = 1.0
-        self.assertTrue(pvt.isValid())
+        self.assertTrue(pvt.isfinite())
         
         pvt.t = numpy.nan
-        self.assertFalse(pvt.isValid())
+        self.assertFalse(pvt.isfinite())
         pvt.t = 0.0
-        self.assertTrue(pvt.isValid())
+        self.assertTrue(pvt.isfinite())
     
     def testInvalidate(self):
         """Test pvt.invalidate
         """
         pvt = PVT(1, 2, 3)
-        self.assertTrue(pvt.isValid())
+        self.assertTrue(pvt.isfinite())
         pvt.invalidate()
-        self.assertFalse(pvt.isValid())
+        self.assertFalse(pvt.isfinite())
         self.assertFalse(numpy.isfinite(pvt.pos))
         self.assertFalse(numpy.isfinite(pvt.vel))
         self.assertFalse(numpy.isfinite(pvt.t))
 
         pvt2 = PVT(-2, -4, 6)
         pvt.invalidate(5)
-        self.assertFalse(pvt.isValid())
+        self.assertFalse(pvt.isfinite())
         self.assertFalse(numpy.isfinite(pvt.pos))
         self.assertFalse(numpy.isfinite(pvt.vel))
         self.assertEqual(pvt.t, 5.0)
