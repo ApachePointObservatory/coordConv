@@ -8,7 +8,7 @@ namespace coordConv {
     Position, velocity and time
     
     Requirements:
-    * position is in degrees (though that is only required by setFromAnglePair).
+    * position is in degrees (though that is only required by setFromPair with isAngle=true).
     * velocity is in degrees/unit of time.
     However, as used within this package, time is always TAI (MJD, seconds).
     */
@@ -145,20 +145,26 @@ namespace coordConv {
         }
         
         /**
-        Set from a pair of angles (in degrees) computed at different times
+        Set from a pair of positions or angles computed at different times
         
-        It matters that these are angles in degrees, because velocity is computed using
-        anglePair[1] - anglePair[0] wrapped into the range [-180, 180)
-    
-        @param[in] anglePair: pair of positions (angles in degrees), where:
-            anglePair[0] is computed at time t
-            anglePair[1] is computed at time t + deltaT
-        @param[in] t: time at which anglePair[0] is computed
-        @param[in] deltaT: time difference between the two angles
+        @param[in] posPair: pair of positions, where:
+            posPair[0] is computed at time t
+            posPair[1] is computed at time t + deltaT
+        @param[in] t: time at which posPair[0] is computed
+        @param[in] deltaT: time difference between the two positions
+        @param[in] isAngle: if true then posPair values are treated as angles, in degrees,
+            and the resulting velocity is computed using:
+            posPair[1] - posPair[0] wrapped into the range [-180, 180)
+        
+        @warning if isAngle true then posPair must be in degrees
         */
-        void setFromAnglePair(double anglePair[2], double t, double deltaT) {
-            pos = anglePair[0];
-            vel = coordConv::wrapCtr(anglePair[1] - anglePair[0]) / deltaT;
+        void setFromPair(double posPair[2], double t, double deltaT, bool isAngle) {
+            pos = posPair[0];
+            if (isAngle) {
+                vel = coordConv::wrapCtr(posPair[1] - posPair[0]) / deltaT;
+            } else {
+                vel = (posPair[1] - posPair[0]) / deltaT;
+            }
             this->t = t;
         }
     };

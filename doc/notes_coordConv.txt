@@ -8,11 +8,12 @@ To do:
 
 Unit tests to add:
 - PVTCoord and CoordSys.convertFrom variants that use PVTCoord.
-- Untested PVT functionality, such as polarFromXY, xyFromPolar and unary minus
+- Untested PVT functionality, such as unary minus and setFromPair (once I can call that from python)
 - Unit test NoneCoordSys and MountCoordSys
 - Unit test makeCoordSys
 
 SWIG questions:
+- Learn to call PVT.setFromPair from Python
 - Figure out how to make a PVT & argument a return value in SWIG
   (e.g. PVTCoord.getSphPVT should probably return two values, not fill two values)
 - Why did %template fail for adding __repr__ to all the CoordSys subclasses in coordSys.i?

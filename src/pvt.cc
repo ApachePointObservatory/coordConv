@@ -8,13 +8,13 @@ namespace coordConv {
 
     bool polarFromXY(PVT &r, PVT &theta, PVT const &x, PVT const &y, double tai) {
         double rArr[2], thetaArr[2];
-        bool atPole;
+        bool atPole = false;
         for (int i = 0; i < 2; ++i) {
             double tempTAI = tai + (i * DeltaT);
-            atPole |= polarFromXY(rArr[i], thetaArr[i], x.getPos(tai), y.getPos(tai));
+            atPole |= polarFromXY(rArr[i], thetaArr[i], x.getPos(tempTAI), y.getPos(tempTAI));
         }
-        r.setFromAnglePair(rArr, tai, DeltaT);
-        theta.setFromAnglePair(thetaArr, tai, DeltaT);
+        r.setFromPair(rArr, tai, DeltaT, false);
+        theta.setFromPair(thetaArr, tai, DeltaT, true);
         return atPole;
     }
 
@@ -22,10 +22,10 @@ namespace coordConv {
         double xArr[2], yArr[2];
         for (int i = 0; i < 2; ++i) {
             double tempTAI = tai + (i * DeltaT);
-            xyFromPolar(xArr[i], yArr[i], r.getPos(tai), theta.getPos(tai));
+            xyFromPolar(xArr[i], yArr[i], r.getPos(tempTAI), theta.getPos(tempTAI));
         }
-        x.setFromAnglePair(xArr, tai, DeltaT);
-        y.setFromAnglePair(yArr, tai, DeltaT);
+        x.setFromPair(xArr, tai, DeltaT, false);
+        y.setFromPair(yArr, tai, DeltaT, false);
     }
 
 }

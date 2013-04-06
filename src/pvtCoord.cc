@@ -47,8 +47,8 @@ namespace coordConv {
         bool atPole = _coord.getSphPos(equatPos[0], polarPos[0]);
         atPole |= laterCoord.getSphPos(equatPos[1], polarPos[1]);
         
-        equatPVT.setFromAnglePair(equatPos, _tai, DeltaT);
-        polarPVT.setFromAnglePair(polarPos, _tai, DeltaT);
+        equatPVT.setFromPair(equatPos, _tai, DeltaT, true);
+        polarPVT.setFromPair(polarPos, _tai, DeltaT, false);
         return atPole;
     }
     
@@ -64,7 +64,7 @@ namespace coordConv {
             Coord unoffCoord = getCoord(tempTAI);
             coordArr.push_back(unoffCoord.offset(toOrientArr[i], fromOrient.getPos(tempTAI), dist.getPos(tempTAI)));
         }
-        toOrient.setFromAnglePair(toOrientArr, tai, DeltaT);
+        toOrient.setFromPair(toOrientArr, tai, DeltaT, true);
         return PVTCoord(coordArr[0], coordArr[1], tai, DeltaT);
     }
 

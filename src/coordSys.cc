@@ -38,7 +38,7 @@ namespace coordConv {
         double toDirPair[2], dumScaleCh;
         Coord coord0 = this->convertFrom(toDirPair[0], scaleChange, fromCoordSys, fromPVTCoord.getCoord(tai),  fromDir.getPos(tai),  site);
         Coord coord1 = this->convertFrom(toDirPair[1], dumScaleCh,  fromCoordSys, fromPVTCoord.getCoord(tai1), fromDir.getPos(tai1), site);
-        toDir.setFromAnglePair(toDirPair, tai, DeltaT);
+        toDir.setFromPair(toDirPair, tai, DeltaT, true);
         return PVTCoord(coord0, coord1, tai, DeltaT);
     }
 

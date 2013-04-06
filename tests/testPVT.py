@@ -1,16 +1,61 @@
 #!/usr/bin/env python
+import math
 import unittest
 import numpy
-from coordConv import PVT
+import coordConv
 
-def predPos(pvt, t):
+DeltaT = 0.01
+
+def refGetPos(pvt, t):
+    """Reference implementation of PVT.getPos
+    """
     return pvt.pos + (pvt.vel * (t - pvt.t))
+
+# def refXYFromPolar(r, theta, tai):
+#     """Reference implementation of PVT.xyFromPolar
+#     """
+#     xArr = []
+#     yArr = []
+#     for testTAI in (tai, tai + DeltaT):
+#         x, y = coordConv.xyFromPolar(r.getPos(testTAI), theta.getPos(testTAI))
+#         xArr.append(x)
+#         yArr.append(y)
+#     xPVT = coordConv.PVT()
+#     xPVT.pos = xArr[0]
+#     xPVT.vel = (xArr[1] - xArr[0]) / DeltaT
+#     xPVT.t = tai
+#     yPVT = coordConv.PVT()
+#     yPVT.pos = yArr[0]
+#     yPVT.vel = (yArr[1] - yArr[0]) / DeltaT
+#     yPVT.t = tai
+#     return xPVT, yPVT
+
+def refPolarFromXY(x, y, tai):
+    """Reference implementation of PVT.polarFromXY
+    """
+    atPole = False
+    rArr = []
+    thetaArr = []
+    for testTAI in (tai, tai + DeltaT):
+        ap, r, theta = coordConv.polarFromXY(x.getPos(testTAI), y.getPos(testTAI))
+        rArr.append(r)
+        thetaArr.append(theta)
+        atPole = atPole or ap
+    rPVT = coordConv.PVT()
+    rPVT.pos = rArr[0]
+    rPVT.vel = (rArr[1] - rArr[0]) / DeltaT
+    rPVT.t = tai
+    thetaPVT = coordConv.PVT()
+    thetaPVT.pos = thetaArr[0]
+    thetaPVT.vel = coordConv.wrapCtr(thetaArr[1] - thetaArr[0]) / DeltaT
+    thetaPVT.t = tai
+    return atPole, rPVT, thetaPVT
 
 class TestPVT(unittest.TestCase):
     def testConstructors(self):
         """Test PVT constructors
         """
-        pvt = PVT(1.0, 2.0, 3.0)
+        pvt = coordConv.PVT(1.0, 2.0, 3.0)
         self.assertEquals(pvt.pos, 1.0)
         self.assertEquals(pvt.vel, 2.0)
         self.assertEquals(pvt.t, 3.0)
@@ -18,7 +63,7 @@ class TestPVT(unittest.TestCase):
     def testCopy(self):
         """Test PVT.copy() and PVT.copy(t)
         """
-        pvt1 = PVT(1.0, -2.0, 3.0)
+        pvt1 = coordConv.PVT(1.0, -2.0, 3.0)
         pvt2 = pvt1.copy()
         pvt3 = pvt1.copy(5.0)
 
@@ -38,10 +83,10 @@ class TestPVT(unittest.TestCase):
     def testAddPVT(self):
         """Test pvt + pvt
         """
-        pvt1 = PVT(1.0, 2.0, 3.0)
-        pvt2 = PVT(-1.5, -3.0, 4.0)
+        pvt1 = coordConv.PVT(1.0, 2.0, 3.0)
+        pvt2 = coordConv.PVT(-1.5, -3.0, 4.0)
         pvt3 = pvt1 + pvt2
-        predPos3 = pvt1.pos + predPos(pvt2, pvt1.t)
+        predPos3 = pvt1.pos + refGetPos(pvt2, pvt1.t)
         self.assertAlmostEqual(pvt3.pos, predPos3)
         self.assertAlmostEqual(pvt3.vel, -1.0)
         self.assertAlmostEqual(pvt3.t, 3.0)
@@ -50,10 +95,10 @@ class TestPVT(unittest.TestCase):
     def testSubtractPVT(self):
         """Test pvt - pvt
         """
-        pvt1 = PVT(1.0, 2.0, 3.0)
-        pvt2 = PVT(-1.5, -3.0, 4.0)
+        pvt1 = coordConv.PVT(1.0, 2.0, 3.0)
+        pvt2 = coordConv.PVT(-1.5, -3.0, 4.0)
         pvt3 = pvt1 - pvt2
-        predPos3 = pvt1.pos - predPos(pvt2, pvt1.t)
+        predPos3 = pvt1.pos - refGetPos(pvt2, pvt1.t)
         self.assertAlmostEqual(pvt3.pos, predPos3)
         self.assertAlmostEqual(pvt3.vel, 5.0)
         self.assertAlmostEqual(pvt3.t, 3.0)
@@ -67,8 +112,8 @@ class TestPVT(unittest.TestCase):
         """Test pvt + scalar, pvt += scalar, pvt - scalar and pvt -= scalar
         """
         for pvt in (
-            PVT(1.0, 2.0, 3.0),
-            PVT(-1.5, -3.0, 4.0)
+            coordConv.PVT(1.0, 2.0, 3.0),
+            coordConv.PVT(-1.5, -3.0, 4.0)
         ):
             for val in (-1.234e97, -25.3, -1.0e-13, 0.0, 1.0e13, 39.6, 1.34e99):
                 addPVT = pvt + val
@@ -76,7 +121,7 @@ class TestPVT(unittest.TestCase):
                 self.assertEqual(addPVT.vel, pvt.vel)
                 self.assertEqual(addPVT.t, pvt.t)
                 
-                inPlaceAddPVT = PVT(pvt.pos, pvt.vel, pvt.t)
+                inPlaceAddPVT = coordConv.PVT(pvt.pos, pvt.vel, pvt.t)
                 inPlaceAddPVT += val
                 self.assertEqual(inPlaceAddPVT.pos, addPVT.pos)
                 self.assertEqual(inPlaceAddPVT.vel, addPVT.vel)
@@ -87,7 +132,7 @@ class TestPVT(unittest.TestCase):
                 self.assertEqual(subPVT.vel, pvt.vel)
                 self.assertEqual(subPVT.t, pvt.t)
 
-                inPlaceSubPVT = PVT(pvt.pos, pvt.vel, pvt.t)
+                inPlaceSubPVT = coordConv.PVT(pvt.pos, pvt.vel, pvt.t)
                 inPlaceSubPVT -= val
                 self.assertEqual(inPlaceSubPVT.pos, subPVT.pos)
                 self.assertEqual(inPlaceSubPVT.vel, subPVT.vel)
@@ -97,8 +142,8 @@ class TestPVT(unittest.TestCase):
         """Test pvt * scalar, pvt *= scalar, pvt / scalar and pvt /= scalar
         """
         for pvt in (
-            PVT(1.0, 2.0, 3.0),
-            PVT(-1.5, -3.0, 4.0)
+            coordConv.PVT(1.0, 2.0, 3.0),
+            coordConv.PVT(-1.5, -3.0, 4.0)
         ):
             for val in (-1.234e97, -25.3, -1.0e-13, 0.0, 1.0e13, 39.6, 1.34e99):
                 multPVT = pvt * val
@@ -106,7 +151,7 @@ class TestPVT(unittest.TestCase):
                 self.assertEqual(multPVT.vel, pvt.vel * val)
                 self.assertEqual(multPVT.t, pvt.t)
 
-                inPlaceMultPVT = PVT(pvt.pos, pvt.vel, pvt.t)
+                inPlaceMultPVT = coordConv.PVT(pvt.pos, pvt.vel, pvt.t)
                 inPlaceMultPVT *= val
                 self.assertEqual(inPlaceMultPVT.pos, multPVT.pos)
                 self.assertEqual(inPlaceMultPVT.vel, multPVT.vel)
@@ -118,7 +163,7 @@ class TestPVT(unittest.TestCase):
                     self.assertEqual(divPVT.vel, pvt.vel / val)
                     self.assertEqual(divPVT.t, pvt.t)
 
-                    inPlaceDivPVT = PVT(pvt.pos, pvt.vel, pvt.t)
+                    inPlaceDivPVT = coordConv.PVT(pvt.pos, pvt.vel, pvt.t)
                     inPlaceDivPVT /= val
                     self.assertEqual(inPlaceDivPVT.pos, divPVT.pos)
                     self.assertEqual(inPlaceDivPVT.vel, divPVT.vel)
@@ -127,15 +172,15 @@ class TestPVT(unittest.TestCase):
     def testGetPos(self):
         """Test pvt.getPos
         """
-        pvt = PVT(1.1, 2.2, 12345.0)
+        pvt = coordConv.PVT(1.1, 2.2, 12345.0)
         for dt in (1235.5, -123.3):
             newt = pvt.t + dt
-            self.assertAlmostEqual(pvt.getPos(newt), predPos(pvt, newt))
+            self.assertAlmostEqual(pvt.getPos(newt), refGetPos(pvt, newt))
     
     def testIsValid(self):
         """Test pvt.isfinite
         """
-        pvt = PVT(1, 2, 3)
+        pvt = coordConv.PVT(1, 2, 3)
         
         self.assertTrue(pvt.isfinite())
         pvt.pos = numpy.nan
@@ -156,7 +201,7 @@ class TestPVT(unittest.TestCase):
     def testInvalidate(self):
         """Test pvt.invalidate
         """
-        pvt = PVT(1, 2, 3)
+        pvt = coordConv.PVT(1, 2, 3)
         self.assertTrue(pvt.isfinite())
         pvt.invalidate()
         self.assertFalse(pvt.isfinite())
@@ -164,12 +209,54 @@ class TestPVT(unittest.TestCase):
         self.assertFalse(numpy.isfinite(pvt.vel))
         self.assertFalse(numpy.isfinite(pvt.t))
 
-        pvt2 = PVT(-2, -4, 6)
+        pvt2 = coordConv.PVT(-2, -4, 6)
         pvt.invalidate(5)
         self.assertFalse(pvt.isfinite())
         self.assertFalse(numpy.isfinite(pvt.pos))
         self.assertFalse(numpy.isfinite(pvt.vel))
         self.assertEqual(pvt.t, 5.0)
+
+    def testPolarFromXY(self):
+        """Test polarFromXY and xyFromPolar
+        """
+        for xPos, yPos, predAtPole in (
+            ( 1,  0, False),
+            (-1,  0, False),
+            ( 0,  1, False),
+            ( 0, -1, False),
+            ( 1,  1, False),
+            ( 1, -1, False),
+            (-1,  1, False),
+            (-1, -1, False),
+            (-123.45, -123.45, False),
+            (0, 0, True),
+        ):
+            for xVel in (-1, 0, 1):
+                for yVel in (-1, 0, 1):
+                    x = coordConv.PVT(xPos, xVel, 10)
+                    y = coordConv.PVT(yPos, yVel, 10)
+                    r = coordConv.PVT()
+                    theta = coordConv.PVT()
+                    for endTime in (5, 10, 15):
+                        atPole = coordConv.polarFromXY(r, theta, x, y, endTime)
+                        refAtPole, refR, refTheta = refPolarFromXY(x, y, endTime)
+                        self.assertEqual(atPole, refAtPole)
+                        self.assertEqual(r.t, endTime)
+                        self.assertEqual(refR.t, endTime)
+                        self.assertEqual(theta.t, endTime)
+                        self.assertEqual(refTheta.t, endTime)
+                        self.assertTrue(numpy.allclose(
+                            (r.pos, r.vel, theta.pos, theta.vel),
+                            (refR.pos, refR.vel, refTheta.pos, refTheta.vel),
+                        ))
+                        refX = coordConv.PVT()
+                        refY = coordConv.PVT()
+                        coordConv.xyFromPolar(refX, refY, r, theta, endTime)
+                        self.assertTrue(numpy.allclose(
+                            (x.pos, x.vel, y.pos, y.vel),
+                            (refX.getPos(10), refX.vel, refY.getPos(10), refY.vel),
+                        ))
+
 
 if __name__ == '__main__':
     unittest.main()
