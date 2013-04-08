@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <iostream>
 #include "coordConv/mathUtils.h"
 
 namespace coordConv {
@@ -145,6 +147,11 @@ namespace coordConv {
         }
         
         /**
+        Return a string representation
+        */
+        virtual std::string __repr__() const;
+        
+        /**
         Set from a pair of positions or angles computed at different times
         
         @param[in] posPair: pair of positions, where:
@@ -214,5 +221,7 @@ namespace coordConv {
         ret.pos = coordConv::wrapCtr(ret.pos);
         return ret;
     }
+
+    std::ostream &operator<<(std::ostream &os, PVT const &pvt);
 
 }

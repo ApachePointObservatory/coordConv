@@ -183,7 +183,12 @@ namespace coordConv {
         this coord
         */
         Coord offset(double &toOrient, double fromOrient, double dist) const;
-    
+        
+        /**
+        Return a string representation
+        */
+        virtual std::string __repr__() const;
+
     private:
         Eigen::Vector3d _pos;   // vector position (AU)
         Eigen::Vector3d _pm;    // vector proper motion and radial velocity (AU/year)
@@ -209,5 +214,7 @@ namespace coordConv {
         */
         void _setCache();
     };
+    
+    std::ostream &operator<<(std::ostream &out, Coord const &coord);
 
 }

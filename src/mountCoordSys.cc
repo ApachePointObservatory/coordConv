@@ -26,5 +26,11 @@ namespace coordConv {
         return Coord(); // null Coord
     }
 
+    std::string MountCoordSys::__repr__() const {
+        std::ostringstream os;
+        os << "MountCoordSys(" << getDate() << ")";
+        return os.str();
+    }
+
 }
 

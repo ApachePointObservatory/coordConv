@@ -166,5 +166,11 @@ namespace coordConv {
         return Coord(appTopoPos);
     }
 
+    std::string ObsCoordSys::__repr__() const {
+        std::ostringstream os;
+        os << "ObsCoordSys(" << getDate() << ")";
+        return os.str();
+    }
+
 }
 

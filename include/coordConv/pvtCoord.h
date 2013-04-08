@@ -92,6 +92,11 @@ namespace coordConv {
         @raise runtime_error if this coord is too near a pole
         */
         virtual PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const;
+
+        /**
+        Return a string representation
+        */
+        virtual std::string __repr__() const;
     
     private:
         Coord _coord;   // coordinate at initial time
@@ -99,5 +104,7 @@ namespace coordConv {
         double _vel;    // velocity along the great circle (deg/sec)
         double _tai;    // initial TAI date (MJD, seconds)
     };
+
+    std::ostream &operator<<(std::ostream &os, PVTCoord const &pvtCoord);
 
 }

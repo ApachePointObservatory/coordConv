@@ -74,4 +74,10 @@ namespace coordConv {
         return Coord(fk5J2000Pos, fk5J2000PM);
     };
 
+    std::string FK5CoordSys::__repr__() const {
+        std::ostringstream os;
+        os << "FK5CoordSys(" << getDate() << ")";
+        return os.str();
+    }
+
 }

@@ -160,8 +160,10 @@ namespace coordConv {
         */
         virtual double dateFromTAI(double tai) const = 0;
         
-        ///< get string representation
-        virtual std::string asString() const;
+        /**
+        Return a string representation
+        */
+        virtual std::string __repr__() const = 0;
     
     protected:
         std::string _name;  /// name of coordinate system
@@ -201,6 +203,7 @@ namespace coordConv {
         virtual CoordSys::Ptr clone(double date) const;
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual std::string __repr__() const;
     };
     
     /**
@@ -220,6 +223,7 @@ namespace coordConv {
         virtual void setDate(double date);
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual std::string __repr__() const;
 
     private:
         Eigen::Matrix3d _to2000PrecMat; /// precession matrix from date to J2000.0
@@ -248,6 +252,7 @@ namespace coordConv {
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual double dateFromTAI(double tai) const;
+        virtual std::string __repr__() const;
 
     private:
         Eigen::Vector3d _eTerms;
@@ -274,6 +279,7 @@ namespace coordConv {
         virtual CoordSys::Ptr clone(double date) const;
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual std::string __repr__() const;
     };
 
     /**
@@ -307,6 +313,7 @@ namespace coordConv {
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual double dateFromTAI(double tai) const;
+        virtual std::string __repr__() const;
         
         /// return maximum delta date (years) before setDate will update the internal cache
         virtual double getMaxAge() const { return _maxAge; };
@@ -340,6 +347,7 @@ namespace coordConv {
         virtual void setDate(double date) { setDate(date, false); };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual std::string __repr__() const;
 
         /**
         Set the date and optionally freeze cached apparent geocentric data
@@ -399,6 +407,7 @@ namespace coordConv {
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord fromAppTopo(Coord const &coord, Site const &site) const;
         virtual Coord toAppTopo(Coord const &coord, Site const &site) const;
+        virtual std::string __repr__() const;
 
         /**
         Set the date and optionally freeze cached apparent geocentric data
@@ -439,6 +448,7 @@ namespace coordConv {
         virtual CoordSys::Ptr clone(double date) const;
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual std::string __repr__() const;
     };
     
     /**
@@ -462,6 +472,7 @@ namespace coordConv {
         virtual CoordSys::Ptr clone(double date) const;
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual std::string __repr__() const;
     };
     
     /**
@@ -473,4 +484,7 @@ namespace coordConv {
     @raise std::runtime_error if the name is not recognized
     */
     CoordSys::Ptr makeCoordSys(std::string const &name, double date);
+
+    std::ostream &operator<<(std::ostream &out, CoordSys const &coordSys);
+
 }

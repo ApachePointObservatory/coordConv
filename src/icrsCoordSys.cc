@@ -47,5 +47,11 @@ namespace coordConv {
         
         return Coord(toPos, fromPM);
     };
+
+    std::string ICRSCoordSys::__repr__() const {
+        std::ostringstream os;
+        os << "ICRSCoordSys(" << getDate() << ")";
+        return os.str();
+    }
     
 }

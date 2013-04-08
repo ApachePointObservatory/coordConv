@@ -26,5 +26,9 @@ namespace coordConv {
         return Coord(); // null Coord
     }
 
+    std::string NoneCoordSys::__repr__() const {
+        return std::string("NoneCoordSys()");
+    }
+
 }
 

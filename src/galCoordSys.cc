@@ -61,4 +61,10 @@ namespace coordConv {
         return Coord(fk5J2000Pos, fk5J2000PM);
     }
 
+    std::string GalCoordSys::__repr__() const {
+        std::ostringstream os;
+        os << "GalCoordSys(" << getDate() << ")";
+        return os.str();
+    }
+
 }

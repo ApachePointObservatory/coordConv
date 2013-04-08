@@ -179,4 +179,10 @@ namespace coordConv {
         return slaEpb((tai + TT_TAI) / SecPerDay); // slaEpb converts MJD days to Besselian epoch
     }
 
+    std::string FK4CoordSys::__repr__() const {
+        std::ostringstream os;
+        os << "FK4CoordSys(" << getDate() << ")";
+        return os.str();
+    }
+
 }

@@ -47,13 +47,6 @@ namespace coordConv {
         return PVTCoord(zpmCoord, coord.getOrient(), coord.getVel(), coord.getTAI());
     }
 
-    
-    std::string CoordSys::asString() const {
-        std::ostringstream os;
-        os << "CoordSys(" << getName() << ", " << getDate() << ")";
-        return os.str();
-    }
-
     CoordSys::Ptr makeCoordSys(std::string const &name, double date) {
         if (name == "icrs") {
             return boost::make_shared<coordConv::ICRSCoordSys>(date);
@@ -80,4 +73,9 @@ namespace coordConv {
         }
     }
 
+    std::ostream &operator<<(std::ostream &os, CoordSys const &coordSys) {
+        // use overloaded __repr__
+        os << coordSys.__repr__();
+        return os;
+    }
 }

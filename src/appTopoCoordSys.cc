@@ -110,4 +110,10 @@ namespace coordConv {
         return Coord(appGeoPos);
     }
 
+    std::string AppTopoCoordSys::__repr__() const {
+        std::ostringstream os;
+        os << "AppTopoCoordSys(" << getDate() << ")";
+        return os.str();
+    }
+
 }

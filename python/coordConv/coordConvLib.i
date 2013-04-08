@@ -61,7 +61,7 @@
 %declareNumPyConverters(Eigen::Vector3d);
 %declareNumPyConverters(Eigen::Matrix3d);
 
-%include "pvt.i"
+%include "coordConv/pvt.h"
 %include "coordConv/physConst.h"
 
 %apply double &OUTPUT { double & };
@@ -72,6 +72,6 @@
 %include "coordConv/rotXY.h"
 %include "coordConv/site.h"
 %include "coordConv/time.h"
-%include "coordConv/coord.i"
+%include "coordConv/coord.h"
 %include "coordConv/pvtCoord.h"
 %include "coordSys.i"

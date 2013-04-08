@@ -68,4 +68,19 @@ namespace coordConv {
         return PVTCoord(coordArr[0], coordArr[1], tai, DeltaT);
     }
 
+    std::string PVTCoord::__repr__() const {
+        std::ostringstream os;
+        os << *this;
+        return os.str();
+    }
+
+    std::ostream &operator<<(std::ostream &os, PVTCoord const &pvtCoord) {
+        Coord coord = pvtCoord.getCoord();
+        double orient = pvtCoord.getOrient();
+        double vel = pvtCoord.getVel();
+        double tai = pvtCoord.getTAI();
+        os << "PVTCoord(" << coord << ", " << orient << ", " << vel << ", " << tai << ")";
+        return os;
+    }
+
 }

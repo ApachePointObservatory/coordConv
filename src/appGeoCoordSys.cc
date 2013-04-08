@@ -140,4 +140,10 @@ namespace coordConv {
         return julianEpochFromMJDSec(tai + TT_TAI);
     }
 
+    std::string AppGeoCoordSys::__repr__() const {
+        std::ostringstream os;
+        os << "AppGeoCoordSys(" << getDate() << ")";
+        return os.str();
+    }
+
 }

@@ -1,3 +1,4 @@
+#include <sstream>
 #include "coordConv/pvt.h"
 
 namespace {
@@ -5,6 +6,12 @@ namespace {
 }
 
 namespace coordConv {
+
+    std::string PVT::__repr__() const {
+        std::ostringstream os;
+        os << *this;
+        return os.str();
+    }
 
     bool polarFromXY(PVT &r, PVT &theta, PVT const &x, PVT const &y, double tai) {
         double rArr[2], thetaArr[2];
@@ -26,6 +33,11 @@ namespace coordConv {
         }
         x.setFromPair(xArr, tai, DeltaT, false);
         y.setFromPair(yArr, tai, DeltaT, false);
+    }
+
+    std::ostream &operator<<(std::ostream &os, PVT const &pvt) {
+        os << "PVT(" << pvt.pos << ", " << pvt.vel << ", " << pvt.t << ")";   
+        return os;
     }
 
 }

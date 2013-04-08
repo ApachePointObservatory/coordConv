@@ -199,6 +199,12 @@ namespace coordConv {
         return toCoord;
     }
 
+    std::string Coord::__repr__() const {
+        std::ostringstream os;
+        os << *this;
+        return os.str();
+    }
+
     void Coord::_setPosFromSph(double equatAng, double polarAng, double parallax) {
         if ((polarAng < -90.0) || (polarAng > 90.0)) {
             std::ostringstream os;
@@ -227,6 +233,21 @@ namespace coordConv {
         // this test for atPole is based on reliably round-tripping equatPM to 6 digits
         double xyFracMag = hypot(_pos(0), _pos(1)) / _dist;
         _atPole = (xyFracMag * xyFracMag < std::numeric_limits<double>::epsilon());
+    }
+
+    std::ostream &operator<<(std::ostream &os, Coord const &coord) {
+        double equatAng, polarAng, equatPM, polarPM;
+        bool atPole = coord.getSphPos(equatAng, polarAng);
+        coord.getPM(equatPM, polarPM);
+        double radVel = coord.getRadVel();
+        double parallax = coord.getParallax();
+
+        os << "Coord(" << equatAng << ", " << polarAng << ", " << parallax;
+        if ((equatPM != 0) || (polarPM != 0) || (radVel != 0)) {
+            os << ", " << equatPM << ", " << polarPM << ", " << radVel;
+        }
+        os << ")";
+        return os;
     }
 
 }
