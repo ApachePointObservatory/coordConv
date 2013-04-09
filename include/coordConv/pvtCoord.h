@@ -15,7 +15,7 @@ namespace coordConv {
         
         @param[in] coord: coordinate at time tai
         @param[in] orient: orientation of arc of motion at coord (deg)
-            see Coord.offset for a diagram explaining orientation
+            see Coord.offset for an explanation of orientation
         @param[in] vel: speed of motion along arc of great circle (deg/sec)
         @param[in] tai: TAI date of coord (MJD seconds)
         */
@@ -28,8 +28,11 @@ namespace coordConv {
         @param[in] coord1: coordinate at time tai + deltaT; proper motion and radial velocity are ignored
         @param[in] tai: initial TAI date of PVTCoord (MJD seconds)
         @param[in] deltaT: TAI of coord1 - TAI of coord0
+        @param[in] defOrient: default orientation (deg);
+            used as orientation if coord1 is so near coord0 that the orientation cannot be computed;
+            see Coord.offset for an explanation of orientation
         */
-        explicit PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT);
+        explicit PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT, double defOrient = 0);
         
         /**
         Construct a PVTCoord with all NaN data

@@ -120,18 +120,19 @@ class TestCoord(unittest.TestCase):
         """Test offset, angularSeparation and orientationTo for small offsets not too near the pole
         
         In this regime delta-long = dist along long / cos(lat) is a reasonable approximation
-        but I have no simple way to compute toOrient
+        but I have no simple way to compute toOrient, except if dist very small then toOrient = fromOrient
         """
         for fromPolarAng in (-40.0, 0.43, 36.7):
             cosPolarAng = cosd(fromPolarAng)
             for fromEquatAng in (0, 41.0): # should not matter
                 fromCoord = Coord(fromEquatAng, fromPolarAng)
-                for fromOrient in (-45.0, 0.01, 12.5):
+                for fromOrient in (-90, -72, -45.0, -30, 0.01, 12.5, 31, 47, 56, 68, 89):
                     cosFromOrient = cosd(fromOrient)
                     sinFromOrient = sind(fromOrient)
-                    for dist in (0.0000001, 0.00001, 0.001, 0.01, 0.13):
+                    for dist in (0, 1e-12, 1e-11, 1e-10, 1e-9, 1e-8, 1e-7, 1e-5, 0.001, 0.01, 0.13):
                         predEquatAng = fromEquatAng + (dist * cosFromOrient / cosPolarAng)
                         predPolarAng = fromPolarAng + (dist * sinFromOrient)
+
                         toCoord, toOrient = fromCoord.offset(fromOrient, dist)
                         atPole, toEquatAng, toPolarAng = toCoord.getSphPos()
                         if abs(dist) > 0.1:
@@ -147,8 +148,15 @@ class TestCoord(unittest.TestCase):
                         fromCoord = Coord(fromEquatAng, fromPolarAng)
                         toCoord = Coord(toEquatAng, toPolarAng)
                         self.assertAlmostEqual(dist, fromCoord.angularSeparation(toCoord))
-                        self.assertAlmostEqual(fromOrient, fromCoord.orientationTo(toCoord), places=orientPlaces)
-                        self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.orientationTo(fromCoord), toOrient), places=orientPlaces)
+                        predFromOrient = fromCoord.orientationTo(toCoord)
+                        if numpy.isfinite(predFromOrient):
+                            self.assertAlmostEqual(fromOrient, predFromOrient, places=orientPlaces)
+                            self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.orientationTo(fromCoord), toOrient), places=orientPlaces)
+                        else:
+                            self.assertLess(dist, 1e-7)
+                            self.assertAlmostEqual(fromEquatAng, toEquatAng)
+                            self.assertAlmostEqual(fromPolarAng, toPolarAng)
+                            self.assertAlmostEqual(fromOrient, toOrient)
 
     def testOffset(self):
         """Test offset, angularSeparation and orientationTo for offsets over a wide range of angles

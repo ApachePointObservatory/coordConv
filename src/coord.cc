@@ -144,36 +144,49 @@ namespace coordConv {
     }
     
     double Coord::orientationTo(Coord const &coord) const {
-        Eigen::Vector3d fromUnitPos = _pos / _dist;
-        Eigen::Vector3d toPos = coord.getVecPos();
+        Eigen::Vector3d fromU = _pos / _dist;
+        Eigen::Vector3d toU = coord.getVecPos();
+        toU.normalize();
         
-        double sinVal = (toPos(1) * fromUnitPos(0)) - (toPos(0) * fromUnitPos(1));
-        double cosVal = (toPos(2) * ((fromUnitPos(0) * fromUnitPos(0)) + (fromUnitPos(1) * fromUnitPos(1))))
-                      - (fromUnitPos(2) * ((toPos(0) * fromUnitPos(0)) + (toPos(1) * fromUnitPos(1))));
-        return (sinVal != 0.0 || cosVal != 0.0) ? wrapCtr(90 - atan2d(sinVal, cosVal)) : DoubleNaN;
+        double sinVal = (toU(1) * fromU(0)) - (toU(0) * fromU(1));
+        double cosVal = (toU(2) * ((fromU(0) * fromU(0)) + (fromU(1) * fromU(1))))
+                      - (fromU(2) * ((toU(0) * fromU(0)) + (toU(1) * fromU(1))));
+        // 2e-10 is based on experimentation; max observed error was < 1.5" with this limit
+        if ((std::abs(sinVal) > 2e-10) || (std::abs(cosVal) > 2e-10)) {
+            return wrapCtr(90 - atan2d(sinVal, cosVal));
+        } else {
+            return DoubleNaN;
+        }
     }
     
     Coord Coord::offset(double &toOrient, double fromOrient, double dist) const {
         if (atPole()) {
             throw std::runtime_error("cannot offset; at pole");
         }
+        // short-circuit zero offset
+        if (dist == 0) {
+            toOrient = wrapCtr(fromOrient);
+            return *this;
+        }
 
         // code is a minor adaptation of LSST afw Coord::offset
 
-        // We must transofmr
-        // To do the rotation, compute a rotation matrix based on axis of rotation.
-        // The axis of rotation is given by _pos x v,
+        // To do the rotation, compute a rotation matrix based on axis of rotation
+        // 
+        // The axis of rotation is given by r x v,
         // where:
-        // - _pos is the vector position of this coord
+        // - r is a unit vector along _pos, the vector position of this coord
         // - v is a unit vector in the direction of the great circle offset (tangent to the sphere at _pos),
-        // computed as follows:
-        // let u = unit vector lying on a parallel of declination
-        // let w = unit vector along line of longitude = r x u
+        //
+        // compute v as follows:
+        // let u = a unit vector along the direction of increasing equatorial angle
+        //       = (-ry, rx, 0), normalized (which is impossible at the pole)
+        // let w = a unit vector along the direction of increasing polar angle
+        //       = r x u
         // the vector v must satisfy the following:
         // r . v = 0
         // u . v = cos(fromOrient)
         // w . v = sin(fromOrient)
-
         // v is a linear combination of u and w
         // v = cos(fromOrient)*u + sin(fromOrient)*w
     
@@ -181,21 +194,23 @@ namespace coordConv {
         // - create u vector
         // - solve w vector (r cross u)
         // - compute v
-        Eigen::Vector3d uloc;
-        double equatAng, polarAng;
-        getSphPos(equatAng, polarAng);
-        uloc << -sind(equatAng), cosd(equatAng), 0.0;
-        Eigen::Vector3d wloc = (_pos / _dist).cross(uloc);
-        Eigen::Vector3d vloc = cosd(fromOrient)*uloc + sind(fromOrient)*wloc;
+        Eigen::Vector3d u = Eigen::Vector3d(-_pos(1), _pos(0), 0) / hypot(_pos(0), _pos(1));
+        Eigen::Vector3d w = (_pos / _dist).cross(u);
+        Eigen::Vector3d v = (cosd(fromOrient) * u) + (sind(fromOrient) * w);
 
-        // take r x vloc to get the axis
-        Eigen::Vector3d axisVector = (_pos / _dist).cross(vloc);
+        // take r x v to get the axis
+        Eigen::Vector3d axisVector = (_pos / _dist).cross(v);
         Eigen::Matrix3d rotMat;
         computeRotationMatrix(rotMat, axisVector, dist);
         Eigen::Vector3d toPos = rotMat * _pos;
         Eigen::Vector3d toVel = rotMat * _pm;
         Coord toCoord(toPos, toVel);
-        toOrient = wrapCtr(180 + toCoord.orientationTo(*this));
+        double unwrappedToOrient = toCoord.orientationTo(*this) + 180.0;
+        if (!std::isfinite(unwrappedToOrient)) {
+            // distance too small
+            unwrappedToOrient = fromOrient;
+        }
+        toOrient = wrapCtr(unwrappedToOrient);
         return toCoord;
     }
 

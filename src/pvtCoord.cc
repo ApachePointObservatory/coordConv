@@ -14,7 +14,7 @@ namespace coordConv {
         _tai(tai)
     {}
     
-    PVTCoord::PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT) :
+    PVTCoord::PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT, double defOrient) :
         _coord(coord0),
         _orient(),
         _vel(),
@@ -26,6 +26,9 @@ namespace coordConv {
         double dist = coord0.angularSeparation(coord1);
         _vel = dist / deltaT;
         _orient = coord0.orientationTo(coord1);
+        if (!std::isfinite(_orient)) {
+            _orient = defOrient;
+        }
     }
 
     PVTCoord::PVTCoord() :
@@ -65,7 +68,7 @@ namespace coordConv {
             coordArr.push_back(unoffCoord.offset(toOrientArr[i], fromOrient.getPos(tempTAI), dist.getPos(tempTAI)));
         }
         toOrient.setFromPair(toOrientArr, tai, DeltaT, true);
-        return PVTCoord(coordArr[0], coordArr[1], tai, DeltaT);
+        return PVTCoord(coordArr[0], coordArr[1], tai, DeltaT, fromOrient.getPos(tai));
     }
 
     std::string PVTCoord::__repr__() const {
