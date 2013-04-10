@@ -317,10 +317,12 @@ namespace coordConv {
         
         /// return maximum delta date (years) before setDate will update the internal cache
         virtual double getMaxAge() const { return _maxAge; };
+        /// return date of cache (TDB, Julian years); 0 if never computed
+        virtual double getCacheDate() const { return _cachedDate; };
 
     private:
         double _maxAge;             ///< maximum date differential to reuse cache (years)
-	    double _cachedDate;         ///< date at which data computed; 0 if never computed
+	    double _cachedDate;         ///< date at which data computed (TDB, Julian years); 0 if never computed
 	    double _pmSpan;             ///< time over which to correct for proper motion (Julian years)
 	    Eigen::Vector3d _bcPos;     ///< barycentric position of Earth (au)
 	    Eigen::Vector3d _hcDir;     ///< heliocentric position of Earth (unit vector)
