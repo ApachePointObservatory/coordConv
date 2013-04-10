@@ -21,7 +21,7 @@ namespace coordConv {
         double corrLong;    ///< longitude corrected for pole wander (deg)
         double corrLat;     ///< latitude corrected for pole wander (deg)
         double wavelen;     ///< wavelength for which to compute refraction coefficients (Angstroms)
-        double refCoA, refCoB;  ///< A, B refraction coefficients (radians!), where:
+        double refCoA, refCoB;  ///< A, B refraction coefficients (deg), where:
             ///< zdSpace = refCoA tan zdEarth + refCoB tan^3 zdEarth
             ///< zdEarth is the zenith distance of an object as observed through the atmosphere (radians)
             ///< zdSpace is the zenith distance of an object if there was no refraction (radians)
