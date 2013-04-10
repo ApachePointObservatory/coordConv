@@ -1,14 +1,11 @@
 Issues:
-- apptopo coordinates: the amount of refraction looks too small to me: 4 arcsec at 10 degrees altitude
-  whereas I think it should be closer to 320 arcsec.
-  But then why does the comparison to the TCC work?
-  
-  TCC refco = 1.207482456409440E-002, -1.301143002747654E-005 deg
-             = 0.00021074544524413635, -2.270922943723219e-07 rad
-             
-  The results look better if I use refCo in degrees, so I suspect that is what I have done in coordConv
-  but that I have mis-documented it. I *should* use degrees because that's what the old TCC did
-  and it is easier to keep it straight if they agree.
+
+- diurnal aberration magnitude is different between Site and TCSpk:
+   site.diurAbMag=-4.24453e-07 ///< magnitude of diurnal aberration vector:
+            /// speed of rotation of observatory / speed of light (radians/au)
+   tsite.diurab 1.3062e-06 # Diurnal aberration amplitude (radians)
+  why are they different, and does it matter? Check the code that computes these values and applies them.
+
 
 To do:
 - Add more methods that work with PVTCoord, once I figure out what is required.

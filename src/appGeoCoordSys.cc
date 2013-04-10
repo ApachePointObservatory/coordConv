@@ -27,6 +27,13 @@ namespace coordConv {
     };
     
     void AppGeoCoordSys::setDate(double date) {
+        // sanity-check the date, since very large values can cause NaNs
+        // and since a common mistake is to call with TAI, MJD seconds
+        if (date > 9999) {
+            std::ostringstream os;
+            os << "date = " << date << " too large; should be TDB years";
+            throw std::runtime_error(os.str());
+        }
         this->_date = date;
         if (std::isfinite(date)) {
             if (std::abs(date - _cachedDate) < _maxAge) {
@@ -35,7 +42,7 @@ namespace coordConv {
             double tdbDays = slaEpj2d(date);
             double amprms[21];
             slaMappa(2000.0, tdbDays, amprms);
-        
+            
             _pmSpan = amprms[0];
             _gravRad = amprms[7];
             _gammaI = amprms[11];
@@ -122,7 +129,7 @@ namespace coordConv {
             double p2Mag = pos2.norm();
             double dot2 = pos2.dot(_bcBeta) / p2Mag;
             double fac = p2Mag * (1.0 + (dot2 / (1.0 + _gammaI)));
-            Eigen::Vector3d oldP2 = pos2; // ??? is a copy required?
+            Eigen::Vector3d oldP2 = pos2;
             pos2 = (((1.0 + dot2) * pos3) - (fac * _bcBeta)) / _gammaI;
             maxErr = (pos2 - oldP2).array().abs().maxCoeff();
         }
