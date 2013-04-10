@@ -37,7 +37,7 @@ namespace coordConv {
         
         @param[in] meanLong;    ///< site longitude, ignoring pole wander (deg, positive eastward)
         @param[in] meanLat;     ///< site latitude, ignoring pole wander (deg)
-        @param[in]  elev;       ///< site elevation (meters above sea level)
+        @param[in] elev;        ///< site elevation (meters above sea level)
         */
         Site(double meanLong, double meanLat, double elev)
         :
@@ -76,6 +76,13 @@ namespace coordConv {
         - pos
         */
         void setPoleWander(double x, double y);
+        
+        /**
+        Print a string representation
+        */
+        virtual std::string __repr__() const;
     };
+
+    std::ostream &operator<<(std::ostream &out, Site const &site);
 
 }

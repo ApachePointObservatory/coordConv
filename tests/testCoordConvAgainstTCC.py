@@ -63,7 +63,7 @@ class TestCoordConv(unittest.TestCase):
                     continue
                 if not gotSiteData:
                     ut1_tai, poleX, poleY = [float(val) for val in line.split()]
-                    site = coordConv.Site(-105.822616, 32.780988, 2.788)
+                    site = coordConv.Site(-105.822616, 32.780988, 2788)
                     site.setPoleWander(poleX, poleY)
                     site.ut1_tai = ut1_tai
                     gotSiteData = True

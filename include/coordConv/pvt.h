@@ -165,7 +165,7 @@ namespace coordConv {
         
         @warning if isAngle true then posPair must be in degrees
         */
-        void setFromPair(double posPair[2], double t, double deltaT, bool isAngle) {
+        void setFromPair(double const posPair[2], double t, double deltaT, bool isAngle) {
             pos = posPair[0];
             if (isAngle) {
                 vel = coordConv::wrapCtr(posPair[1] - posPair[0]) / deltaT;
