@@ -37,7 +37,37 @@ class TestCoordSys(unittest.TestCase):
             for tai in (4232.89, 20000.32, 56350.03, 74222.9):
                 coordSys = cls(2000)
                 self.assertAlmostEqual(tai, coordSys.dateFromTAI(tai))
-
+    
+    def testMakeCoordSys(self):
+        """Test makeCoordSys
+        """
+        for csysName in ("icrs", "fk5", "fk4", "gal", "appgeo", "apptopo", "obs", "none", "mount"):
+            predIsMean = csysName in set(("icrs", "fk5", "fk4", "gal"))
+            for date in (1000.5, 2001):
+                csys = coordConv.makeCoordSys(csysName, date)
+                self.assertEqual(csys.getDate(), date)
+                self.assertEqual(csys.isMean(), predIsMean)
+                self.assertEqual(csys.getName(), csysName)
+                
+    def testNoneAndMountCoordSys(self):
+        """Test that conversions to and from NoneCoordSys and MountCoordSys yield a null result
+        """
+        for nullSys in (
+            coordConv.NoneCoordSys(),
+            coordConv.MountCoordSys()
+        ):
+            site = coordConv.Site(-105.822616, 32.780988, 2788)
+            fromCoord = coordConv.Coord(10, 30)
+            for csysName in ("icrs", "fk5", "fk4", "gal", "appgeo", "apptopo", "obs", "none", "mount"):
+                otherSys = coordConv.makeCoordSys(csysName, 2001)
+                toCoord = nullSys.convertFrom(otherSys, fromCoord, site)
+                self.assertFalse(toCoord.isfinite())
+                
+                toCoord = otherSys.convertFrom(nullSys, fromCoord, site)
+                self.assertFalse(toCoord.isfinite())
+                
+                
+        
 
 if __name__ == '__main__':
     unittest.main()

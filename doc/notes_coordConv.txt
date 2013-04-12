@@ -1,10 +1,10 @@
 Issues:
 
-- diurnal aberration magnitude is different between Site and TCSpk:
+- Diurnal aberration magnitude is different between Site and TCSpk:
    site.diurAbMag=-4.24453e-07 ///< magnitude of diurnal aberration vector:
             /// speed of rotation of observatory / speed of light (radians/au)
    tsite.diurab 1.3062e-06 # Diurnal aberration amplitude (radians)
-  why are they different, and does it matter? Check the code that computes these values and applies them.
+  Why are they different, and does it matter? Check the code that computes these values and applies them.
 
 
 To do:
@@ -18,9 +18,7 @@ To do:
 Unit tests to add:
 - site.setPoleWander
 - PVTCoord and CoordSys.convertFrom variants that use PVTCoord.
-- Untested PVT functionality, such as unary minus and setFromPair (once I can call that from python)
-- Unit test NoneCoordSys and MountCoordSys
-- Unit test makeCoordSys
+- Untested PVT functionality, such as setFromPair (once I can call that from python)
 
 SWIG questions:
 - Learn to call PVT.setFromPair from Python

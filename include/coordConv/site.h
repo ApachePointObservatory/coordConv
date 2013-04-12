@@ -38,27 +38,10 @@ namespace coordConv {
         @param[in] meanLong;    ///< site longitude, ignoring pole wander (deg, positive eastward)
         @param[in] meanLat;     ///< site latitude, ignoring pole wander (deg)
         @param[in] elev;        ///< site elevation (meters above sea level)
+        
+        @raise std::range_error if meanLat is not in range [-90, 90]
         */
-        Site(double meanLong, double meanLat, double elev)
-        :
-            meanLong(meanLong),
-            meanLat(meanLat),
-            elev(elev),
-            poleX(0),
-            poleY(0),
-            ut1_tai(0),
-            utc_tai(0),
-            corrLong(0),
-            corrLat(0),
-            wavelen(0),
-            refCoA(0),
-            refCoB(0),
-            azCorr(0),
-            diurAbMag(0),
-            pos(Eigen::Vector3d::Constant(0.0))
-        {
-            setPoleWander(0.0, 0.0);
-        }
+        Site(double meanLong, double meanLat, double elev);
         
         /**
         Set current pole wander, based on the USNO earth orientation bulletin

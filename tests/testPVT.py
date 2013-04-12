@@ -108,6 +108,18 @@ class TestPVT(unittest.TestCase):
         self.assertAlmostEqual(pvt1.vel, 5.0)
         self.assertAlmostEqual(pvt1.t, 3.0)
     
+    def testUnaryMinus(self):
+        """Test -pvt
+        """
+        for pvt in (
+            coordConv.PVT(1.0, 2.0, 3.0),
+            coordConv.PVT(-1.5, -3.0, 4.0)
+        ):
+            negPVT = -pvt
+            self.assertEqual(negPVT.t, pvt.t)
+            self.assertEqual(negPVT.pos, -pvt.pos)
+            self.assertEqual(negPVT.vel, -pvt.vel)
+    
     def testAddSubtractScalar(self):
         """Test pvt + scalar, pvt += scalar, pvt - scalar and pvt -= scalar
         """
