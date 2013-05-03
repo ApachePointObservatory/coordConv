@@ -4,23 +4,18 @@ Issues:
    site.diurAbMag=-4.24453e-07 ///< magnitude of diurnal aberration vector:
             /// speed of rotation of observatory / speed of light (radians/au)
    tsite.diurab 1.3062e-06 # Diurnal aberration amplitude (radians)
-  Why are they different, and does it matter? Check the code that computes these values and applies them.
-
+  I think this is OK, but double check to make sure. Once I figure it out, document it somewhere
+  (perhaps where it is set by setPoleWander; it's subtle enough that it might be confusing in site.h?),
+  since I'm pretty sure I have wondered this before.
 
 To do:
-- Add more methods that work with PVTCoord, once I figure out what is required.
-  Candidates include:
+- Add more methods that work with PVTCoord, if needed, such as:
   - PVTCoord.angularSeparation (arguments are PVTCoords; result is PVT)
   - PVTCoord.angleTo (argument is PVTCoord; result is PVT)
-  Perhaps wait until I have a need for these?
-- Consider having PVT be included by mathUtils, so that the scalar and PVT flavors of functions can be defined in the same file.
 
 Unit tests to add:
-- site.setPoleWander
 - PVTCoord and CoordSys.convertFrom variants that use PVTCoord.
 - Untested PVT functionality, such as setFromPair (once I can call that from python)
 
 SWIG questions:
 - Learn to call PVT.setFromPair from Python
-- Figure out how to make a PVT & argument a return value in SWIG
-  (e.g. PVTCoord.getSphPVT should probably return two values, not fill two values)

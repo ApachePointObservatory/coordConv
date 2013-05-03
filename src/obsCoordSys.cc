@@ -67,7 +67,8 @@ namespace coordConv {
             // unrefracted zenith distance
             double zdu = atan2d(rxymag, zu);
 
-            // Compute the refraction correction using an iterative approximation (see details).
+            // Compute the refraction correction using an iterative approximation;
+            // based on tests 2 iterations is plenty, but do one more for paranoia's sake.
             // Compute it at the unrefracted zenith distance, unless that ZD is too large,
             // in which case compute the correction at the max unrefracted zenith distance.
             double zdr_u = 0.0;
@@ -75,7 +76,7 @@ namespace coordConv {
             if (zdu_iter > ZDu_Max) {
                zdu_iter = ZDu_Max;
             }
-            for (int iter = 0; iter < 2; ++iter) {
+            for (int iter = 0; iter < 3; ++iter) {
                double zdr_iter = zdu_iter + zdr_u;
                double cosZD = cosd(zdr_iter);
                double tanZD = tand(zdr_iter);

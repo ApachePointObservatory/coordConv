@@ -7,7 +7,7 @@ import coordConv
 class TestCoordSys(unittest.TestCase):
     """Test some aspects of CoordSys and subclasses
     
-    Note that coordinate conversions are tested by testCoordConvAgainstTCC
+    Note that most coordinate conversions are tested by testCoordConvAgainstTCC
     """
     def testIsMean(self):
         """Test isMean
@@ -37,6 +37,46 @@ class TestCoordSys(unittest.TestCase):
             for tai in (4232.89, 20000.32, 56350.03, 74222.9):
                 coordSys = cls(2000)
                 self.assertAlmostEqual(tai, coordSys.dateFromTAI(tai))
+    
+    def testNullConversion(self):
+        site = coordConv.Site(-105.822616, 32.780988, 2788)
+        site.setPoleWander(1.1e-4, -0.5e-4)
+        site.ut1_tai = -2e-8
+        site.refCoA =  1.2e-2
+        site.refCoB = -1.3e-5
+
+        maxRoundTripErr = 0
+        for cls in (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.GalCoordSys, coordConv.AppGeoCoordSys):
+            for date in (1975, 2012):
+                coordSys = cls(date)
+                for equatAng in (100, -45):
+                    for polAng in (-20, 25, 89):
+                        for dist in (0, 0.01, 1):
+                            for pmRA in (0, -3):
+                                for pmDec in (0, 5):
+                                    for radVel in (0, 7):
+                                        fromCoord = coordConv.Coord(equatAng, polAng, dist, pmRA, pmDec, radVel)
+                                        fk5Coord = coordSys.toFK5J2000(fromCoord, site)
+                                        toCoord = coordSys.fromFK5J2000(fk5Coord, site)
+                                        roundTripErr = toCoord.angularSeparation(fromCoord)
+                                        maxRoundTripErr = max(roundTripErr, maxRoundTripErr)
+                                        self.assertLess(roundTripErr, 1e-8)
+        print "maxRoundTripErr for mean and app. geo. coordinate systems =", maxRoundTripErr, "deg"
+
+        maxRoundTripErr = 0
+        for cls in (coordConv.AppTopoCoordSys, coordConv.ObsCoordSys):
+            for date in (4842765000, 4872765000):
+                coordSys = cls(date)
+                for equatAng in (100, -45):
+                    for polAng in (0, 25, 89):
+                        for dist in (0, 0.01, 1):
+                            fromCoord = coordConv.Coord(equatAng, polAng, dist)
+                            fk5Coord = coordSys.toFK5J2000(fromCoord, site)
+                            toCoord = coordSys.fromFK5J2000(fk5Coord, site)
+                            roundTripErr = toCoord.angularSeparation(fromCoord)
+                            maxRoundTripErr = max(roundTripErr, maxRoundTripErr)
+                            self.assertLess(roundTripErr, 1e-7)
+        print "maxRoundTripErr for app. topo and observed coordinate systems =", maxRoundTripErr, "deg"
     
     def testMakeCoordSys(self):
         """Test makeCoordSys
