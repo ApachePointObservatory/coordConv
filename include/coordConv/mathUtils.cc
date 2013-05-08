@@ -1,6 +1,9 @@
 #pragma once
 
 #include <cmath>
+#include <stdexcept>
+#include <iostream>
+#include <iomanip>
 /*
 Define inline math utilities
 */
@@ -28,14 +31,30 @@ namespace coordConv {
     }
 
     inline double wrapCtr(double ang) {
-        return wrapPos(ang + 180.0) - 180.0;
+        // put angle into range (-360, 360), then finish the job
+        double wrappedAng = std::fmod(ang, 360.0);
+        if (wrappedAng < -180.0) {
+            wrappedAng += 360.0;
+        } else if (wrappedAng > 180) {
+            wrappedAng -= 360.0;
+        }
+        if (wrappedAng == 180.0) {
+            wrappedAng = -180.0;
+        };
+        return wrappedAng;
     }
 
     inline double wrapNear(double ang, double nearAng) {
         double wrappedAng = nearAng + wrapCtr(ang - nearAng);
-        if ((wrappedAng - nearAng) < -180) {
-            // I'm not sure exactly how this happens, but unit tests showed it can
+        double const delta = wrappedAng - nearAng;
+        // roundoff error can cause of-of-range values; the following fixes those
+        // and even seems to preserve ang - nearAng < 180, though I'm not sure why
+        if (delta < -180) {
             wrappedAng += 360;
+            double newDelta = wrappedAng - nearAng;
+        } else if (delta >= 180) {
+            wrappedAng -= 360;
+            double newDelta = wrappedAng - nearAng;
         }
         return wrappedAng;
     }
