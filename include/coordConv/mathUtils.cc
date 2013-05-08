@@ -19,27 +19,27 @@ namespace coordConv {
 
     inline double wrapPos(double ang) {
         // put angle into range (-360, 360), then finish the job
-        double wrappedAng = std::fmod(ang, 360.0);
-        if (wrappedAng < 0.0) {
-            wrappedAng += 360.0;
+        double wrappedAng = std::fmod(ang, 360);
+        if (wrappedAng < 0) {
+            wrappedAng += 360;
         }
-        if (wrappedAng == 360.0) {
+        if (wrappedAng == 360) {
             // this can happen if wrappedAng is so small that wrappedAng + 360 rounds to 360
-            wrappedAng = 0.0;
+            wrappedAng = 0;
         };
         return wrappedAng;
     }
 
     inline double wrapCtr(double ang) {
         // put angle into range (-360, 360), then finish the job
-        double wrappedAng = std::fmod(ang, 360.0);
-        if (wrappedAng < -180.0) {
-            wrappedAng += 360.0;
+        double wrappedAng = std::fmod(ang, 360);
+        if (wrappedAng < -180) {
+            wrappedAng += 360;
         } else if (wrappedAng > 180) {
-            wrappedAng -= 360.0;
+            wrappedAng -= 360;
         }
-        if (wrappedAng == 180.0) {
-            wrappedAng = -180.0;
+        if (wrappedAng == 180) {
+            wrappedAng = -180;
         };
         return wrappedAng;
     }
