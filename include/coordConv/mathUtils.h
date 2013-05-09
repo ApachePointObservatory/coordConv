@@ -58,13 +58,13 @@ namespace coordConv {
     double wrapCtr(double ang);
     
     /**
-    Wrap one angle to be within 180 degrees of another: 180 <= wrapped ang - nearAng < 180
+    Wrap one angle to be within 180 degrees of a reference angle: 180 <= wrapped ang - refAng < 180
     
     @param[in] ang: angle to wrap (deg)
-    @param[in] nearAng: result is wrapped to be near this angle (deg)
+    @param[in] refAng: result is wrapped to be near this reference angle (deg)
     @return wrapped angle (deg)
     */
-    inline double wrapNear(double ang, double nearAng);
+    inline double wrapNear(double ang, double refAng);
 
     /// sine of angle in degrees
     inline double sind(double ang) { return std::sin(ang * RadPerDeg); }

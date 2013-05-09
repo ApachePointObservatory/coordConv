@@ -44,11 +44,12 @@ namespace coordConv {
         return wrappedAng;
     }
 
-    inline double wrapNear(double ang, double nearAng) {
-        double wrappedAng = nearAng + wrapCtr(ang - nearAng);
-        double const delta = wrappedAng - nearAng;
-        // roundoff error can cause out-of-range values; the following fixes those
-        // and even seems to preserve ang - nearAng < 180, though I'm not sure why
+    inline double wrapNear(double ang, double refAng) {
+        double wrappedAng = refAng + wrapCtr(ang - refAng);
+
+        // roundoff error can cause slightly out-of-range values; the following fixes those
+        // (and even seems to preserve ang - refAng < 180, though I'm not sure why)
+        double const delta = wrappedAng - refAng;
         if (delta < -180) {
             wrappedAng += 360;
         } else if (delta >= 180) {
