@@ -31,6 +31,9 @@ class TestSite(unittest.TestCase):
                             approxCorrLat  = lat + (((x * coordConv.sind(long)) + (y * coordConv.cosd(long))) * coordConv.tand(lat))
                             self.assertAlmostEqual(approxCorrLong, site.corrLong, 3)
                             self.assertAlmostEqual(approxCorrLat, site.corrLat, 3)
+                        
+                            siteCopy = coordConv.Site(site)
+                            self.assertEqual(repr(site), repr(siteCopy))
     
     def testError(self):
         """Test that constructing with invalid latitude raises an exception

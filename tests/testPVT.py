@@ -59,6 +59,11 @@ class TestPVT(unittest.TestCase):
         self.assertEquals(pvt.pos, 1.0)
         self.assertEquals(pvt.vel, 2.0)
         self.assertEquals(pvt.t, 3.0)
+        
+        pvtCopy = coordConv.PVT(pvt)
+        self.assertEquals(pvt.pos, pvtCopy.pos)
+        self.assertEquals(pvt.vel, pvtCopy.vel)
+        self.assertEquals(pvt.t,   pvtCopy.t)
     
     def testCopy(self):
         """Test PVT.copy() and PVT.copy(t)

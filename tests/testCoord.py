@@ -89,7 +89,9 @@ class TestCoord(unittest.TestCase):
 
                                 destRadVel = coord.getRadVel()
                                 self.assertAlmostEqual(radVel, destRadVel)
-
+                                
+                                coordCopy = Coord(coord)
+                                self.assertEqual(repr(coord), repr(coordCopy))
         
     def testAtPole(self):
         """Test atPole computation

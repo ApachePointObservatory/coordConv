@@ -79,7 +79,7 @@ class TestCoordSys(unittest.TestCase):
         print "maxRoundTripErr for app. topo and observed coordinate systems =", maxRoundTripErr, "deg"
     
     def testMakeCoordSys(self):
-        """Test makeCoordSys
+        """Test makeCoordSys and clone
         """
         for csysName in ("icrs", "fk5", "fk4", "gal", "appgeo", "apptopo", "obs", "none", "mount"):
             predIsMean = csysName in set(("icrs", "fk5", "fk4", "gal"))
@@ -88,6 +88,25 @@ class TestCoordSys(unittest.TestCase):
                 self.assertEqual(csys.getDate(), date)
                 self.assertEqual(csys.isMean(), predIsMean)
                 self.assertEqual(csys.getName(), csysName)
+                
+                csysClone = csys.clone()
+                self.assertEqual(csys.getDate(), csysClone.getDate())
+                self.assertEqual(csys.isMean(),  csysClone.isMean())
+                self.assertEqual(csys.getName(), csysClone.getName())
+
+    def testCopyConstructor(self):
+        """Test copy constructor
+        """
+        for csysClass in (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.FK4CoordSys, coordConv.GalCoordSys,
+            coordConv.AppGeoCoordSys, coordConv.AppTopoCoordSys, coordConv.ObsCoordSys,
+            coordConv.NoneCoordSys, coordConv.MountCoordSys):
+            for date in (1000.5, 2001):
+                csys = csysClass(date)
+                self.assertEqual(csys.getDate(), date)
+                
+                csysCopy = csysClass(csys)
+                self.assertEqual(csys.getDate(), csysCopy.getDate())
+                self.assertEqual(csys.getName(), csysCopy.getName())
                 
     def testNoneAndMountCoordSys(self):
         """Test that conversions to and from NoneCoordSys and MountCoordSys yield a null result

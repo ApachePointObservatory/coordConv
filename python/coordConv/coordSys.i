@@ -11,4 +11,14 @@
 %shared_ptr(coordConv::NoneCoordSys);
 %shared_ptr(coordConv::MountCoordSys);
 
+%copyctor coordConv::ICRSCoordSys;
+%copyctor coordConv::FK5CoordSys;
+%copyctor coordConv::FK4CoordSys;
+%copyctor coordConv::GalCoordSys;
+%copyctor coordConv::AppGeoCoordSys;
+%copyctor coordConv::AppTopoCoordSys;
+%copyctor coordConv::ObsCoordSys;
+%copyctor coordConv::NoneCoordSys;
+%copyctor coordConv::MountCoordSys;
+
 %include "coordConv/coordSys.h"
