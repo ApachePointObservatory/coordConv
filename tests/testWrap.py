@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 import unittest
 import numpy
-from coordConv import wrapCtr, wrapPos, wrapNear, sind, cosd, PVT
-
-Eps = 2e-14
+from coordConv import wrapCtr, wrapPos, wrapNear, sind, cosd, PVT, DoubleEpsilon
 
 class TestWrap(unittest.TestCase):
     def testWrap(self):
         for wrap in (-1000, -10, -1, 0, 1, 10, 1000):
             for offset in (-360, -180, -90, 0, 90, 180, 270, 360):
-                for epsMult in (-10, -4, -2, -1, 0, 1, 2, 4, 10):
-                    ang = (wrap * 360) + offset + (epsMult * Eps)
+                for epsMult in (-3, -2, -1, 0, 1, 2, 3):
+                    ang = offset + (wrap * 360)
+                    ang += ang * DoubleEpsilon * epsMult
                     sinAng = sind(ang)
                     cosAng = cosd(ang)
                     pvt = PVT(ang, ang, 35.0) # pick anything for vel and time
@@ -43,8 +42,9 @@ class TestWrap(unittest.TestCase):
                     self.assertEqual(ctrPvt.t, pvt.t)
                     
                     for refAngBase in (-180, 0, 180, 360):
-                        for refEpsMult in (-10, -4, -2, -1, 0, 1, 2, 4, 10):
-                            refAng = refAngBase + (refEpsMult * Eps)
+                        for refEpsMult in (-3, -2, -1, 0, 1, 2, 3):
+                            refAng = refAngBase
+                            refAng += refAng * refEpsMult * DoubleEpsilon
                             nearAng = wrapNear(ang, refAng)
                             self.assertGreaterEqual(nearAng - refAng, -180)
                             self.assertLess(nearAng - refAng, 180)

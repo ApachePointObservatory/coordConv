@@ -33,14 +33,19 @@ namespace coordConv {
     inline double wrapCtr(double ang) {
         // put angle into range (-360, 360), then finish the job
         double wrappedAng = std::fmod(ang, 360);
-        if (wrappedAng < -180) {
-            wrappedAng += 360;
-        } else if (wrappedAng > 180) {
+        if (wrappedAng >= 180) {
             wrappedAng -= 360;
+            if (wrappedAng < -180) {
+                // handle roundoff error
+                wrappedAng = -180;
+            }
+        } else if (wrappedAng < -180) {
+            wrappedAng += 360;
+            if (wrappedAng >= 180) {
+                // handle roundoff error
+                wrappedAng = -180;
+            }
         }
-        if (wrappedAng == 180) {
-            wrappedAng = -180;
-        };
         return wrappedAng;
     }
 
@@ -49,11 +54,13 @@ namespace coordConv {
 
         // roundoff error can cause slightly out-of-range values; the following fixes those
         // (and even seems to preserve ang - refAng < 180, though I'm not sure why)
-        double const delta = wrappedAng - refAng;
-        if (delta < -180) {
-            wrappedAng += 360;
-        } else if (delta >= 180) {
+        if (wrappedAng - refAng >= 180) {
             wrappedAng -= 360;
+        }
+        // avoid if-else in case wrappedAng -= 360 results in wrappedAng - refAng slightly less than -180;
+        // maximum relative roundoff error for addition is 2 epsilon
+        if (wrappedAng - refAng < -180) {
+            wrappedAng -= wrappedAng * 2.0 * DoubleEpsilon;
         }
         return wrappedAng;
     }
