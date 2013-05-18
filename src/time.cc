@@ -1,7 +1,7 @@
-#import "slalib.h"
-#import "coordConv/mathUtils.h"
-#import "coordConv/physConst.h"
-#import "coordConv/time.h"
+#include "slalib.h"
+#include "coordConv/mathUtils.h"
+#include "coordConv/physConst.h"
+#include "coordConv/time.h"
 
 namespace coordConv {
 

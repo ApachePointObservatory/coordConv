@@ -1,6 +1,6 @@
 #pragma once
 
-#import "coordConv/site.h"
+#include "coordConv/site.h"
 
 namespace coordConv {
 
