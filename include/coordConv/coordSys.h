@@ -483,7 +483,7 @@ namespace coordConv {
     @param[in] name: name of coordinate system (case matters)
     @param[in] date: date of coordinate system (units depend on the coordinate system)
     @return the specified coordinate system at the specified date
-    @raise std::runtime_error if the name is not recognized
+    @raise std::invalid_argument (ValueError in python) if name is not recognized.
     */
     CoordSys::Ptr makeCoordSys(std::string const &name, double date);
 

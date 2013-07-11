@@ -124,9 +124,12 @@ class TestCoordSys(unittest.TestCase):
                 
                 toCoord = otherSys.convertFrom(nullSys, fromCoord, site)
                 self.assertFalse(toCoord.isfinite())
-                
-                
-        
+    
+    def testInvalidCoordSys(self):
+        """Test that makeCoordSys raises ValueError for invalid coordinate system name
+        """
+        for csysName in ("foo", "bar", "icrsx", "null"):
+            self.assertRaises(ValueError, coordConv.makeCoordSys, csysName, 0)
 
 if __name__ == '__main__':
     unittest.main()

@@ -69,7 +69,7 @@ namespace coordConv {
         } else {
             std::ostringstream os;
             os << "Unknown coordinate system name: " << name;
-            throw std::runtime_error(os.str());
+            throw std::invalid_argument(os.str());
         }
     }
 
