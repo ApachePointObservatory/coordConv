@@ -6,16 +6,6 @@ from coordConv import Coord, sind, cosd, wrapPos, wrapNear, angSideAng, \
     DoubleEpsilon, MinParallax, AUPerParsec, RadPerDeg, ArcsecPerDeg, SecPerDay, DaysPerYear, KmPerAU
 
 class TestCoord(unittest.TestCase):
-    def testConstants(self):
-        """Some of these tests rely on the physical constants being correct, so verify that
-        """
-        self.assertAlmostEqual(AUPerParsec, (180 * 3600) / math.pi)
-        self.assertAlmostEqual(RadPerDeg, math.pi / 180.0)
-        self.assertAlmostEqual(ArcsecPerDeg, 60 * 60)
-        self.assertAlmostEqual(SecPerDay, 24 * 60 * 60)
-        self.assertAlmostEqual(DaysPerYear, 365.25)
-        self.assertAlmostEqual(KmPerAU, 149597871)
-        
     def testBasics(self):
         """Check sph -> vec and back again for points not at the pole
         

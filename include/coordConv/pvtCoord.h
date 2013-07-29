@@ -27,10 +27,12 @@ namespace coordConv {
         @param[in] coord0: coordinate at time tai
         @param[in] coord1: coordinate at time tai + deltaT; proper motion and radial velocity are ignored
         @param[in] tai: initial TAI date of PVTCoord (MJD seconds)
-        @param[in] deltaT: TAI of coord1 - TAI of coord0
+        @param[in] deltaT: TAI of coord1 - TAI of coord0; must be nonzero
         @param[in] defOrient: default orientation (deg);
             used as orientation if coord1 is so near coord0 that the orientation cannot be computed;
             see Coord.offset for an explanation of orientation
+        
+        @raise std::runtime_error if deltaT = 0
         */
         explicit PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT, double defOrient = 0);
         
@@ -92,7 +94,7 @@ namespace coordConv {
         
         @note The result is PVTCoord at tai, offset by dist at tai in direction fromOrient at tai.
 
-        @raise runtime_error if this coord is too near a pole
+        @raise std::runtime_error if this coord is too near a pole
         */
         virtual PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const;
 

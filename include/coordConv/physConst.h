@@ -1,4 +1,5 @@
 #pragma once
+#import <cmath>
 /*
 Physical constants
 
@@ -13,16 +14,16 @@ References:
 */
 namespace coordConv {
 
-    const double Pi = 3.1415926535897932384626; // (from CRC Math Tables)
-    const double HoursPerDeg  = 24.0 / 360.0;   // hours per degree
-    const double RadPerDeg = 2.0 * Pi / 360.0;  // radians per degree
-    const double KmPerAU    = 149597871.0;      // kilometers per astr. unit (Astr. Almanac)
+    const double Pi = std::atan(1.0)*4;
+    const double HoursPerDeg = 24.0 / 360.0;    // hours per degree
+    const double RadPerDeg = Pi / 180.0;        // radians per degree
+    const double KmPerAU = 149597871.0;         // kilometers per astr. unit (Astr. Almanac)
     const double AUPerParsec = 206264.8062470964;   // astronomical units per parsec (the APPLE subr. library)
     const double ArcsecPerDeg = 3600.0;         // arcseconds per degree
-    const double SecPerDay  = 24.0 * 3600.0;    // seconds per day
+    const double SecPerDay = 24.0 * 3600.0;     // seconds per day
     const double DaysPerYear = 365.25;          // days per TT (or TAI...)  year
-    const double VLight = 1.0 / 499.004782;     // the speed of light in vacuum (au/sec) (Astr. Almanac)
-    const double DegK_DegC = 273.150;           // deg. Kelvin - deg. C (Allen)
+    const double VLight = 299792.458 / KmPerAU; // (au/sec), based on c = 299792458 m/sec (exact)
+    const double DegK_DegC = 273.15;            // deg. Kelvin - deg. C (Allen, exact)
     const double MJD_UnixTime = 40587 * SecPerDay;  // MJD (seconds) - unix time
         // unix time is 0 at 1970-01-01 00:00:00; unix time = JD − 2,440,587.5 (days)
         // MJD is 0 at 1858-11-17 00:00:00;             MJD = JD − 2,400,000.5 (days)
