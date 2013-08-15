@@ -14,7 +14,7 @@ To do:
   - PVTCoord.angleTo (argument is PVTCoord; result is PVT)
 
 Unit tests to add:
-- PVTCoord and CoordSys.convertFrom variants that use PVTCoord.
+- CoordSys.convertFrom variants that use PVTCoord.
 - Untested PVT functionality, such as setFromPair (once I can call that from python)
 
 SWIG questions:
