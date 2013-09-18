@@ -43,15 +43,17 @@ namespace coordConv {
         double newOrient;
         return _coord.offset(newOrient, _orient, dist);
     }    
-
-    bool PVTCoord::getSphPVT(PVT &equatPVT, PVT &polarPVT) const {
+    
+    bool PVTCoord::getSphPVT(PVT &equatPVT, PVT &polarPVT, double tai) const {
         double equatPos[2], polarPos[2];
-        Coord laterCoord = getCoord(_tai + DeltaT);
-        bool atPole = _coord.getSphPos(equatPos[0], polarPos[0]);
-        atPole |= laterCoord.getSphPos(equatPos[1], polarPos[1]);
-        
-        equatPVT.setFromPair(equatPos, _tai, DeltaT, true);
-        polarPVT.setFromPair(polarPos, _tai, DeltaT, false);
+        bool atPole = false;
+        for (int i = 0; i < 2; ++i) {
+            double evalDate = tai + (i * DeltaT);
+            Coord coord = getCoord(evalDate);
+            atPole |= coord.getSphPos(equatPos[i], polarPos[i]);
+        }
+        equatPVT.setFromPair(equatPos, tai, DeltaT, true);
+        polarPVT.setFromPair(polarPos, tai, DeltaT, false);
         return atPole;
     }
     

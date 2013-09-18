@@ -74,15 +74,16 @@ namespace coordConv {
         Return True if all values are finite
         */
         bool isfinite() const;
-        
+       
         /**
-        Retrieve spherical position
+        Retrieve spherical position at a specified TAI date
         
         @param[out] equatPVT: equatorial PVT (deg, deg/sec, TAI date)
         @param[out] polarPVT: polar PVT (deg, deg/sec, TAI date)
+        @param[in] tai: TAI date at which to retrieve position (MJD, sec)
         @return atPole: true if so near the pole that equatorial angle could not be computed.
         */
-        virtual bool getSphPVT(PVT &equatPVT, PVT &polarPVT) const;
+        virtual bool getSphPVT(PVT &equatPVT, PVT &polarPVT, double tai) const;
         
         /**
         Offset a PVTCoord; see Coord::offset for a full explanation.
@@ -90,6 +91,7 @@ namespace coordConv {
         @param[out] toOrient: orientation of offset arc at offset position (deg)
         @param[in] fromOrient: orientation of offset arc at this position (deg)
         @param[in] dist: offset distance as the length of the arc of a great circle (deg)
+        @param[in] tai: TAI date at which to compute offset (MJD, sec)
         @return offset coord
         
         @note The result is PVTCoord at tai, offset by dist at tai in direction fromOrient at tai.

@@ -34,7 +34,7 @@ class TestCoord(unittest.TestCase):
         
         equatPVT = coordConv.PVT()
         polarPVT = coordConv.PVT()
-        atPole = pvtCoord.getSphPVT(equatPVT, polarPVT)
+        atPole = pvtCoord.getSphPVT(equatPVT, polarPVT, tai)
         self.assertEqual(atPole, coord.atPole() or atPole)
         self.assertAlmostEqual(coordConv.wrapCtr(equatPVT.pos - equatAng), 0)
         self.assertAlmostEqual(equatPVT.t, tai)
