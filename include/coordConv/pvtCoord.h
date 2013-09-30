@@ -100,6 +100,17 @@ namespace coordConv {
         */
         virtual PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const;
 
+        bool operator==(PVTCoord const &rhs) {
+            return (this->getCoord()  == rhs.getCoord())
+                && (this->getOrient() == rhs.getOrient())
+                && (this->getVel()    == rhs.getVel())
+                && (this->getTAI()    == rhs.getTAI());
+        }
+
+        bool operator!=(PVTCoord const &rhs) {
+            return !operator==(rhs);
+        }
+
         /**
         Return a string representation
         */
@@ -112,17 +123,6 @@ namespace coordConv {
         double _tai;    // initial TAI date (MJD, seconds)
     };
 
-
-    inline bool operator==(PVTCoord const &lhs, PVTCoord const &rhs) {
-        return (lhs.getCoord()  == rhs.getCoord())
-            && (lhs.getOrient() == rhs.getOrient())
-            && (lhs.getVel()    == rhs.getVel())
-            && (lhs.getTAI()    == rhs.getTAI());
-    }
-
-    inline bool operator!=(PVTCoord const &lhs, PVTCoord const &rhs) {
-        return !operator==(lhs, rhs);
-    }
 
     std::ostream &operator<<(std::ostream &os, PVTCoord const &pvtCoord);
 

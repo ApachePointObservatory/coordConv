@@ -84,6 +84,23 @@ class TestPVT(unittest.TestCase):
         self.assertEqual(pvt3.pos, -3.0)
         self.assertEqual(pvt3.vel, -2.0)
         self.assertEqual(pvt3.t, 5.0)
+
+    def testEquality(self):
+        """Test operator== and operator!=
+        """
+        def pvtIter():
+            for pos in (-1.1, 0, 1.1, numpy.nan):
+                for vel in (-0.1, 0, 0.1, numpy.nan):
+                    for t in (0, 1, 2, numpy.nan):
+                        yield coordConv.PVT(pos, vel, t)
+
+        for pvt1 in pvtIter():
+            for pvt2 in pvtIter():
+                if pvt1.pos == pvt2.pos and pvt1.vel == pvt2.vel and pvt1.t == pvt2.t:
+                    self.assertTrue(pvt1 == pvt2)
+                else:
+                    self.assertTrue(pvt1 != pvt2)
+                self.assertNotEqual(pvt1 == pvt2, pvt1 != pvt2)
     
     def testAddPVT(self):
         """Test pvt + pvt

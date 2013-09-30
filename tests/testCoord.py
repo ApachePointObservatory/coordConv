@@ -82,6 +82,25 @@ class TestCoord(unittest.TestCase):
                                 
                                 coordCopy = Coord(coord)
                                 self.assertEqual(repr(coord), repr(coordCopy))
+    def testEquality(self):
+        """Test operator== and operator!=
+        """
+        def coordIter():
+            for equatAng in (0, 71, -123.4):
+                for polarAng in (0, -75):
+                    for parallax in (0, 0.1):
+                        for equatPM in (0, -3):
+                            for polarPM in (-7, 0):
+                                for radVel in (0, -34):
+                                    yield Coord(equatAng, polarAng, parallax, equatPM, polarPM, radVel)
+
+        for coord1 in coordIter():
+            for coord2 in coordIter():
+                if numpy.all(coord1.getVecPos() == coord2.getVecPos()) and numpy.all(coord1.getVecPM() == coord2.getVecPM()):
+                    self.assertTrue(coord1 == coord2)
+                else:
+                    self.assertTrue(coord1 != coord2)
+                self.assertNotEqual(coord1 == coord2, coord1 != coord2)
         
     def testAtPole(self):
         """Test atPole computation

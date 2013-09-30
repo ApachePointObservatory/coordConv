@@ -159,6 +159,16 @@ namespace coordConv {
         @return date in appropriate units for this coordinate system
         */
         virtual double dateFromTAI(double tai) const = 0;
+
+        /// Equality operator; a method instead of a free function to simplify SWIG wrapping
+        bool operator==(CoordSys const &rhs) {
+            return (this->getName() == rhs.getName()) && (this->getDate() == rhs.getDate());
+        }
+
+        /// Inequality operator; a method instead of a free function to simplify SWIG wrapping
+        bool operator!=(CoordSys const &rhs) {
+            return !operator==(rhs);
+        }
         
         /**
         Return a string representation
@@ -486,14 +496,6 @@ namespace coordConv {
     @raise std::invalid_argument (ValueError in python) if name is not recognized.
     */
     CoordSys::Ptr makeCoordSys(std::string const &name, double date);
-
-    inline bool operator==(CoordSys const &lhs, CoordSys const &rhs) {
-        return (lhs.getName() == rhs.getName()) && (lhs.getDate() == rhs.getDate());
-    }
-
-    inline bool operator!=(CoordSys const &lhs, CoordSys const &rhs) {
-        return !operator==(lhs, rhs);
-    }
 
     std::ostream &operator<<(std::ostream &out, CoordSys const &coordSys);
 

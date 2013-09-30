@@ -145,6 +145,14 @@ namespace coordConv {
         PVT operator-() const {
             return PVT(-pos, -vel, t);
         }
+
+        bool operator==(PVT const &rhs) {
+            return (this->pos == rhs.pos) && (this->vel == rhs.vel) && (this->t == rhs.t);
+        }
+
+        bool operator!=(PVT const &rhs) {
+            return !operator==(rhs);
+        }
         
         /**
         Return a string representation
@@ -220,14 +228,6 @@ namespace coordConv {
         PVT ret = pvt;
         ret.pos = coordConv::wrapCtr(ret.pos);
         return ret;
-    }
-
-    inline bool operator==(PVT const &lhs, PVT const &rhs) {
-        return (lhs.pos == rhs.pos) && (lhs.vel == rhs.vel) && (lhs.t == rhs.t);
-    }
-
-    inline bool operator!=(PVT const &lhs, PVT const &rhs) {
-        return !operator==(lhs, rhs);
     }
 
     std::ostream &operator<<(std::ostream &os, PVT const &pvt);

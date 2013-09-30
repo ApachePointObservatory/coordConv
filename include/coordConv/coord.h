@@ -183,6 +183,14 @@ namespace coordConv {
         this coord
         */
         Coord offset(double &toOrient, double fromOrient, double dist) const;
+
+        bool operator==(Coord const &rhs) {
+            return (this->getVecPos() == rhs.getVecPos()) && (this->getVecPM() == rhs.getVecPM());
+        }
+
+        bool operator!=(Coord const &rhs) {
+            return !operator==(rhs);
+        }
         
         /**
         Return a string representation
@@ -214,14 +222,6 @@ namespace coordConv {
         */
         void _setCache();
     };
-
-    inline bool operator==(Coord const &lhs, Coord const &rhs) {
-        return (lhs.getVecPos() == rhs.getVecPos()) && (lhs.getVecPM() == rhs.getVecPM());
-    }
-
-    inline bool operator!=(Coord const &lhs, Coord const &rhs) {
-        return !operator==(lhs, rhs);
-    }
     
     std::ostream &operator<<(std::ostream &out, Coord const &coord);
 

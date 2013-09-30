@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import unittest
-import math
 import numpy
 import coordConv
 
@@ -102,6 +101,29 @@ class TestCoord(unittest.TestCase):
                                 self.assertRaises(RuntimeError, coordConv.PVTCoord, coord0, coord1, tai, 0, orient)
         self.assertGreater(numNotDefOrient, 100)
         self.assertGreater(numDefOrient, 100)
+
+    def testEquality(self):
+        """Test operator== and operator!=
+        """
+        def pvtCoordIter():
+            for equatAng in (0, 71, -123.4):
+                for polarAng in (0, -75, -89.999999, 89.999999):
+                    coord = coordConv.Coord(equatAng, polarAng)
+                    for orient in (0, -45, 31.23):
+                        for vel in (0, 0.1, 0.23):
+                            for tai in (500.5, 10001.3):
+                                yield coordConv.PVTCoord(coord, orient, vel, tai)
+
+        for pvtCoord1 in pvtCoordIter():
+            for pvtCoord2 in pvtCoordIter():
+                if pvtCoord1.getCoord() == pvtCoord2.getCoord() \
+                    and pvtCoord1.getOrient() == pvtCoord2.getOrient() \
+                    and pvtCoord1.getVel() == pvtCoord2.getVel() \
+                    and pvtCoord1.getTAI() == pvtCoord2.getTAI():
+                    self.assertTrue(pvtCoord1 == pvtCoord2)
+                else:
+                    self.assertTrue(pvtCoord1 != pvtCoord2)
+                self.assertNotEqual(pvtCoord1 == pvtCoord2, pvtCoord1 != pvtCoord2)
 
     def testOffset(self):
         """Test PVTCoord.offset

@@ -1,8 +1,16 @@
 #!/usr/bin/env python
 import unittest
-import math
-import numpy
 import coordConv
+
+MeanSysList = (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.FK4CoordSys, coordConv.GalCoordSys)
+JulianSysList = (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.GalCoordSys, coordConv.AppGeoCoordSys)
+MeanNameList = ("icrs", "fk5", "fk4", "gal")
+AzAltSysList = (coordConv.AppTopoCoordSys, coordConv.ObsCoordSys)
+AzAltNameList = ("apptopo", "obs")
+AppSysList = (coordConv.AppGeoCoordSys,) + AzAltSysList
+AppNameList = ("appgeo",) + AzAltNameList
+FullSysList = MeanSysList + AppSysList + (coordConv.MountCoordSys, coordConv.NoneCoordSys)
+FullNameList = MeanNameList + AppNameList + ("mount", "none")
 
 class TestCoordSys(unittest.TestCase):
     """Test some aspects of CoordSys and subclasses
@@ -12,16 +20,18 @@ class TestCoordSys(unittest.TestCase):
     def testIsMean(self):
         """Test isMean
         """
-        for cls in (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.FK4CoordSys, coordConv.GalCoordSys):
+        meanNameSet = set(MeanNameList)
+        for cls in FullSysList:
             coordSys = cls(2000)
-            self.assertTrue(coordSys.isMean())
-        
-        for cls in (coordConv.AppGeoCoordSys, coordConv.AppTopoCoordSys, coordConv.ObsCoordSys):
-            coordSys = cls(2000)
-            self.assertFalse(coordSys.isMean())
+            if coordSys.getName() in meanNameSet:
+                self.assertTrue(coordSys.isMean())
+            else:
+                self.assertFalse(coordSys.isMean())
     
     def testDateFromTAI(self):
-        for cls in (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.GalCoordSys, coordConv.AppGeoCoordSys):
+        """Test dateFromTAI
+        """
+        for cls in JulianSysList:
             coordSys = cls(2000)
             for tai in (4232.89, 20000.32, 56350.03, 74222.9):
                 predDate = coordConv.julianEpochFromMJDSec(coordConv.TT_TAI + tai)
@@ -33,12 +43,30 @@ class TestCoordSys(unittest.TestCase):
             predDate = 1900.0 + ((ttDays - 15019.81352 ) / 365.242198781)
             self.assertAlmostEqual(predDate, coordSys.dateFromTAI(tai), places=5)
         
-        for cls in (coordConv.AppTopoCoordSys, coordConv.ObsCoordSys):
+        for cls in AzAltSysList:
             for tai in (4232.89, 20000.32, 56350.03, 74222.9):
                 coordSys = cls(2000)
                 self.assertAlmostEqual(tai, coordSys.dateFromTAI(tai))
+
+    def testEquality(self):
+        """Test operator== and operator!=
+        """
+        def csysIter():
+            for csysClass in FullSysList:
+                for date in (2002, 3001):
+                    yield csysClass(date)
+
+        for csys1 in csysIter():
+            for csys2 in csysIter():
+                if (csys1.getName() == csys2.getName()) and (csys1.getDate() == csys2.getDate()):
+                    self.assertTrue(csys1 == csys2)
+                else:
+                    self.assertTrue(csys1 != csys2)
+                self.assertNotEqual(csys1 == csys2, csys1 != csys2)
     
     def testNullConversion(self):
+        """Test round trip conversion
+        """
         site = coordConv.Site(-105.822616, 32.780988, 2788)
         site.setPoleWander(1.1e-4, -0.5e-4)
         site.ut1_tai = -2e-8
@@ -46,7 +74,7 @@ class TestCoordSys(unittest.TestCase):
         site.refCoB = -1.3e-5
 
         maxRoundTripErr = 0
-        for cls in (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.GalCoordSys, coordConv.AppGeoCoordSys):
+        for cls in JulianSysList:
             for date in (1975, 2012):
                 coordSys = cls(date)
                 for equatAng in (100, -45):
@@ -64,7 +92,7 @@ class TestCoordSys(unittest.TestCase):
         print "maxRoundTripErr for mean and app. geo. coordinate systems =", maxRoundTripErr, "deg"
 
         maxRoundTripErr = 0
-        for cls in (coordConv.AppTopoCoordSys, coordConv.ObsCoordSys):
+        for cls in AzAltSysList:
             for date in (4842765000, 4872765000):
                 coordSys = cls(date)
                 for equatAng in (100, -45):
@@ -81,8 +109,8 @@ class TestCoordSys(unittest.TestCase):
     def testMakeCoordSys(self):
         """Test makeCoordSys and clone
         """
-        for csysName in ("icrs", "fk5", "fk4", "gal", "appgeo", "apptopo", "obs", "none", "mount"):
-            predIsMean = csysName in set(("icrs", "fk5", "fk4", "gal"))
+        for csysName in FullNameList:
+            predIsMean = csysName in set(MeanNameList)
             for date in (1000.5, 2001):
                 csys = coordConv.makeCoordSys(csysName, date)
                 self.assertEqual(csys.getDate(), date)
@@ -97,9 +125,7 @@ class TestCoordSys(unittest.TestCase):
     def testCopyConstructor(self):
         """Test copy constructor
         """
-        for csysClass in (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.FK4CoordSys, coordConv.GalCoordSys,
-            coordConv.AppGeoCoordSys, coordConv.AppTopoCoordSys, coordConv.ObsCoordSys,
-            coordConv.NoneCoordSys, coordConv.MountCoordSys):
+        for csysClass in FullSysList:
             for date in (1000.5, 2001):
                 csys = csysClass(date)
                 self.assertEqual(csys.getDate(), date)
@@ -117,7 +143,7 @@ class TestCoordSys(unittest.TestCase):
         ):
             site = coordConv.Site(-105.822616, 32.780988, 2788)
             fromCoord = coordConv.Coord(10, 30)
-            for csysName in ("icrs", "fk5", "fk4", "gal", "appgeo", "apptopo", "obs", "none", "mount"):
+            for csysName in FullNameList:
                 otherSys = coordConv.makeCoordSys(csysName, 2001)
                 toCoord = nullSys.convertFrom(otherSys, fromCoord, site)
                 self.assertFalse(toCoord.isfinite())
