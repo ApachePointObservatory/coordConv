@@ -487,6 +487,14 @@ namespace coordConv {
     */
     CoordSys::Ptr makeCoordSys(std::string const &name, double date);
 
+    inline bool operator==(CoordSys const &lhs, CoordSys const &rhs) {
+        return (lhs.getName() == rhs.getName()) && (lhs.getDate() == rhs.getDate());
+    }
+
+    inline bool operator!=(CoordSys const &lhs, CoordSys const &rhs) {
+        return !operator==(lhs, rhs);
+    }
+
     std::ostream &operator<<(std::ostream &out, CoordSys const &coordSys);
 
 }

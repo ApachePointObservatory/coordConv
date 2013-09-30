@@ -214,6 +214,14 @@ namespace coordConv {
         */
         void _setCache();
     };
+
+    inline bool operator==(Coord const &lhs, Coord const &rhs) {
+        return (lhs.getVecPos() == rhs.getVecPos()) && (lhs.getVecPM() == rhs.getVecPM());
+    }
+
+    inline bool operator!=(Coord const &lhs, Coord const &rhs) {
+        return !operator==(lhs, rhs);
+    }
     
     std::ostream &operator<<(std::ostream &out, Coord const &coord);
 

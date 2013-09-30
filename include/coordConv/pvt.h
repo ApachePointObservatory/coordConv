@@ -222,6 +222,14 @@ namespace coordConv {
         return ret;
     }
 
+    inline bool operator==(PVT const &lhs, PVT const &rhs) {
+        return (lhs.pos == rhs.pos) && (lhs.vel == rhs.vel) && (lhs.t == rhs.t);
+    }
+
+    inline bool operator!=(PVT const &lhs, PVT const &rhs) {
+        return !operator==(lhs, rhs);
+    }
+
     std::ostream &operator<<(std::ostream &os, PVT const &pvt);
 
 }

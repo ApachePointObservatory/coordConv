@@ -112,6 +112,18 @@ namespace coordConv {
         double _tai;    // initial TAI date (MJD, seconds)
     };
 
+
+    inline bool operator==(PVTCoord const &lhs, PVTCoord const &rhs) {
+        return (lhs.getCoord()  == rhs.getCoord())
+            && (lhs.getOrient() == rhs.getOrient())
+            && (lhs.getVel()    == rhs.getVel())
+            && (lhs.getTAI()    == rhs.getTAI());
+    }
+
+    inline bool operator!=(PVTCoord const &lhs, PVTCoord const &rhs) {
+        return !operator==(lhs, rhs);
+    }
+
     std::ostream &operator<<(std::ostream &os, PVTCoord const &pvtCoord);
 
 }
