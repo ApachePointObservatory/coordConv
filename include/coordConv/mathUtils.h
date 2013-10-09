@@ -32,12 +32,13 @@ namespace coordConv {
     @param[in]  y: unrotated y value
     @param[in]  ang: angle by which to rotate (deg)
 
-    Changing coordinate systems:
-    Given a point P whose position in coordinate system A is P_A_xy
-    and another coordinate system B whose angle with respect to A is B_A_ang
-    and whose position with respect to A is B_A_xy,
-    then P_B_xy, the position of P in coordinate system B is:
-        P_B_xy = (P_A_xy - B_A_xy) rotated by -B_A_ang
+    Using rot2D to change coordinate systems:
+    Given a coordinate system A and a coordinate system B, such that:
+    - B's origin is at B_A_xy in A
+    - B's orientation is B_A_ang in A
+    Then a point P can be transformed as follows between these systems:
+    - P_B_xy = rot2D(P_A_xy - B_A_xy, -B_A_ang)
+    - P_A_xy = B_A_xy + rot2D(P_B_xy, +B_A_ang)
     */
     void rot2D(double &rotX, double &rotY, double x, double y, double ang);
 
