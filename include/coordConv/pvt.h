@@ -209,6 +209,25 @@ namespace coordConv {
     void xyFromPolar(PVT &x, PVT &y, PVT const &r, PVT const &theta, double tai);
 
     /**
+    Rotate a 2-dimensional PVT vector by a given angle.
+
+    @param[out] rotX: rotated x value
+    @param[out] rotY: rotated y value
+    @param[in]  x: unrotated x value
+    @param[in]  y: unrotated y value
+    @param[in]  ang: angle by which to rotate (deg)
+    @param[in] tai: TAI date (MJD, sec)
+
+    Changing coordinate systems:
+    Given a point P whose position in coordinate system A is P_A_xy
+    and another coordinate system B whose angle with respect to A is B_A_ang
+    and whose position with respect to A is B_A_xy,
+    then P_B_xy, the position of P in coordinate system B is:
+        P_B_xy = (P_A_xy - B_A_xy) rotated by -B_A_ang
+    */
+    void rot2D(PVT &rotX, PVT &rotY, PVT const &x, PVT const &y, double ang, double tai);
+
+    /**
     Compute PVT angle wrapped into range [0, 360) deg; only the pos differs
     */
     inline PVT wrapPos(

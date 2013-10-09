@@ -35,6 +35,16 @@ namespace coordConv {
         y.setFromPair(yArr, tai, DeltaT, false);
     }
 
+    void rot2D(PVT &rotX, PVT &rotY, PVT const &x, PVT const &y, double ang, double tai) {
+        double rotXArr[2], rotYArr[2];
+        for (int i = 0; i < 2; ++i) {
+            double tempTAI = tai + (i * DeltaT);
+            rot2D(rotXArr[i], rotYArr[i], x.getPos(tempTAI), y.getPos(tempTAI), ang);
+        }
+        rotX.setFromPair(rotXArr, tai, DeltaT, false);
+        rotY.setFromPair(rotYArr, tai, DeltaT, false);
+    }
+
     std::ostream &operator<<(std::ostream &os, PVT const &pvt) {
         os << "PVT(" << pvt.pos << ", " << pvt.vel << ", " << pvt.t << ")";   
         return os;
