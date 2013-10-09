@@ -84,6 +84,30 @@ namespace coordConv {
         @return atPole: true if so near the pole that equatorial angle could not be computed.
         */
         virtual bool getSphPVT(PVT &equatPVT, PVT &polarPVT, double tai) const;
+
+        /**
+        Compute the angular separation from another PVTCoord
+
+        @param[in] coord: PVT coord to which to measure angular separation
+        @param[in] tai: TAI date at which to retrieve position (MJD, sec)
+        
+        @return angular separation (deg)
+        */
+        PVT angularSeparation(PVTCoord const &pvtCoord, double tai) const;
+
+        /**
+        Compute the orientation of a great circle offset to another PVTCoord
+
+        @param[in] pvtCoord: PVT coord to which to measure orientation
+        @param[in] tai: TAI date at which to retrieve position (MJD, sec)
+        
+        In detail: computes the orientation at this point of a great circle connecting this PVT coord
+        to another PVT coord. The orientation is 0 if the great circle lies along the direction of
+        increasing equatorial angle, 90 if it lies along the direction increasing polar angle.
+        
+        @return orientation (deg), or NaN if the two PVTCoord are too close together at tai
+        */
+        PVT orientationTo(PVTCoord const &pvtCoord, double tai) const;
         
         /**
         Offset a PVTCoord; see Coord::offset for a full explanation.
@@ -92,11 +116,11 @@ namespace coordConv {
         @param[in] fromOrient: orientation of offset arc at this position (deg)
         @param[in] dist: offset distance as the length of the arc of a great circle (deg)
         @param[in] tai: TAI date at which to compute offset (MJD, sec)
-        @return offset coord
+        @return offset PVT coord
         
         @note The result is PVTCoord at tai, offset by dist at tai in direction fromOrient at tai.
 
-        @raise std::runtime_error if this coord is too near a pole
+        @raise std::runtime_error if this PVT coord is too near a pole at tai
         */
         virtual PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const;
 

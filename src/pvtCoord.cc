@@ -61,6 +61,32 @@ namespace coordConv {
         return _coord.isfinite() && std::isfinite(_orient) && std::isfinite(_vel) && std::isfinite(_tai);
     }
 
+    PVT PVTCoord::angularSeparation(PVTCoord const &pvtCoord, double tai) const {
+        double posArr[2];
+        for (int i = 0; i < 2; ++i) {
+            double tempTAI = tai + (i * DeltaT);
+            Coord thisCoord = getCoord(tempTAI);
+            Coord otherCoord = pvtCoord.getCoord(tempTAI);
+            posArr[i] = thisCoord.angularSeparation(otherCoord);
+        }
+        PVT res = PVT();
+        res.setFromPair(posArr, tai, DeltaT, false);
+        return res;
+    }
+
+    PVT PVTCoord::orientationTo(PVTCoord const &pvtCoord, double tai) const {
+        double posArr[2];
+        for (int i = 0; i < 2; ++i) {
+            double tempTAI = tai + (i * DeltaT);
+            Coord thisCoord = getCoord(tempTAI);
+            Coord otherCoord = pvtCoord.getCoord(tempTAI);
+            posArr[i] = thisCoord.orientationTo(otherCoord);
+        }
+        PVT res = PVT();
+        res.setFromPair(posArr, tai, DeltaT, true);
+        return res;
+    }
+
     PVTCoord PVTCoord::offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const {
         std::vector<Coord> coordArr;
         double toOrientArr[2];
