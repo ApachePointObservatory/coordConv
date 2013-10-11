@@ -62,9 +62,11 @@
 %declareNumPyConverters(Eigen::Matrix3d);
 
 %copyctor coordConv::PVT;
+%copyctor coordConv::Coord;
+%copyctor coordConv::Site;
+%copyctor coordConv::PVTCoord;
 
 %include "coordConv/pvt.h"
-
 %include "coordConv/physConst.h"
 
 %apply double &OUTPUT { double & };
@@ -73,18 +75,8 @@
 %include "coordConv/angSideAng.h"
 %include "coordConv/rotEqPol.h"
 %include "coordConv/rotXY.h"
-
-%copyctor coordConv::Site;
-
 %include "coordConv/site.h"
 %include "coordConv/time.h"
-
-%copyctor coordConv::Coord;
-
 %include "coordConv/coord.h"
-
-%copyctor coordConv::PVTCoord;
-
 %include "coordConv/pvtCoord.h"
-
 %include "coordSys.i"
