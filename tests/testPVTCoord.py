@@ -89,10 +89,11 @@ class TestCoord(unittest.TestCase):
                                 if numpy.isfinite(coord0.orientationTo(coord1)):
                                     numNotDefOrient += 1
                                     self.assertAlmostEqual(pvtCoord.getOrient(), orient)
+                                    self.assertAlmostEqual(pvtCoord.getVel(), predVel)
                                 else:
                                     numDefOrient += 1
                                     self.assertAlmostEqual(pvtCoord.getOrient(), defOrient)
-                                self.assertAlmostEqual(pvtCoord.getVel(), predVel)
+                                    self.assertAlmostEqual(pvtCoord.getVel(), 0)
                                 self.assertAlmostEqual(pvtCoord.getTAI(), tai)
                                 self.assertTrue(pvtCoord.isfinite())
                                 self.checkPVTCoord(pvtCoord)
