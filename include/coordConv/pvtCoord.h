@@ -39,6 +39,12 @@ namespace coordConv {
         /**
         Construct a PVTCoord from spherical position
 
+        The polar and equatorial velocity define the arc of a great circle:
+        - angle = atan2(polarPVT.vel, equatPVT.vel)
+        - vel = sqrt(polarPVT.vel^2 + equatPVT.vel^2)
+        Thus polarPVT.vel is not d(polarPVT.pos)/dt and does not go to infinity at the pole
+        for a given velocity along a great circle.
+
         @param[in] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
         @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
         @param[in] tai: date at which to evaluate equatAng and polarAng, and initial TAI date of PVTCoord (MJD seconds)
@@ -51,6 +57,12 @@ namespace coordConv {
 
         /**
         Construct a PVTCoord from spherical position and proper motion
+
+        The polar and equatorial velocity define the arc of a great circle:
+        - angle = atan2(polarPVT.vel, equatPVT.vel)
+        - vel = sqrt(polarPVT.vel^2 + equatPVT.vel^2)
+        Thus polarPVT.vel is not d(polarPVT.pos)/dt and does not go to infinity at the pole
+        for a given velocity along a great circle.
         
         @param[in] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
         @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
@@ -175,23 +187,6 @@ namespace coordConv {
         double _orient; // orientation of great circle arc at initial time (deg)
         double _vel;    // velocity along the great circle (deg/sec)
         double _tai;    // initial TAI date (MJD, seconds)
-
-        /**
-        Set from a pair of coords
-        
-        @param[in] coord0: coordinate at time tai
-        @param[in] coord1: coordinate at time tai + deltaT; proper motion and radial velocity are ignored
-        @param[in] tai: initial TAI date of PVTCoord (MJD seconds)
-        @param[in] deltaT: TAI of coord1 - TAI of coord0; must be nonzero
-        @param[in] defOrient: default orientation (deg); if the velocity is so low that orientation
-            cannot be computed then orientation=defOrient and vel=0
-            See Coord.offset for an explanation of orientation
-
-        @return true if defOrient used
-        
-        @raise std::runtime_error if deltaT = 0
-        */
-        bool _setFromCoordPair(Coord const &coord0, Coord const &coord1, double tai, double deltaT, double defOrient);
     };
 
 
