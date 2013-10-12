@@ -3,7 +3,6 @@
 #include <vector>
 #include <tr1/array>
 #include "coordConv/pvtCoord.h"
-#include "coordConv/mathUtils.h"
 
 static const double DeltaT = 0.01;
 
@@ -18,44 +17,33 @@ namespace coordConv {
     
     PVTCoord::PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT, double defOrient) :
         _coord(coord0),
-        _orient(defOrient), // assume insufficient velocity to compute orientation
-        _vel(0),            // assume insufficient velocity to compute orientation
+        _orient(defOrient),    // assume default for now
+        _vel(0),            // assume default for now
         _tai(tai)
     {
         if (deltaT == 0) {
             throw std::runtime_error("deltaT must be nonzero");
         }
         double dist = coord0.angularSeparation(coord1);
-        double vel = dist / deltaT;
         double orient = coord0.orientationTo(coord1);
         if (std::isfinite(orient)) {
+            _vel = dist / deltaT;
             _orient = orient;
-            _vel = vel;
         }
     }
 
-    PVTCoord::PVTCoord(PVT const &polarPVT, PVT const &equatPVT, double tai, double parallax, double defOrient) {
-        _coord = Coord(polarPVT.getPos(tai), equatPVT.getPos(tai), parallax);
-        _vel = hypot(equatPVT.vel, polarPVT.vel);
-        if (std::abs(_vel) > DoubleEpsilon) {
-            _orient = atan2d(equatPVT.vel, polarPVT.vel);
-        } else {
-            _orient = defOrient;
-            _vel = 0;
-        }
+    PVTCoord::PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax, double defOrient) {
+        double polarPos = polarPVT.getPos(tai);
+        _coord = Coord(equatPVT.getPos(tai), polarPos, parallax);
         _tai = tai;
+        _setOrientVelFromSph(polarPos, equatPVT.vel, polarPVT.vel, defOrient);
     }
 
-    PVTCoord::PVTCoord(PVT const &polarPVT, PVT const &equatPVT, double tai, double parallax, double equatPM, double polarPM, double radVel, double defOrient) {
-        _coord = Coord(polarPVT.getPos(tai), equatPVT.getPos(tai), parallax, equatPM, polarPM, radVel);
-        _vel = hypot(equatPVT.vel, polarPVT.vel);
-        if (std::abs(_vel) > DoubleEpsilon) {
-            _orient = atan2d(equatPVT.vel, polarPVT.vel);
-        } else {
-            _orient = defOrient;
-            _vel = 0;
-        }
+    PVTCoord::PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax, double equatPM, double polarPM, double radVel, double defOrient) {
+        double polarPos = polarPVT.getPos(tai);
+        _coord = Coord(equatPVT.getPos(tai), polarPos, parallax, equatPM, polarPM, radVel);
         _tai = tai;
+        _setOrientVelFromSph(polarPos, equatPVT.vel, polarPVT.vel, defOrient);
     }
 
     PVTCoord::PVTCoord() :
@@ -130,6 +118,20 @@ namespace coordConv {
         std::ostringstream os;
         os << *this;
         return os.str();
+    }
+
+    void PVTCoord::_setOrientVelFromSph(double polarPos, double equatVel, double polarVel, double defOrient) {
+        if (_coord.atPole()) {
+            if ((std::abs(polarVel) > DoubleEpsilon) || (std::abs(equatVel) > DoubleEpsilon)) {
+                throw std::runtime_error("Too near pole; cannot specify nonzero velocity");
+            }
+            _orient = defOrient;
+            _vel = 0;
+        } else {
+            double equatSpaceVel = equatVel * cosd(polarPos);
+            _orient = atan2d(polarVel, equatSpaceVel);
+            _vel = hypot(polarVel, equatSpaceVel);
+        }
     }
 
     std::ostream &operator<<(std::ostream &os, PVTCoord const &pvtCoord) {

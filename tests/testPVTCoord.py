@@ -124,23 +124,27 @@ class TestCoord(unittest.TestCase):
         self.assertGreater(numDefOrient, 100)
 
     def testTwoPVTConstructors(self):
-        """Test the two two-PVT constructors:
+        """Test both two-PVT constructors:
 
         PVTCoord(equatPVT, polarPVT, tai, parallax, defOrient)
         PVTCoord(equatPVT, polarPVT, tai, parallax, equatPM, polarPM, radVel, defOrient)
         """
         for equatAng in (0, 71, -123.4):
-            for polarAng in (0, -75, -89.999999, 89.999999):
-                for orient in (0,): # , -45, 31.23):
+            for polarAng in (0, -75, -89.99, 89.99):
+                for orient in (0, -45, 31.23):
                     sinOrient = coordConv.sind(orient)
                     cosOrient = coordConv.cosd(orient)
                     for vel in (0, 0.1, 0.23):
                         for tai in (500.5, 10001.3):
-                            equatPVT = coordConv.PVT(equatAng, vel * cosOrient, tai)
-                            polarPVT = coordConv.PVT(polarAng, vel * sinOrient, tai)
+                            coord0 = coordConv.Coord(equatAng, polarAng)
+                            polarVel = vel * sinOrient
+                            equatVel = vel * cosOrient / coordConv.cosd(polarAng)
+                            equatPVT = coordConv.PVT(equatAng, equatVel, tai)
+                            polarPVT = coordConv.PVT(polarAng, polarVel, tai)
 
+                            desOrient = orient if vel > 1e-15 else 0
                             pvtCoord = coordConv.PVTCoord(equatPVT, polarPVT, tai)
-                            self.assertAlmostEqual(pvtCoord.getOrient(), orient)
+                            self.assertAlmostEqual(pvtCoord.getOrient(), desOrient)
                             self.assertAlmostEqual(pvtCoord.getVel(), vel)
                             self.assertAlmostEqual(pvtCoord.getTAI(), tai)
                             self.assertTrue(pvtCoord.isfinite())
@@ -151,7 +155,7 @@ class TestCoord(unittest.TestCase):
                                     for polarPM in (0, -0.12):
                                         for radVel in (0, 0.13):
                                             pvtCoord = coordConv.PVTCoord(equatPVT, polarPVT, tai, parallax, equatPM, polarPM, radVel)
-                                            self.assertAlmostEqual(pvtCoord.getOrient(), orient)
+                                            self.assertAlmostEqual(pvtCoord.getOrient(), desOrient)
                                             self.assertAlmostEqual(pvtCoord.getVel(), vel)
                                             self.assertAlmostEqual(pvtCoord.getTAI(), tai)
                                             self.assertTrue(pvtCoord.isfinite())
@@ -165,6 +169,7 @@ class TestCoord(unittest.TestCase):
                                             self.assertAlmostEqual(parallax, coordToCheck.getParallax())
 
 
+    def testEquality(self):
         """Test operator== and operator!=
         """
         def pvtCoordIter():

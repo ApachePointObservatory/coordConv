@@ -37,13 +37,7 @@ namespace coordConv {
         explicit PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT, double defOrient=0);
 
         /**
-        Construct a PVTCoord from spherical position
-
-        The polar and equatorial velocity define the arc of a great circle:
-        - angle = atan2(polarPVT.vel, equatPVT.vel)
-        - vel = sqrt(polarPVT.vel^2 + equatPVT.vel^2)
-        Thus polarPVT.vel is not d(polarPVT.pos)/dt and does not go to infinity at the pole
-        for a given velocity along a great circle.
+        Construct a PVTCoord from spherical PVTs
 
         @param[in] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
         @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
@@ -52,17 +46,18 @@ namespace coordConv {
         @param[in] defOrient: default orientation (deg); if the velocity is so low that orientation
             cannot be computed then orientation=defOrient and vel=0
             See Coord.offset for an explanation of orientation
+
+        The provided velocities are treated as the instantaneous dEquat/dt and dPolar/dt along the great circle arc, so:
+        - orientation = atan2d(equat space vel, polar vel)
+        - velocity = hypot(equat space vel, polar vel)
+        where equat space vel = equat vel * cosd(polar pos at tai)
+
+        @raise std::runtime_error if too near pole and equat or polar abs(vel) > DoubleEpsilon
         */
-        explicit PVTCoord(PVT const &polarPVT, PVT const &equatPVT, double tai, double parallax=0, double defOrient=0);
+        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax=0, double defOrient=0);
 
         /**
-        Construct a PVTCoord from spherical position and proper motion
-
-        The polar and equatorial velocity define the arc of a great circle:
-        - angle = atan2(polarPVT.vel, equatPVT.vel)
-        - vel = sqrt(polarPVT.vel^2 + equatPVT.vel^2)
-        Thus polarPVT.vel is not d(polarPVT.pos)/dt and does not go to infinity at the pole
-        for a given velocity along a great circle.
+        Construct a PVTCoord from spherical PVTs and proper motion
         
         @param[in] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
         @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
@@ -75,8 +70,15 @@ namespace coordConv {
         @param[in] defOrient: default orientation (deg); if the velocity is so low that orientation
             cannot be computed then orientation=defOrient and vel=0
             See Coord.offset for an explanation of orientation
+
+        The PVT velocities are treated as the instantaneous dEquat/dt and dPolar/dt along the great circle arc:
+        - orientation = atan2d(equat space vel, polar vel)
+        - velocity = hypot(equat space vel, polar vel)
+        where equat space vel = equat vel * cosd(polar pos at tai)
+
+        @raise std::runtime_error if too near pole and equat or polar abs(vel) > DoubleEpsilon
         */
-        explicit PVTCoord(PVT const &polarPVT, PVT const &equatPVT, double tai, double parallax, double equatPM, double polarPM, double radVel, double defOrient=0);
+        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax, double equatPM, double polarPM, double radVel, double defOrient=0);
         
         /**
         Construct a PVTCoord with all NaN data
@@ -119,6 +121,8 @@ namespace coordConv {
        
         /**
         Retrieve spherical position at a specified TAI date
+        
+        The returned velocities are the instantaneous dEquat/dt and dPolar/dt along the great circle arc
         
         @param[out] equatPVT: equatorial PVT (deg, deg/sec, TAI date)
         @param[out] polarPVT: polar PVT (deg, deg/sec, TAI date)
@@ -187,6 +191,24 @@ namespace coordConv {
         double _orient; // orientation of great circle arc at initial time (deg)
         double _vel;    // velocity along the great circle (deg/sec)
         double _tai;    // initial TAI date (MJD, seconds)
+
+        /**
+        Set _orient and _vel from spherical info
+        
+        @param[in] polarPos: polar angle
+        @param[in] equatVel: equatorial velocity (dEquatPos/dt)
+        @param[in] polarVel: polar velocity
+        @param[in] defOrient: default orientation (deg); if _coord.atPole()
+            then orientation=defOrient and vel=0
+
+        The provided velocities are treated as the instantaneous dEquat/dt and dPolar/dt along the great circle arc, so:
+        - orientation = atan2d(equatSpaceVel, polarVel)
+        - velocity = hypot(equatSpaceVel, polarVel)
+        where equatSpaceVel = equatVel * cosd(polarPos)
+
+        @raise std::runtime_error if _coord.atPole() and |equatVel| or |polarVel| > DoubleEpsilon.
+        */
+        void _setOrientVelFromSph(double polarPos, double equatVel, double polarVel, double defOrient);
     };
 
 
