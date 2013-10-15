@@ -13,7 +13,9 @@ namespace coordConv {
         _orient(orient),
         _vel(vel),
         _tai(tai)
-    {}
+    {
+        _checkCoord();
+    }
     
     PVTCoord::PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT, double defOrient) :
         _coord(coord0),
@@ -30,6 +32,7 @@ namespace coordConv {
             _vel = dist / deltaT;
             _orient = orient;
         }
+        _checkCoord();
     }
 
     PVTCoord::PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax, double defOrient) {
@@ -37,6 +40,7 @@ namespace coordConv {
         _coord = Coord(equatPVT.getPos(tai), polarPos, parallax);
         _tai = tai;
         _setOrientVelFromSph(polarPos, equatPVT.vel, polarPVT.vel, defOrient);
+        _checkCoord();
     }
 
     PVTCoord::PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax, double equatPM, double polarPM, double radVel, double defOrient) {
@@ -44,6 +48,7 @@ namespace coordConv {
         _coord = Coord(equatPVT.getPos(tai), polarPos, parallax, equatPM, polarPM, radVel);
         _tai = tai;
         _setOrientVelFromSph(polarPos, equatPVT.vel, polarPVT.vel, defOrient);
+        _checkCoord();
     }
 
     PVTCoord::PVTCoord() :
@@ -54,9 +59,13 @@ namespace coordConv {
     { };
     
     Coord PVTCoord::getCoord(double tai) const {
-        double dist = _vel * (tai - _tai);
-        double newOrient;
-        return _coord.offset(newOrient, _orient, dist);
+        if (_vel == 0.0) {
+            return _coord;
+        } else {
+            double dist = _vel * (tai - _tai);
+            double newOrient;
+            return _coord.offset(newOrient, _orient, dist);
+        }
     }    
     
     bool PVTCoord::getSphPVT(PVT &equatPVT, PVT &polarPVT, double tai) const {
@@ -131,6 +140,12 @@ namespace coordConv {
             double equatSpaceVel = equatVel * cosd(polarPos);
             _orient = atan2d(polarVel, equatSpaceVel);
             _vel = hypot(polarVel, equatSpaceVel);
+        }
+    }
+
+    void PVTCoord::_checkCoord() const {
+        if (_coord.atPole() and _vel != 0) {
+            throw std::runtime_error("Invalid PVTCoord: coord at pole but velocity nonzero");
         }
     }
 

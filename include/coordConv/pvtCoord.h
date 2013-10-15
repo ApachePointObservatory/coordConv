@@ -18,6 +18,8 @@ namespace coordConv {
             see Coord.offset for an explanation of orientation
         @param[in] vel: speed of motion along arc of great circle (deg/sec)
         @param[in] tai: TAI date of coord (MJD seconds)
+
+        @raise std::runtime_error if coord is at pole at time tai and vel nonzero.
         */
         explicit PVTCoord(Coord const &coord, double orient, double vel, double tai);
 
@@ -32,7 +34,9 @@ namespace coordConv {
             cannot be computed then orientation=defOrient and vel=0
             See Coord.offset for an explanation of orientation
         
-        @raise std::runtime_error if deltaT = 0
+        @raise std::runtime_error if:
+        - deltaT = 0
+        - coord0 is at pole and vel nonzero.
         */
         explicit PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT, double defOrient=0);
 
@@ -52,7 +56,7 @@ namespace coordConv {
         - velocity = hypot(equat space vel, polar vel)
         where equat space vel = equat vel * cosd(polar pos at tai)
 
-        @raise std::runtime_error if too near pole and equat or polar abs(vel) > DoubleEpsilon
+        @raise std::runtime_error if coord is at pole at time tai and vel nonzero.
         */
         explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax=0, double defOrient=0);
 
@@ -76,7 +80,7 @@ namespace coordConv {
         - velocity = hypot(equat space vel, polar vel)
         where equat space vel = equat vel * cosd(polar pos at tai)
 
-        @raise std::runtime_error if too near pole and equat or polar abs(vel) > DoubleEpsilon
+        @raise std::runtime_error if coord is at pole at time tai and vel nonzero.
         */
         explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax, double equatPM, double polarPM, double radVel, double defOrient=0);
         
@@ -191,6 +195,13 @@ namespace coordConv {
         double _orient; // orientation of great circle arc at initial time (deg)
         double _vel;    // velocity along the great circle (deg/sec)
         double _tai;    // initial TAI date (MJD, seconds)
+
+        /**
+        Sanity check, e.g. to make sure _vel is 0 if at pole
+
+        @raise std::runtime_error if PVTCoord invalid
+        */
+        void _checkCoord() const;
 
         /**
         Set _orient and _vel from spherical info

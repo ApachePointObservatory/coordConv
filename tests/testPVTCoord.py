@@ -195,43 +195,143 @@ class TestCoord(unittest.TestCase):
     def testOffset(self):
         """Test PVTCoord.offset
         """
+        def pvtCoordIter():
+            """Return a sequence of PVTCoord"""
+            for equatAng in (0, 71, -123.4):
+                for polarAng in (0, -75, -89.99999, -90, 89.99999):
+                    coord = coordConv.Coord(equatAng, polarAng)
+                    for orient in (0, 31.23):
+                        for vel in (0, 0.23):
+                            if coord.atPole() and vel != 0:
+                                continue # do not try to make invalid PVTCoords
+                            for tai in (500.5, 10001.3):
+                                yield coordConv.PVTCoord(coord, orient, vel, tai)
+
+        def offPVTIter(pvtCoord):
+            """return a sequence of (offOrientPVT, offDistPVT)"""
+            tai = pvtCoord.getTAI()
+            orient = pvtCoord.getOrient()
+            for offOrient in (0, -72):
+                for offOrientVel in (0, 0.1):
+                    for offOrientTAI in (tai, orient + 10):
+                        offOrientPVT = coordConv.PVT(offOrient, offOrientVel, offOrientTAI)
+                        for offDist in (0, 0.1, 1):
+                            for offDistVel in (0, 0.3):
+                                for offDistTAI in (tai, orient - 5):
+                                    offDistPVT = coordConv.PVT(offDist, offDistVel, offDistTAI)
+                                    yield offOrientPVT, offDistPVT
+
         numAtPole = 0
         numNotAtPole = 0
         toOrientPVT = coordConv.PVT()
-        for equatAng in (0, 71, -123.4):
-            for polarAng in (0, -75, -89.99999, -90, 89.99999):
-                coord = coordConv.Coord(equatAng, polarAng)
-                for orient in (0, 31.23):
-                    for vel in (0, 0.23):
-                        for tai in (500.5, 10001.3):
-                            pvtCoord = coordConv.PVTCoord(coord, orient, vel, tai)
-                            for offOrient in (0, -72):
-                                for offOrientVel in (0, 0.1):
-                                    for offOrientTAI in (tai, orient + 10):
-                                        offOrientPVT = coordConv.PVT(offOrient, offOrientVel, offOrientTAI)
-                                        for offDist in (0, 0.1, 1):
-                                            for offDistVel in (0, 0.3):
-                                                for offDistTAI in (tai, orient - 5):
-                                                    offDistPVT = coordConv.PVT(offDist, offDistVel, offDistTAI)
-                                                    if coord.atPole():
-                                                        numAtPole += 1
-                                                        self.assertRaises(RuntimeError, pvtCoord.offset, toOrientPVT, offOrientPVT, offDistPVT, offTAI)
-                                                    else:
-                                                        numNotAtPole += 1
-                                                        for offTAI in (tai, tai - 1, tai + 2):
-                                                            offPVTCoord = pvtCoord.offset(toOrientPVT, offOrientPVT, offDistPVT, offTAI)
-                                                            self.assertTrue(offPVTCoord.isfinite())
-                                                            offOrientAtOffTAI = offOrientPVT.getPos(offTAI)
-                                                            offDistAtOffTAI = offDistPVT.getPos(offTAI)
-                                                            toOrientAtOffTAI = toOrientPVT.getPos(offTAI)
-                                                            offCoordAtOffTAI = offPVTCoord.getCoord(offTAI)
-                                                            coordAtOffTAI = pvtCoord.getCoord(offTAI)
-                                                            predOffCoord, predToOrient = coordAtOffTAI.offset(offOrientAtOffTAI, offDistAtOffTAI)
-                                                            
-                                                            self.assertAlmostEqual(toOrientAtOffTAI, predToOrient)
-                                                            self.assertAlmostEqual(offCoordAtOffTAI.angularSeparation(predOffCoord), 0)
+        for pvtCoord in pvtCoordIter():
+            tai = pvtCoord.getTAI()
+            for offOrientPVT, offDistPVT in offPVTIter(pvtCoord):
+                if pvtCoord.getCoord().atPole():
+                    numAtPole += 1
+                    self.assertRaises(RuntimeError, pvtCoord.offset, toOrientPVT, offOrientPVT, offDistPVT, tai)
+                else:
+                    numNotAtPole += 1
+                    for offTAI in (tai, tai - 1, tai + 2):
+                        offPVTCoord = pvtCoord.offset(toOrientPVT, offOrientPVT, offDistPVT, offTAI)
+                        self.assertTrue(offPVTCoord.isfinite())
+                        offOrientAtOffTAI = offOrientPVT.getPos(offTAI)
+                        offDistAtOffTAI = offDistPVT.getPos(offTAI)
+                        toOrientAtOffTAI = toOrientPVT.getPos(offTAI)
+                        offCoordAtOffTAI = offPVTCoord.getCoord(offTAI)
+                        coordAtOffTAI = pvtCoord.getCoord(offTAI)
+                        predOffCoord, predToOrient = coordAtOffTAI.offset(offOrientAtOffTAI, offDistAtOffTAI)
+                        
+                        self.assertAlmostEqual(toOrientAtOffTAI, predToOrient)
+                        self.assertAlmostEqual(offCoordAtOffTAI.angularSeparation(predOffCoord), 0)
+
         self.assertGreater(numNotAtPole, 100)
         self.assertGreater(numAtPole, 100)
+
+
+    def testAngularSeparation(self):
+        """Test PVTCoord.angularSeparation and orientationTo
+        """
+        def pvtCoordIter():
+            for equatAng in (0, 71, -123.4):
+                for polarAng in (0, -75, -89.99999, -90, 89.99999):
+                    coord = coordConv.Coord(equatAng, polarAng)
+                    for orient in (0, 31.23):
+                        for vel in (0, 0.023):
+                            if coord.atPole() and vel != 0:
+                                continue # do not try to make invalid PVTCoords
+                            for tai in (10002.5, 10001.3):
+                                yield coordConv.PVTCoord(coord, orient, vel, tai)
+
+        def refAngularSeparation(pvtCoord0, pvtCoord1, tai):
+            """Compute angular separation between pvtCoord0, pvtCoord1 using Coord.angularSeparation
+            """
+            DeltaT = 0.01
+            posList = []
+            for tempTAI in (tai, tai + DeltaT):
+                coord0 = pvtCoord0.getCoord(tempTAI)
+                coord1 = pvtCoord1.getCoord(tempTAI)
+                posList.append(coord0.angularSeparation(coord1))
+            return makePVTFromPair(posList, tai, DeltaT, True)
+
+        def refOrientTo(pvtCoord0, pvtCoord1, tai):
+            """Compute orientation from pvtCoord0 to pvtCoord1 using Coord.orientationTo
+            """
+            DeltaT = 0.01
+            posList = []
+            for tempTAI in (tai, tai + DeltaT):
+                coord0 = pvtCoord0.getCoord(tempTAI)
+                coord1 = pvtCoord1.getCoord(tempTAI)
+                posList.append(coord0.orientationTo(coord1))
+            return makePVTFromPair(posList, tai, DeltaT, True)
+
+        for pvtCoord0 in pvtCoordIter():
+            tai0 = pvtCoord0.getTAI()
+            for pvtCoord1 in pvtCoordIter():
+                for tai in (tai0 + 5, tai0 - 79.2):
+                    angSep01 = pvtCoord0.angularSeparation(pvtCoord1, tai)
+                     # compute reference separation, which should be the same for 0->1 and 1->0
+                    refAngSep = refAngularSeparation(pvtCoord0, pvtCoord1, tai)
+                    self.assertPVTsAlmostEqual(angSep01, refAngSep, isAngle=False)
+
+                    angSep10 = pvtCoord1.angularSeparation(pvtCoord0, tai)
+                    self.assertPVTsAlmostEqual(angSep10, refAngSep)
+
+                    if pvtCoord0 == pvtCoord1:
+                        self.assertAlmostEqual(angSep01.pos, 0)
+
+                    orientTo01 = pvtCoord0.orientationTo(pvtCoord1, tai)
+                    refOrientTo01 = refOrientTo(pvtCoord0, pvtCoord1, tai)
+                    if not orientTo01.isfinite():
+                        self.assertFalse(refOrientTo01.isfinite())
+                    else:
+                        self.assertPVTsAlmostEqual(orientTo01, refOrientTo01, isAngle=True)
+
+
+                    orientTo10 = pvtCoord1.orientationTo(pvtCoord0, tai)
+                    refOrientTo10 = refOrientTo(pvtCoord1, pvtCoord0, tai)
+                    if not orientTo10.isfinite():
+                        self.assertFalse(refOrientTo10.isfinite())
+                    else:
+                        self.assertPVTsAlmostEqual(orientTo10, refOrientTo10, isAngle=True)
+
+    def assertPVTsAlmostEqual(self, pvt0, pvt1, posDig=7, velDig=7, isAngle=False):
+        """Compare two PVTS; both must have the same time
+        """
+        self.assertEqual(pvt0.t, pvt1.t)
+        if isAngle:
+            self.assertAlmostEqual(coordConv.wrapCtr(pvt0.pos - pvt1.pos), 0, posDig)
+        else:
+            self.assertAlmostEqual(pvt0.pos, pvt1.pos, posDig)
+        self.assertAlmostEqual(pvt0.vel, pvt1.vel, velDig)
+
+def makePVTFromPair(posPair, tai, deltaT, isAngle):
+    pos = posPair[0];
+    if (isAngle):
+        vel = coordConv.wrapCtr(posPair[1] - posPair[0]) / deltaT
+    else:
+        vel = (posPair[1] - posPair[0]) / deltaT
+    return coordConv.PVT(pos, vel, tai)
 
 
 if __name__ == '__main__':
