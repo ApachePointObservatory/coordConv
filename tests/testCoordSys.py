@@ -9,8 +9,8 @@ AzAltSysList = (coordConv.AppTopoCoordSys, coordConv.ObsCoordSys)
 AzAltNameList = ("apptopo", "obs")
 AppSysList = (coordConv.AppGeoCoordSys,) + AzAltSysList
 AppNameList = ("appgeo",) + AzAltNameList
-FullSysList = MeanSysList + AppSysList + (coordConv.MountCoordSys, coordConv.NoneCoordSys)
-FullNameList = MeanNameList + AppNameList + ("mount", "none")
+FullSysList = MeanSysList + AppSysList + (coordConv.NoneCoordSys,)
+FullNameList = MeanNameList + AppNameList + ("none",)
 
 class TestCoordSys(unittest.TestCase):
     """Test some aspects of CoordSys and subclasses
@@ -134,12 +134,12 @@ class TestCoordSys(unittest.TestCase):
                 self.assertEqual(csys.getDate(), csysCopy.getDate())
                 self.assertEqual(csys.getName(), csysCopy.getName())
                 
-    def testNoneAndMountCoordSys(self):
-        """Test that conversions to and from NoneCoordSys and MountCoordSys yield a null result
+    def testNoneAndOtherCoordSys(self):
+        """Test that conversions to and from NoneCoordSys and OtherCoordSys yield a null result
         """
         for nullSys in (
             coordConv.NoneCoordSys(),
-            coordConv.MountCoordSys()
+            coordConv.OtherCoordSys("foo"),
         ):
             site = coordConv.Site(-105.822616, 32.780988, 2788)
             fromCoord = coordConv.Coord(10, 30)

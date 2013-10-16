@@ -62,8 +62,6 @@ namespace coordConv {
             return boost::make_shared<coordConv::AppTopoCoordSys>(date);
         } else if (name == "obs") {
             return boost::make_shared<coordConv::ObsCoordSys>(date);
-        } else if (name == "mount") {
-            return boost::make_shared<coordConv::MountCoordSys>(date);
         } else if (name == "none") {
             return boost::make_shared<coordConv::NoneCoordSys>(date);
         } else {

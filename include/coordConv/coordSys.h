@@ -23,8 +23,8 @@ namespace coordConv {
         /**
         Construct a CoordSys given a name and date
         */
-        explicit CoordSys(std::string const &name, bool isMean, double date) :
-            _name(name), _isMean(isMean), _date() { setDate(date); };
+        explicit CoordSys(std::string const &name, double date, bool isMean, bool canConvert) :
+            _name(name),  _date(), _canConvert(canConvert), _isMean(isMean) { setDate(date); };
         
         ///< Destructor
         virtual ~CoordSys() { };
@@ -43,6 +43,11 @@ namespace coordConv {
         Get the name of this coordinate system (all lowercase)
         */
         std::string getName() const { return _name; };
+        
+        /**
+        Return true if the coordinate system can convert coordinates
+        */
+        bool canConvert() const { return _isMean; };
         
         /**
         Return true for a mean coordinate system, false for an apparent coordinate system
@@ -177,8 +182,9 @@ namespace coordConv {
     
     protected:
         std::string _name;  /// name of coordinate system
-        bool _isMean;       /// true for mean coordinate systems
         double _date;       /// date of coordinate system (units depend on coordinate system)
+        bool _isMean;       /// true for mean coordinate systems
+        bool _canConvert;   /// true if the coordinate system can convert coordinates
     };
     
     class MeanCoordSys: public CoordSys {
@@ -443,11 +449,44 @@ namespace coordConv {
     };
     
     /**
+    Other coordinate system
+    
+    This is a placeholder for additional coordinate systems that are not supported by this package
+    (for example a telescope may want to use coordinates such as "mount" or "instrument").
+
+    See also NoneCoordSys.
+
+    * canConvert is always false
+    * fromFK5J2000, toFK5J2000 and convertFrom all return a null Coord()
+    * dateFromTAI returns the supplied TAI date
+    * removePM returns the supplied coord (though perhaps it should return a null Coord, instead)
+    */
+    class OtherCoordSys: public CoordSys {
+    public:
+        /**
+        Construct an OtherCoordSys
+        
+        @param[in] name: name of coordinate system
+        @param[in] date: date as TAI (MJD, seconds)
+        @param[in] isMean: is this a mean system?
+        */
+        explicit OtherCoordSys(std::string const &name, double date=0, bool isMean=false);
+        virtual ~OtherCoordSys() {};
+        virtual CoordSys::Ptr clone() const;
+        virtual CoordSys::Ptr clone(double date) const;
+        virtual double dateFromTAI(double tai) const;
+        virtual Coord removePM(Coord const &coord, double tai) const { return coord; };
+        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
+        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
+        virtual std::string __repr__() const;
+    };
+    
+    /**
     None coordinates
     
     This coordinate system always converts to NaN. Date is TAI (MJD, seconds)
     */
-    class NoneCoordSys: public ApparentCoordSys {
+    class NoneCoordSys: public OtherCoordSys {
     public:
         /**
         Construct a NoneCoordSys
@@ -458,32 +497,6 @@ namespace coordConv {
         virtual ~NoneCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
-        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
-        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
-        virtual std::string __repr__() const;
-    };
-    
-    /**
-    Mount coordinates
-    
-    This is a placeholder for mount coordinates, for those writing telescope control
-    systems and who need a place to store user-requested mount coordinates.
-    
-    Like NoneCoordSys it returns Coord() for any coordinate conversion.
-    */
-    class MountCoordSys: public ApparentCoordSys {
-    public:
-        /**
-        Construct a MountCoordSys
-        
-        @param[in] date: date as TAI (MJD, seconds)
-        */
-        explicit MountCoordSys(double date=0);
-        virtual ~MountCoordSys() {};
-        virtual CoordSys::Ptr clone() const;
-        virtual CoordSys::Ptr clone(double date) const;
-        virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
-        virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual std::string __repr__() const;
     };
     
@@ -494,6 +507,9 @@ namespace coordConv {
     @param[in] date: date of coordinate system (units depend on the coordinate system)
     @return the specified coordinate system at the specified date
     @raise std::invalid_argument (ValueError in python) if name is not recognized.
+
+    @warning: this will not construct an OtherCoordSys, since those have arbitary names
+    (but it will construct a NoneCoordSys)
     */
     CoordSys::Ptr makeCoordSys(std::string const &name, double date);
 

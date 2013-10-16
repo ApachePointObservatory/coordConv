@@ -4,7 +4,7 @@ namespace coordConv {
 
     ApparentCoordSys::ApparentCoordSys(std::string const &name, double date)
     :
-        CoordSys(name, false, date)
+        CoordSys(name, date, false, true)
     {}
     
     // works for apparent topocentric and observed; override for geocentric

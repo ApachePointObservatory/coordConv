@@ -8,8 +8,8 @@
 %shared_ptr(coordConv::AppGeoCoordSys);
 %shared_ptr(coordConv::AppTopoCoordSys);
 %shared_ptr(coordConv::ObsCoordSys);
+%shared_ptr(coordConv::OtherCoordSys);
 %shared_ptr(coordConv::NoneCoordSys);
-%shared_ptr(coordConv::MountCoordSys);
 
 %copyctor coordConv::ICRSCoordSys;
 %copyctor coordConv::FK5CoordSys;
@@ -18,7 +18,7 @@
 %copyctor coordConv::AppGeoCoordSys;
 %copyctor coordConv::AppTopoCoordSys;
 %copyctor coordConv::ObsCoordSys;
+%copyctor coordConv::OtherCoordSys;
 %copyctor coordConv::NoneCoordSys;
-%copyctor coordConv::MountCoordSys;
 
 %include "coordConv/coordSys.h"
