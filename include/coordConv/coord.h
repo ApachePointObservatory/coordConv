@@ -156,7 +156,7 @@ namespace coordConv {
         to another coord. The orientation is 0 if the great circle lies along the direction of
         increasing equatorial angle, 90 if it lies along the direction increasing polar angle.
         
-        @return orientation (deg), or NaN if the two coords are too close together
+        @return orientation (deg), or NaN if the angular separation is noo near 0 or 180 degrees
         */
         double orientationTo(Coord const &coord) const;
         

@@ -155,7 +155,7 @@ namespace coordConv {
         to another PVT coord. The orientation is 0 if the great circle lies along the direction of
         increasing equatorial angle, 90 if it lies along the direction increasing polar angle.
         
-        @return orientation (deg), or NaN if the two PVTCoord are too close together at tai
+        @return orientation (deg), or NaN if the angular separation is too near 0 or 180 at tai
         */
         PVT orientationTo(PVTCoord const &pvtCoord, double tai) const;
         
