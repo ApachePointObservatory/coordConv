@@ -24,7 +24,7 @@ namespace coordConv {
         Construct a CoordSys given a name and date
         */
         explicit CoordSys(std::string const &name, double date, bool isMean, bool canConvert) :
-            _name(name),  _date(), _canConvert(canConvert), _isMean(isMean) { setDate(date); };
+            _name(name),  _date(), _isMean(isMean), _canConvert(canConvert) { setDate(date); };
         
         ///< Destructor
         virtual ~CoordSys() { };
@@ -47,7 +47,7 @@ namespace coordConv {
         /**
         Return true if the coordinate system can convert coordinates
         */
-        bool canConvert() const { return _isMean; };
+        bool canConvert() const { return _canConvert; };
         
         /**
         Return true for a mean coordinate system, false for an apparent coordinate system

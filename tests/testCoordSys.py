@@ -116,6 +116,7 @@ class TestCoordSys(unittest.TestCase):
                 self.assertEqual(csys.getDate(), date)
                 self.assertEqual(csys.isMean(), predIsMean)
                 self.assertEqual(csys.getName(), csysName)
+                self.assertEqual(csys.canConvert(), csysName != "none")
                 
                 csysClone = csys.clone()
                 self.assertEqual(csys.getDate(), csysClone.getDate())
@@ -141,6 +142,7 @@ class TestCoordSys(unittest.TestCase):
             coordConv.NoneCoordSys(),
             coordConv.OtherCoordSys("foo"),
         ):
+            self.assertFalse(nullSys.canConvert())
             site = coordConv.Site(-105.822616, 32.780988, 2788)
             fromCoord = coordConv.Coord(10, 30)
             for csysName in FullNameList:
