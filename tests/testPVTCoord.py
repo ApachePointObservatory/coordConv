@@ -1,6 +1,8 @@
 #!/usr/bin/env python
+import itertools
 import unittest
 import numpy
+
 import coordConv
 
 class TestCoord(unittest.TestCase):
@@ -248,7 +250,6 @@ class TestCoord(unittest.TestCase):
         self.assertGreater(numNotAtPole, 100)
         self.assertGreater(numAtPole, 100)
 
-
     def testAngularSeparation(self):
         """Test PVTCoord.angularSeparation and orientationTo
         """
@@ -314,6 +315,51 @@ class TestCoord(unittest.TestCase):
                         self.assertFalse(refOrientTo10.isfinite())
                     else:
                         self.assertPVTsAlmostEqual(orientTo10, refOrientTo10, isAngle=True)
+
+    def testConvertFrom(self):
+        """Test a few instances of CoordSys.convertFrom on PVTCoords
+        
+        This test assumes that CoordSys.convertFrom works on Coords (tested elsewhere)
+        """
+        site = coordConv.Site(-105.822616, 32.780988, 2788)
+        fromCoordSys = coordConv.ICRSCoordSys()
+        toCoordSys = coordConv.GalCoordSys()
+        cnvTAI = 4889900000.2
+        dt = 0.001
+        taiPair = (cnvTAI, cnvTAI + dt)
+
+        def pvtCoordIter():
+            for equatAng in (0, 71, -123.4):
+                for polarAng in (0, -75, -89.9, 89.9):
+                    coord = coordConv.Coord(equatAng, polarAng)
+                    for orient in (0, 31.23):
+                        for vel in (0, 0.023):
+                            if coord.atPole() and vel != 0:
+                                continue # do not try to make invalid PVTCoords
+                            for tai in (4889100000.5, 1000.1):
+                                yield coordConv.PVTCoord(coord, orient, vel, tai)
+
+        for fromPVTCoord in pvtCoordIter():
+            fromCoordPair = [fromPVTCoord.getCoord(t) for t in taiPair]
+            toPVTCoord = toCoordSys.convertFrom(fromCoordSys, fromPVTCoord, site, cnvTAI)
+            for fromCoord, tai in itertools.izip(fromCoordPair, taiPair):
+                predToCoord = toCoordSys.convertFrom(fromCoordSys, fromCoord, site)
+                measToCoord = toPVTCoord.getCoord(tai)
+                self.assertAlmostEqual(predToCoord.angularSeparation(measToCoord), 0)
+
+            toDir = coordConv.PVT()
+            for fromDirPos in (45, -150):
+                for fromDirVel in (0, 0.1):
+                    fromDir = coordConv.PVT(fromDirPos, fromDirVel, cnvTAI)
+                    toPVTCoord, scaleChange = toCoordSys.convertFrom(toDir, fromCoordSys, fromPVTCoord, fromDir, site, cnvTAI)
+                    for fromCoord, tai in itertools.izip(fromCoordPair, taiPair):
+                        predToCoord, predToDir, predScaleChange = toCoordSys.convertFrom(fromCoordSys, fromCoord, fromDir.getPos(tai), site)
+                        measToCoord = toPVTCoord.getCoord(tai)
+                        self.assertAlmostEqual(predToCoord.angularSeparation(measToCoord), 0)
+                        self.assertAlmostEqual(toDir.getPos(tai), predToDir)
+                        self.assertAlmostEqual(scaleChange, predScaleChange)
+                        self.assertAlmostEqual(scaleChange, 1.0) # no scale change because mean to mean conversion
+
 
     def assertPVTsAlmostEqual(self, pvt0, pvt1, posDig=7, velDig=7, isAngle=False):
         """Compare two PVTS; both must have the same time

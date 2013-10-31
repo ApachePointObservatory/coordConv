@@ -8,13 +8,7 @@ Issues:
   (perhaps where it is set by setPoleWander; it's subtle enough that it might be confusing in site.h?),
   since I'm pretty sure I have wondered this before.
 
-To do:
-- Add more methods that work with PVTCoord, if needed, such as:
-  - PVTCoord.angularSeparation (arguments are PVTCoords; result is PVT)
-  - PVTCoord.angleTo (argument is PVTCoord; result is PVT)
-
 Unit tests to add:
-- CoordSys.convertFrom variants that use PVTCoord.
 - Untested PVT functionality, such as setFromPair (once I can call that from python)
 
 SWIG questions:
