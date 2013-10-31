@@ -8,8 +8,11 @@ Issues:
   (perhaps where it is set by setPoleWander; it's subtle enough that it might be confusing in site.h?),
   since I'm pretty sure I have wondered this before.
 
-Unit tests to add:
-- Untested PVT functionality, such as setFromPair (once I can call that from python)
-
 SWIG questions:
-- Learn to call PVT.setFromPair from Python
+- Learn to call PVT.setFromPair from Python and then unit test it.
+  One solution is to implement std::array support in coordConv (moving it there from pytcc).
+  Then N-dimensional arrays would be trivial and safe C++ and Python. But it would result in
+  a potentially awkward mix of ndarray, Eigen and std::array. One strange way to solve that
+  would be to stop passing Eigen around at all and pass 3x3 rotation matrices as 9-element arrays;
+  as long as they are computed and used by coordConv that's not too bad, but it's ugly if
+  those rotation matrices will be constructed or used by any other code.

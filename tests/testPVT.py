@@ -244,11 +244,35 @@ class TestPVT(unittest.TestCase):
         self.assertFalse(numpy.isfinite(pvt.t))
 
         pvt2 = coordConv.PVT(-2, -4, 6)
-        pvt.invalidate(5)
-        self.assertFalse(pvt.isfinite())
-        self.assertFalse(numpy.isfinite(pvt.pos))
-        self.assertFalse(numpy.isfinite(pvt.vel))
-        self.assertEqual(pvt.t, 5.0)
+        pvt2.invalidate(5)
+        self.assertFalse(pvt2.isfinite())
+        self.assertFalse(numpy.isfinite(pvt2.pos))
+        self.assertFalse(numpy.isfinite(pvt2.vel))
+        self.assertEqual(pvt2.t, 5.0)
+
+    def testRot2D(self):
+        """Test rot2D
+        """
+        def pvtIter():
+            for pos in (5, -3):
+                for vel in (0.1, 0, -0.3):
+                    for tai in (500, 999):
+                        yield coordConv.PVT(pos, vel, tai)
+
+        for fromPVTX in pvtIter():
+            for fromPVTY in pvtIter():
+                for ang in (0, 21, -75.5):
+                    for rotTAI in (fromPVTX.t - 200, fromPVTX.t + 5000):
+                        toPVTX = coordConv.PVT()
+                        toPVTY = coordConv.PVT()
+                        coordConv.rot2D(toPVTX, toPVTY, fromPVTX, fromPVTY, ang, rotTAI)
+
+                        for testTAI in (rotTAI, rotTAI + 1010):
+                            fromX = fromPVTX.getPos(testTAI)
+                            fromY = fromPVTY.getPos(testTAI)
+                            predToX, predToY = coordConv.rot2D(fromX, fromY, ang)
+                            self.assertAlmostEqual(predToX, toPVTX.getPos(testTAI))
+                            self.assertAlmostEqual(predToY, toPVTY.getPos(testTAI))
 
     def testPolarFromXY(self):
         """Test polarFromXY and xyFromPolar
