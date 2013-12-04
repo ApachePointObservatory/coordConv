@@ -1,7 +1,9 @@
 #include <cmath>
 #include <stdexcept>
 #include <sstream>
+
 #include "slalib.h"
+
 #include "coordConv/mathUtils.h"
 #include "coordConv/physConst.h"
 #include "coordConv/coordSys.h"

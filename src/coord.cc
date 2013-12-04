@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stdexcept>
 #include <sstream>
 #include "coordConv/mathUtils.h"

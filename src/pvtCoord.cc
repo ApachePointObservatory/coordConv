@@ -1,7 +1,10 @@
 #include <cmath>
+#include <limits>
 #include <stdexcept>
 #include <vector>
 #include <tr1/array>
+
+#include "coordConv/mathUtils.h"
 #include "coordConv/pvtCoord.h"
 
 static const double DeltaT = 0.01;
@@ -107,7 +110,24 @@ namespace coordConv {
             posArr[i] = thisCoord.orientationTo(otherCoord);
         }
         PVT res = PVT();
-        res.setFromPair(posArr, tai, DeltaT, true);
+        // if the orientation is only finite at one of the two times
+        // then the distance is 0 at the other time and the orientation is fixed
+        // (since the relative velocity vector goes through this PVT)
+        if (std::isfinite(posArr[0]) && std::isfinite(posArr[1])) {
+            res.setFromPair(posArr, tai, DeltaT, true);
+        } else if (std::isfinite(posArr[0])) {
+            res.pos = posArr[0];
+            res.vel = 0;
+            res.t = tai;
+        } else if (std::isfinite(posArr[1])) {
+            res.pos = posArr[1];
+            res.vel = 0;
+            res.t = tai;
+        } else {
+            res.pos = DoubleNaN;
+            res.vel = DoubleNaN;
+            res.t = tai;
+        }
         return res;
     }
 

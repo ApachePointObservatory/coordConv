@@ -30,6 +30,12 @@ class TestCoord(unittest.TestCase):
             if dist > 1e-7:
                 measOrient = coord.orientationTo(coord1)
                 if not numpy.isfinite(measOrient):
+                    # this occurs when either coord is very close to the pole
+                    # unfortunate the atPole flag is usually not set, which suggests the flag is not useful
+                    polarAng = coord.getSphPos()[2]
+                    polarAng1 = coord1.getSphPos()[2]
+                    maxPolarAng = max(abs(polarAng), abs(polarAng1))
+                    self.assertGreater(maxPolarAng, 89.999)
                     continue
                 self.assertAlmostEqual(coord.orientationTo(coord1), orient)
         
@@ -284,12 +290,19 @@ class TestCoord(unittest.TestCase):
                 coord0 = pvtCoord0.getCoord(tempTAI)
                 coord1 = pvtCoord1.getCoord(tempTAI)
                 posList.append(coord0.orientationTo(coord1))
-            return makePVTFromPair(posList, tai, DeltaT, True)
+            if numpy.all(numpy.isfinite(posList)):
+                return makePVTFromPair(posList, tai, DeltaT, True)
+            elif numpy.isfinite(posList[0]):
+                return coordConv.PVT(posList[0], 0, tai)
+            elif numpy.isfinite(posList[1]):
+                return coordConv.PVT(posList[1], 0, tai)
+            else:
+                return coordConv.PVT()
 
         for pvtCoord0 in pvtCoordIter():
             tai0 = pvtCoord0.getTAI()
             for pvtCoord1 in pvtCoordIter():
-                for tai in (tai0 + 5, tai0 - 79.2):
+                for tai in (tai0, tai0 + 5):
                     angSep01 = pvtCoord0.angularSeparation(pvtCoord1, tai)
                      # compute reference separation, which should be the same for 0->1 and 1->0
                     refAngSep = refAngularSeparation(pvtCoord0, pvtCoord1, tai)
