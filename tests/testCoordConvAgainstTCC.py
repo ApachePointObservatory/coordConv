@@ -90,9 +90,6 @@ class TestCoordConv(unittest.TestCase):
                 site.refCoB = refCoB
         
                 try:
-#                     import os, pdb
-#                     print "PID=", os.getpid()
-#                     pdb.set_trace()
                     toCoord, toDir, scaleChange = toCoordSys.convertFrom(fromCoordSys, fromCoord, fromDir, site)
                 except Exception:
                     print "Failed on line %s: %s\n" % (lineInd + 1, line)
