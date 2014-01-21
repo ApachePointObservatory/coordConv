@@ -7,33 +7,59 @@ This package provides astronomical coordinate conversions to an accuracy of a sm
 
 Contents include:
 * Coord: represents a position on the sky, with proper motion and radial velocity; provides easy access to spherical and cartesian position.
-* Coordinate systems, including ICRSCoordSys, FK5CoordSys, AppGeoCoordSys, AppTopoCoordSys and ObsCoordSys (refracted apparent topocentric). To convert a position from one coordinate system to another:
-  * Construct a Site object (see below)
-  * Construct the "from" Coord
-  * Construct the "from" coordinate system (e.g. ICRSCoord)
-  * Constrct the "to" coordinate system
-  * toCoord = toCoordSys.convertFrom(fromCoordSys, fromCoord, site)
-* PVTCoord: a Coord with velocity along the arc of a great circle
+* Coordinate systems, including ICRSCoordSys, FK5CoordSys, AppGeoCoordSys, AppTopoCoordSys and ObsCoordSys (refracted apparent topocentric).
+* PVTCoord: a Coord with velocity along the arc of a great circle.
 * Site: information about the observatory, current earth orientation data (using the IERS Earth Orientation bulletin if maximum accuracy is wanted) and refraction coefficients. The contents are required for conversions involving apparent coordinates and are ignored otherwise.
-* PVT: an object representing a position, velocity and time
+* PVT: an object representing a position, velocity and time.
+
+To convert a position from one coordinate system to another:
+* Construct a Site object.
+* Construct the "from" Coord.
+* Construct the "from" coordinate system (e.g. ICRSCoord).
+* Construct the "to" coordinate system.
+* toCoord = toCoordSys.convertFrom(fromCoordSys, fromCoord, site).
 
 \section coordConv_conventions Conventions
 
 * Spherical positions are in degrees (even RA). The first axis is the equatorial angle (e.g. RA or longitude); the second axis is the polar angle (e.g. Dec or latitude).
 * Cartesian positions are in astronomical units.
-* Proper motion is arcsec/century; the equatorial component is dEquatAng/dt, so it may be large near the pole
-* Radial velocity is km/sec, positive receding (but it rarely matters)
-* All coordinate systems are right-handed, so azimuth os 0 south (which is unusual), 90 east
-* TAI is MJD, seconds (not days)
+* Proper motion is arcsec/century; the equatorial component is dEquatAng/dt, so it may be large near the pole.
+* Radial velocity is km/sec, positive receding (but it rarely matters).
+* All coordinate systems are right-handed, so azimuth os 0 south (which is unusual), 90 east.
+* TAI is MJD, seconds (not days).
 
 \section coordConv_requirements Requirements
 
 The following packages are required:
+* slalib
 * Eigen: C++ vector library
 * ndarray: adds python support to Eigen. I use the LSST version, which requires:
 * boost
 * daf_base (an LSST package)
 * sconsUtils (an LSST package that supports easy building of packages)
 
-The simplest way to build this package is to install the minimal LSST software stack <https://dev.lsstcorp.org/trac/wiki/Installing>, which includes ndarray, then use eups to setup this package up and build it using "scons" and/or "scons install".
+The simplest way to build this package is:
+* Install slalib
+* Install the minimal LSST software stack <https://dev.lsstcorp.org/trac/wiki/Installing>, which includes all dependencies other than slalib
+* Use eups to setup this package up and build it using "scons" and/or "scons install"
+
+\section coordConv_slalib Slalib
+
+This code calls the following slalib routines:
+* slaDbear
+* slaDrange
+* slaDranrm
+* slaEpb
+* slaEpj
+* slaEpj2d
+* slaEqeqx
+* slaEtrms
+* slaGeoc
+* slaGmst
+* slaGmsta
+* slaMappa
+* slaPolmo
+* slaPrebn
+* slaPrec
+* slaRefco
 */
