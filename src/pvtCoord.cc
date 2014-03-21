@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iomanip>
 #include <limits>
 #include <stdexcept>
 #include <vector>
@@ -174,7 +175,14 @@ namespace coordConv {
         double orient = pvtCoord.getOrient();
         double vel = pvtCoord.getVel();
         double tai = pvtCoord.getTAI();
-        os << "PVTCoord(" << coord << ", " << orient << ", " << vel << ", " << tai << ")";
+        std::ios_base::fmtflags oldFlags = os.flags();
+        std::streamsize const oldPrecision = os.precision();
+        os << std::fixed
+            << "PVTCoord(" << coord << ", " 
+            << std::setprecision(5) << orient << ", " << vel << ", "
+            << std::setprecision(7) << tai
+            << ")" << std::setprecision(oldPrecision);
+        os.flags(oldFlags);
         return os;
     }
 

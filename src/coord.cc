@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iomanip>
 #include <stdexcept>
 #include <sstream>
 #include "coordConv/mathUtils.h"
@@ -257,12 +258,16 @@ namespace coordConv {
         coord.getPM(equatPM, polarPM);
         double radVel = coord.getRadVel();
         double parallax = coord.getParallax();
-
-        os << "Coord(" << equatAng << ", " << polarAng << ", " << parallax;
+        std::ios_base::fmtflags oldFlags = os.flags();
+        std::streamsize const oldPrecision = os.precision();
+        os << std::fixed
+            << "Coord(" << std::setprecision(6) << equatAng << ", " << polarAng << ", "
+            << std::setprecision(5) << parallax;
         if ((equatPM != 0) || (polarPM != 0) || (radVel != 0)) {
-            os << ", " << equatPM << ", " << polarPM << ", " << radVel;
+            os << std::setprecision(2) << ", " << equatPM << ", " << polarPM << ", " << radVel;
         }
-        os << ")";
+        os << ")" << std::setprecision(oldPrecision);
+        os.flags(oldFlags);
         return os;
     }
 

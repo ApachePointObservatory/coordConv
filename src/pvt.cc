@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <sstream>
 #include "coordConv/pvt.h"
 
@@ -46,7 +47,13 @@ namespace coordConv {
     }
 
     std::ostream &operator<<(std::ostream &os, PVT const &pvt) {
-        os << "PVT(" << pvt.pos << ", " << pvt.vel << ", " << pvt.t << ")";   
+        std::ios_base::fmtflags oldFlags = os.flags();
+        std::streamsize const oldPrecision = os.precision();
+        os << std::fixed
+            << "PVT(" << std::setprecision(6) << pvt.pos << ", " << pvt.vel << ", "
+            << std::setprecision(7) << pvt.t
+            << ")" << std::setprecision(oldPrecision);
+        os.flags(oldFlags);
         return os;
     }
 
