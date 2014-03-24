@@ -88,35 +88,33 @@ namespace coordConv {
         Construct a PVTCoord with all NaN data
         */
         explicit PVTCoord();
-
-        virtual ~PVTCoord() {};
         
         /**
         Get orientation at initial TAI date
         */
-        virtual double getOrient() const { return _orient; };
+        double getOrient() const { return _orient; };
         
         /**
         Get velocity
         */
-        virtual double getVel() const { return _vel; };
+        double getVel() const { return _vel; };
         
         /**
         Get initial TAI date
         */
-        virtual double getTAI() const { return _tai; };
+        double getTAI() const { return _tai; };
         
         /**
         Return Coord at initial TAI date
         */
-        virtual Coord getCoord() const { return _coord; };
+        Coord getCoord() const { return _coord; };
         
         /**
         Compute the coord at a specified TAI date
         
         @param[in] tai: TAI date at which to compute coord (MJD, sec)
         */
-        virtual Coord getCoord(double tai) const;
+        Coord getCoord(double tai) const;
     
         /**
         Return True if all values are finite
@@ -133,7 +131,7 @@ namespace coordConv {
         @param[in] tai: TAI date at which to retrieve position (MJD, sec)
         @return atPole: true if so near the pole that equatorial angle could not be computed.
         */
-        virtual bool getSphPVT(PVT &equatPVT, PVT &polarPVT, double tai) const;
+        bool getSphPVT(PVT &equatPVT, PVT &polarPVT, double tai) const;
 
         /**
         Compute the angular separation from another PVTCoord
@@ -172,7 +170,7 @@ namespace coordConv {
 
         @raise std::runtime_error if this PVT coord is too near a pole at tai
         */
-        virtual PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const;
+        PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const;
 
         bool operator==(PVTCoord const &rhs) {
             return (this->getCoord()  == rhs.getCoord())
@@ -188,7 +186,7 @@ namespace coordConv {
         /**
         Return a string representation
         */
-        virtual std::string __repr__() const;
+        std::string __repr__() const;
     
     private:
         Coord _coord;   // coordinate at initial time

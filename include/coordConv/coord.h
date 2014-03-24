@@ -195,7 +195,7 @@ namespace coordConv {
         /**
         Return a string representation
         */
-        virtual std::string __repr__() const;
+        std::string __repr__() const;
 
     private:
         Eigen::Vector3d _pos;   // vector position (AU)

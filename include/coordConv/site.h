@@ -63,7 +63,7 @@ namespace coordConv {
         /**
         Print a string representation
         */
-        virtual std::string __repr__() const;
+        std::string __repr__() const;
     };
 
     std::ostream &operator<<(std::ostream &out, Site const &site);

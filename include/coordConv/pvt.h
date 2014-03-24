@@ -43,8 +43,6 @@ namespace coordConv {
             t(DoubleNaN)
         { };
         
-        virtual ~PVT() {};
-        
         /// Return a copy
         PVT copy() const {
             return PVT(pos, vel, t);
@@ -158,7 +156,7 @@ namespace coordConv {
         /**
         Return a string representation
         */
-        virtual std::string __repr__() const;
+        std::string __repr__() const;
         
         /**
         Set from a pair of positions or angles computed at different times
