@@ -62,8 +62,8 @@ class TestCoordConv(unittest.TestCase):
                 if not line or line.startswith("#"):
                     continue
                 if not gotSiteData:
-                    ut1_tai, poleX, poleY = [float(val) for val in line.split()]
-                    site = coordConv.Site(-105.822616, 32.780988, 2788)
+                    meanLat, meanLong, elevation, ut1_tai, poleX, poleY = [float(val) for val in line.split()]
+                    site = coordConv.Site(meanLong, meanLat, elevation)
                     site.setPoleWander(poleX, poleY)
                     site.ut1_tai = ut1_tai
                     gotSiteData = True
@@ -79,6 +79,10 @@ class TestCoordConv(unittest.TestCase):
                 if (fromSysCode == 1) and (fromRadVel != 0) and (fromPM1 == 0) and (fromPM2 == 0):
                     print "Skipping line %s; FK4 with zero PM and nonzero radVel" % (lineInd + 1,)
                     continue
+                # if (fromSysCode < -2) or (toSysCode < -2):
+                #     print "*** TEMPORARILY SKIPPING line %s" % (lineInd + 1,)
+                #     continue
+
                 
                 nTested += 1
 
@@ -115,10 +119,10 @@ class TestCoordConv(unittest.TestCase):
                         # thatn the latest slaMappa and that appears to explain a small discrepancy
                         # when converting to/from apparent geocentric coordinates;
                         # the error is most noticeable for the precession/nutation matrix.
-                        atol = 1e-4
+                        atol = 2e-4
                     self.assertLess(toCoord.angularSeparation(refToCoord), atol)
                     self.assertTrue(numpy.allclose(predList, refList, atol=atol))
-                    self.assertAlmostEqual(refToDir, coordConv.wrapNear(toDir, refToDir), places=3)
+                    self.assertAlmostEqual(refToDir, coordConv.wrapNear(toDir, refToDir), places=2)
 # scale change bears very little resemblance between old and new.
 # I believe this is a bug in the old TCC, since mean->mean should be 1.0
 # and the new code is significantly closer to 1.0 than the old code.
