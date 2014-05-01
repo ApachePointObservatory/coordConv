@@ -7,7 +7,7 @@ This package provides astronomical coordinate conversions to an accuracy of a sm
 
 Contents include:
 * Coord: represents a position on the sky, with proper motion and radial velocity; provides easy access to spherical and cartesian position.
-* Coordinate systems, including ICRSCoordSys, FK5CoordSys, AppGeoCoordSys, AppTopoCoordSys and ObsCoordSys (refracted apparent topocentric).
+* Coordinate system objects, including ICRSCoordSys, FK5CoordSys, AppGeoCoordSys, AppTopoCoordSys and ObsCoordSys (refracted apparent topocentric).
 * PVTCoord: a Coord with velocity along the arc of a great circle.
 * Site: information about the observatory, current earth orientation data (using the IERS Earth Orientation bulletin if maximum accuracy is wanted) and refraction coefficients. The contents are required for conversions involving apparent coordinates and are ignored otherwise.
 * PVT: an object representing a position, velocity and time.
@@ -21,45 +21,29 @@ To convert a position from one coordinate system to another:
 
 \section coordConv_conventions Conventions
 
-* Spherical positions are in degrees (even RA). The first axis is the equatorial angle (e.g. RA or longitude); the second axis is the polar angle (e.g. Dec or latitude).
+* Spherical positions are in degrees (even right ascension). The first axis is the equatorial angle (e.g. right ascension or azimuth); the second axis is the polar angle (e.g. declination or altitude).
 * Cartesian positions are in astronomical units.
 * Proper motion is arcsec/century; the equatorial component is dEquatAng/dt, so it may be large near the pole.
-* Radial velocity is km/sec, positive receding (but it rarely matters).
+* Radial velocity is km/sec, positive receding.
 * All coordinate systems are right-handed, so azimuth os 0 south (which is unusual), 90 east.
-* TAI is MJD, seconds (not days).
+* TAI is MJD, seconds (not days, which is unusual).
 
 \section coordConv_requirements Requirements
 
-The following packages are required:
+The following packages are required, and all but slalib are available in the LSST software stack:
 * slalib
 * Eigen: C++ vector library
-* ndarray: adds python support to Eigen. I use the LSST version, which requires:
+* ndarray: adds python support to Eigen. I use the LSST version, which also requires:
 * boost
-* daf_base (an LSST package)
-* sconsUtils (an LSST package that supports easy building of packages)
+* daf_base: an LSST package
+* sconsUtils: an LSST package that makes it easier to build packages using scons
 
 The simplest way to build this package is:
-* Install slalib
-* Install the minimal LSST software stack <https://dev.lsstcorp.org/trac/wiki/Installing>, which includes all dependencies other than slalib
-* Use eups to setup this package up and build it using "scons" and/or "scons install"
-
-\section coordConv_slalib Slalib
-
-This code calls the following slalib routines:
-* slaDbear
-* slaDrange
-* slaDranrm
-* slaEpb
-* slaEpj
-* slaEpj2d
-* slaEqeqx
-* slaEtrms
-* slaGeoc
-* slaGmst
-* slaGmsta
-* slaMappa
-* slaPolmo
-* slaPrebn
-* slaPrec
-* slaRefco
+* Install slalib.
+* Install the minimal version of the current stable LSST software stack <https://dev.lsstcorp.org/trac/wiki/Installing>, which includes all dependencies other than slalib. As of 2014-05-01 coordConv is known to run with the Summer 2013 LSST software.
+* Type the following commands, substituting appropriate values for terms in diamonds brackets:
+    * cd <package root>
+    * setup -r .                                    # setup the package in eups
+    * scons install version=<version> declare       # build the software, run unit tests and copy it into the LSST stack
+    * eups declare coordConv <version> -t current   # declare the newly installed software current, so it will be setup default if no version is specified
 */
