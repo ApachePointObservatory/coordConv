@@ -254,7 +254,7 @@ namespace coordConv {
 
     std::ostream &operator<<(std::ostream &os, Coord const &coord) {
         double equatAng, polarAng, equatPM, polarPM;
-        bool atPole = coord.getSphPos(equatAng, polarAng);
+        coord.getSphPos(equatAng, polarAng);
         coord.getPM(equatPM, polarPM);
         double radVel = coord.getRadVel();
         double parallax = coord.getParallax();
