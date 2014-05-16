@@ -102,7 +102,7 @@ namespace coordConv {
         @param[in] fromCoordSys: initial coordinate system and date
         @param[in] fromPVTCoord: initial PVTCoord
         @param[in] site: site information
-        @param[in] tai at which to evaluate PVTs (MJD, sec)
+        @param[in] tai at which to evaluate this coordSys and fromCoordSys if either is apparent, and PVTs (MJD, sec)
         @return PVTCoord in this coordinate system at this date
         */
         virtual PVTCoord convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site, double tai) const;
@@ -129,7 +129,7 @@ namespace coordConv {
         @param[in] fromCoord: initial position
         @param[in] fromDir: initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
         @param[in] site: site information
-        @param[in] tai at which to evaluate PVTs (MJD, sec)
+        @param[in] tai at which to evaluate this coordSys and fromCoordSys if either is apparent, and PVTs (MJD, sec)
         @return position in this coordinate system
         */
         virtual PVTCoord convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site, double tai) const;

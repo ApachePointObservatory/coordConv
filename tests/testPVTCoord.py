@@ -329,6 +329,32 @@ class TestCoord(unittest.TestCase):
                     else:
                         self.assertPVTsAlmostEqual(orientTo10, refOrientTo10, isAngle=True)
 
+    def testConvertFromVel(self):
+        """Test velocity of convertFrom
+        """
+        taiDate = 4889900000.205
+        site = coordConv.Site(-105.822616, 32.780988, 2788)
+        icrsCoordSys = coordConv.ICRSCoordSys()
+        appTopoCoordSys = coordConv.AppTopoCoordSys(taiDate)
+
+        # find ICRS coordinate of a sidereal point on the equator along the meridion
+        appTopoCoord = coordConv.Coord(0, 90 - site.meanLat)
+        icrsCoord = icrsCoordSys.convertFrom(appTopoCoordSys, appTopoCoord, site)
+
+        icrsPVTCoord = coordConv.PVTCoord(icrsCoord, 0, 0, taiDate)
+
+        appTopoPVTCoord = appTopoCoordSys.convertFrom(icrsCoordSys, icrsPVTCoord, site, taiDate)
+        self.assertAlmostEqual(appTopoPVTCoord.getOrient(), -180, places=5)
+        self.assertAlmostEqual(appTopoPVTCoord.getVel(), 1/240.0, places=3) # 360 deg/day
+
+        fromDir = coordConv.PVT(0, 0, taiDate)
+        toDir = coordConv.PVT()
+
+        appTopoPVTCoord2 = appTopoCoordSys.convertFrom(toDir, icrsCoordSys, icrsPVTCoord, fromDir, site, taiDate)[0]
+
+        self.assertAlmostEqual(appTopoPVTCoord.getOrient(), appTopoPVTCoord2.getOrient())
+        self.assertAlmostEqual(appTopoPVTCoord.getOrient(), appTopoPVTCoord2.getOrient())
+
     def testConvertFrom(self):
         """Test a few instances of CoordSys.convertFrom on PVTCoords
         
@@ -337,7 +363,7 @@ class TestCoord(unittest.TestCase):
         site = coordConv.Site(-105.822616, 32.780988, 2788)
         fromCoordSys = coordConv.ICRSCoordSys()
         toCoordSys = coordConv.GalCoordSys()
-        cnvTAI = 4889900000.2
+        cnvTAI = 4889900000.205
         dt = 0.001
         taiPair = (cnvTAI, cnvTAI + dt)
 

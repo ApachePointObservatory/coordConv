@@ -5,6 +5,21 @@
 
 namespace {
     const double DeltaT = 0.01;
+
+    /**
+    * Return a copy of a CoordSys, setting the date if coordSys is apparent, else leaving the date unchanged
+    *
+    * @param[in] coordSys: the CoordSys to copy
+    * @param[in] taiDate: TAI (MJD sec) date to use if CoordSys is apparent
+    * @return a clone of coordSys; if apparent then date is computed from taiDate, else the date is left alone
+    */
+    inline coordConv::CoordSys::Ptr copyCoordSys(coordConv::CoordSys const &coordSys, double taiDate) {
+        if (coordSys.isMean()) {
+            return coordSys.clone();
+        } else {
+            return coordSys.clone(coordSys.dateFromTAI(taiDate));
+        }
+    }
 }
 
 namespace coordConv {
@@ -16,20 +31,12 @@ namespace coordConv {
 
     PVTCoord CoordSys::convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site, double tai) const {
         double const tai1 = tai + DeltaT;
-        CoordSys::Ptr fromCoordSys1Ptr;
-        if (fromCoordSys.isMean()) {
-            fromCoordSys1Ptr = fromCoordSys.clone();
-        } else {
-            fromCoordSys1Ptr = fromCoordSys.clone(fromCoordSys.dateFromTAI(tai1));
-        }
-        CoordSys::Ptr toCoordSys1Ptr;
-        if (this->isMean()) {
-            toCoordSys1Ptr = this->clone();;
-        } else {
-            toCoordSys1Ptr = this->clone(this->dateFromTAI(tai1));
-        }
-        Coord coord0 =           this->convertFrom( fromCoordSys,     fromPVTCoord.getCoord(tai),  site);
-        Coord coord1 = toCoordSys1Ptr->convertFrom(*fromCoordSys1Ptr, fromPVTCoord.getCoord(tai1), site);
+        CoordSys::ConstPtr fromSys0Ptr = copyCoordSys(fromCoordSys, tai);
+        CoordSys::ConstPtr fromSys1Ptr = copyCoordSys(fromCoordSys, tai1);
+        CoordSys::ConstPtr toSys0Ptr = copyCoordSys(*this, tai);
+        CoordSys::ConstPtr toSys1Ptr = copyCoordSys(*this, tai1);
+        Coord coord0 = toSys0Ptr->convertFrom(*fromSys0Ptr, fromPVTCoord.getCoord(tai),  site);
+        Coord coord1 = toSys1Ptr->convertFrom(*fromSys1Ptr, fromPVTCoord.getCoord(tai1), site);
         return PVTCoord(coord0, coord1, tai, DeltaT);
     }
 
@@ -48,20 +55,12 @@ namespace coordConv {
     PVTCoord CoordSys::convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site, double tai) const {
         double const tai1 = tai + DeltaT;
         double toDirPair[2], dumScaleCh;
-        CoordSys::Ptr fromCoordSys1Ptr;
-        if (fromCoordSys.isMean()) {
-            fromCoordSys1Ptr = fromCoordSys.clone();
-        } else {
-            fromCoordSys1Ptr = fromCoordSys.clone(fromCoordSys.dateFromTAI(tai1));
-        }
-        CoordSys::Ptr toCoordSys1Ptr;
-        if (this->isMean()) {
-            toCoordSys1Ptr = this->clone();;
-        } else {
-            toCoordSys1Ptr = this->clone(this->dateFromTAI(tai1));
-        }
-        Coord coord0 =           this->convertFrom(toDirPair[0], scaleChange,    fromCoordSys,  fromPVTCoord.getCoord(tai),  fromDir.getPos(tai),  site);
-        Coord coord1 = toCoordSys1Ptr->convertFrom(toDirPair[1], dumScaleCh, *fromCoordSys1Ptr, fromPVTCoord.getCoord(tai1), fromDir.getPos(tai1), site);
+        CoordSys::ConstPtr fromSys0Ptr = copyCoordSys(fromCoordSys, tai);
+        CoordSys::ConstPtr fromSys1Ptr = copyCoordSys(fromCoordSys, tai1);
+        CoordSys::ConstPtr toSys0Ptr = copyCoordSys(*this, tai);
+        CoordSys::ConstPtr toSys1Ptr = copyCoordSys(*this, tai1);
+        Coord coord0 = toSys0Ptr->convertFrom(toDirPair[0], scaleChange, *fromSys0Ptr, fromPVTCoord.getCoord(tai),  fromDir.getPos(tai),  site);
+        Coord coord1 = toSys1Ptr->convertFrom(toDirPair[1], dumScaleCh,  *fromSys1Ptr, fromPVTCoord.getCoord(tai1), fromDir.getPos(tai1), site);
         toDir.setFromPair(toDirPair, tai, DeltaT, true);
         return PVTCoord(coord0, coord1, tai, DeltaT);
     }
