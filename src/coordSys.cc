@@ -48,8 +48,20 @@ namespace coordConv {
     PVTCoord CoordSys::convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site, double tai) const {
         double const tai1 = tai + DeltaT;
         double toDirPair[2], dumScaleCh;
-        Coord coord0 = this->convertFrom(toDirPair[0], scaleChange, fromCoordSys, fromPVTCoord.getCoord(tai),  fromDir.getPos(tai),  site);
-        Coord coord1 = this->convertFrom(toDirPair[1], dumScaleCh,  fromCoordSys, fromPVTCoord.getCoord(tai1), fromDir.getPos(tai1), site);
+        CoordSys::Ptr fromCoordSys1Ptr;
+        if (fromCoordSys.isMean()) {
+            fromCoordSys1Ptr = fromCoordSys.clone();
+        } else {
+            fromCoordSys1Ptr = fromCoordSys.clone(fromCoordSys.dateFromTAI(tai1));
+        }
+        CoordSys::Ptr toCoordSys1Ptr;
+        if (this->isMean()) {
+            toCoordSys1Ptr = this->clone();;
+        } else {
+            toCoordSys1Ptr = this->clone(this->dateFromTAI(tai1));
+        }
+        Coord coord0 =           this->convertFrom(toDirPair[0], scaleChange,    fromCoordSys,  fromPVTCoord.getCoord(tai),  fromDir.getPos(tai),  site);
+        Coord coord1 = toCoordSys1Ptr->convertFrom(toDirPair[1], dumScaleCh, *fromCoordSys1Ptr, fromPVTCoord.getCoord(tai1), fromDir.getPos(tai1), site);
         toDir.setFromPair(toDirPair, tai, DeltaT, true);
         return PVTCoord(coord0, coord1, tai, DeltaT);
     }
