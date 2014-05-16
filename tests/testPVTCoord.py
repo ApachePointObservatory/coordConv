@@ -144,7 +144,7 @@ class TestCoord(unittest.TestCase):
                     cosOrient = coordConv.cosd(orient)
                     for vel in (0, 0.1, 0.23):
                         for tai in (500.5, 10001.3):
-                            coord0 = coordConv.Coord(equatAng, polarAng)
+                            # coord0 = coordConv.Coord(equatAng, polarAng)
                             polarVel = vel * sinOrient
                             equatVel = vel * cosOrient / coordConv.cosd(polarAng)
                             equatPVT = coordConv.PVT(equatAng, equatVel, tai)
