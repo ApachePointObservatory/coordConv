@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import time
+from __future__ import absolute_import, division
+
 import datetime
 import unittest
 import math
+
 import coordConv
 
 class TestConstants(unittest.TestCase):

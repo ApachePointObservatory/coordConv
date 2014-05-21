@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, division
+
 import itertools
 import unittest
 import numpy
@@ -306,10 +308,10 @@ class TestCoord(unittest.TestCase):
                     angSep01 = pvtCoord0.angularSeparation(pvtCoord1, tai)
                      # compute reference separation, which should be the same for 0->1 and 1->0
                     refAngSep = refAngularSeparation(pvtCoord0, pvtCoord1, tai)
-                    self.assertPVTsAlmostEqual(angSep01, refAngSep, isAngle=False)
+                    coordConv.assertPVTsAlmostEqual(angSep01, refAngSep)
 
                     angSep10 = pvtCoord1.angularSeparation(pvtCoord0, tai)
-                    self.assertPVTsAlmostEqual(angSep10, refAngSep)
+                    coordConv.assertPVTsAlmostEqual(angSep10, refAngSep)
 
                     if pvtCoord0 == pvtCoord1:
                         self.assertAlmostEqual(angSep01.pos, 0)
@@ -319,7 +321,7 @@ class TestCoord(unittest.TestCase):
                     if not orientTo01.isfinite():
                         self.assertFalse(refOrientTo01.isfinite())
                     else:
-                        self.assertPVTsAlmostEqual(orientTo01, refOrientTo01, isAngle=True)
+                        coordConv.assertPVTsAlmostEqual(orientTo01, refOrientTo01, doWrap=True)
 
 
                     orientTo10 = pvtCoord1.orientationTo(pvtCoord0, tai)
@@ -327,7 +329,7 @@ class TestCoord(unittest.TestCase):
                     if not orientTo10.isfinite():
                         self.assertFalse(refOrientTo10.isfinite())
                     else:
-                        self.assertPVTsAlmostEqual(orientTo10, refOrientTo10, isAngle=True)
+                        coordConv.assertPVTsAlmostEqual(orientTo10, refOrientTo10, doWrap=True)
 
     def testConvertFromVel(self):
         """Test velocity of convertFrom
@@ -344,7 +346,7 @@ class TestCoord(unittest.TestCase):
         icrsPVTCoord = coordConv.PVTCoord(icrsCoord, 0, 0, taiDate)
 
         appTopoPVTCoord = appTopoCoordSys.convertFrom(icrsCoordSys, icrsPVTCoord, site, taiDate)
-        self.assertAlmostEqual(appTopoPVTCoord.getOrient(), -180, places=5)
+        coordConv.assertAnglesAlmostEqual(appTopoPVTCoord.getOrient(), -180, places=5)
         self.assertAlmostEqual(appTopoPVTCoord.getVel(), 1/240.0, places=3) # 360 deg/day
 
         fromDir = coordConv.PVT(0, 0, taiDate)
@@ -352,8 +354,8 @@ class TestCoord(unittest.TestCase):
 
         appTopoPVTCoord2 = appTopoCoordSys.convertFrom(toDir, icrsCoordSys, icrsPVTCoord, fromDir, site, taiDate)[0]
 
-        self.assertAlmostEqual(appTopoPVTCoord.getOrient(), appTopoPVTCoord2.getOrient())
-        self.assertAlmostEqual(appTopoPVTCoord.getOrient(), appTopoPVTCoord2.getOrient())
+        coordConv.assertAnglesAlmostEqual(appTopoPVTCoord.getOrient(), appTopoPVTCoord2.getOrient())
+        coordConv.assertAnglesAlmostEqual(appTopoPVTCoord.getOrient(), appTopoPVTCoord2.getOrient())
 
     def testConvertFrom(self):
         """Test a few instances of CoordSys.convertFrom on PVTCoords
@@ -399,16 +401,6 @@ class TestCoord(unittest.TestCase):
                         self.assertAlmostEqual(scaleChange, predScaleChange)
                         self.assertAlmostEqual(scaleChange, 1.0) # no scale change because mean to mean conversion
 
-
-    def assertPVTsAlmostEqual(self, pvt0, pvt1, posDig=7, velDig=7, isAngle=False):
-        """Compare two PVTS; both must have the same time
-        """
-        self.assertEqual(pvt0.t, pvt1.t)
-        if isAngle:
-            self.assertAlmostEqual(coordConv.wrapCtr(pvt0.pos - pvt1.pos), 0, posDig)
-        else:
-            self.assertAlmostEqual(pvt0.pos, pvt1.pos, posDig)
-        self.assertAlmostEqual(pvt0.vel, pvt1.vel, velDig)
 
 def makePVTFromPair(posPair, tai, deltaT, isAngle):
     pos = posPair[0];

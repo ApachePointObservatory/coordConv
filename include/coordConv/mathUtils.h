@@ -118,5 +118,6 @@ namespace coordConv {
     @param[in] rotAngle: rotation angle (deg)
     */
     void computeRotationMatrix(Eigen::Matrix3d &rotMat, Eigen::Vector3d const &axis, double rotAngle);
+
 }
 #include "coordConv/mathUtils.cc"

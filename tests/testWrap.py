@@ -1,6 +1,8 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, division
+
 import unittest
-import numpy
+
 from coordConv import wrapCtr, wrapPos, wrapNear, sind, cosd, PVT, DoubleEpsilon
 
 class TestWrap(unittest.TestCase):

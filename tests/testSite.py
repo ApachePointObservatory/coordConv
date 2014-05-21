@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import math
+from __future__ import absolute_import, division
+
 import unittest
-import numpy
+
 import coordConv
 
 

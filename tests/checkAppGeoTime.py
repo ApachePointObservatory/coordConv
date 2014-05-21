@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-import time
-import unittest
-import itertools
-import os.path
-import numpy
+from __future__ import absolute_import, division
+
 import coordConv
 """
 Determine how much delta-T is allowed before apparent geocentric data is too stale

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, division
+
 import unittest
 import math
-import numpy
 import coordConv
 
 ArcSecPerRev = 3600.0 * 360.0

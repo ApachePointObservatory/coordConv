@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import math
+from __future__ import absolute_import # division breaks PVT / float
+
 import unittest
 import numpy
 import coordConv
@@ -10,25 +11,6 @@ def refGetPos(pvt, t):
     """Reference implementation of PVT.getPos
     """
     return pvt.pos + (pvt.vel * (t - pvt.t))
-
-# def refXYFromPolar(r, theta, tai):
-#     """Reference implementation of PVT.xyFromPolar
-#     """
-#     xArr = []
-#     yArr = []
-#     for testTAI in (tai, tai + DeltaT):
-#         x, y = coordConv.xyFromPolar(r.getPos(testTAI), theta.getPos(testTAI))
-#         xArr.append(x)
-#         yArr.append(y)
-#     xPVT = coordConv.PVT()
-#     xPVT.pos = xArr[0]
-#     xPVT.vel = (xArr[1] - xArr[0]) / DeltaT
-#     xPVT.t = tai
-#     yPVT = coordConv.PVT()
-#     yPVT.pos = yArr[0]
-#     yPVT.vel = (yArr[1] - yArr[0]) / DeltaT
-#     yPVT.t = tai
-#     return xPVT, yPVT
 
 def refPolarFromXY(x, y, tai):
     """Reference implementation of PVT.polarFromXY

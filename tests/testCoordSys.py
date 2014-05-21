@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, division
+
 import unittest
+
 import coordConv
 
 MeanSysList = (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.FK4CoordSys, coordConv.GalCoordSys)

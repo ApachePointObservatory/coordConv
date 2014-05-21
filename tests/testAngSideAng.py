@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, division
+
 import unittest
 import numpy
 from coordConv import angSideAng, sind, cosd, tand, atan2d
