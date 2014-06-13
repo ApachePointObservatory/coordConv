@@ -6,9 +6,9 @@
 
 namespace coordConv {
 
-    MeanCoordSys::MeanCoordSys(std::string const &name, double date)
+    MeanCoordSys::MeanCoordSys(std::string const &name, double date, DateTypeEnum dateType)
     :
-        CoordSys(name, date, true, true)
+        CoordSys(name, date, dateType, true, true)
     {}
     
     // this works for all mean systems that use Julian epoch (all but FK4)

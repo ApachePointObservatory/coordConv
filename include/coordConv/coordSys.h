@@ -9,6 +9,13 @@
 #include "coordConv/pvtCoord.h"
 
 namespace coordConv {
+
+    enum DateTypeEnum {
+        DateType_Julian,    ///< Julian years
+        DateType_Besselian, ///< Besselian years
+        DateType_TAI,       ///< TAI (MJD, seconds)
+        DateType_None       ///< date is irrelevant
+    };
     
     /**
     Abstract base class for coordinate systems
@@ -23,8 +30,8 @@ namespace coordConv {
         /**
         Construct a CoordSys given a name and date
         */
-        explicit CoordSys(std::string const &name, double date, bool isMean, bool canConvert) :
-            _name(name),  _date(), _isMean(isMean), _canConvert(canConvert) { setDate(date); };
+        explicit CoordSys(std::string const &name, double date, DateTypeEnum dateType, bool isMean, bool canConvert) :
+            _name(name),  _date(), _dateType(dateType), _isMean(isMean), _canConvert(canConvert) { setDate(date); };
         
         ///< Destructor
         virtual ~CoordSys() { };
@@ -38,6 +45,11 @@ namespace coordConv {
         Return a copy with a specified date
         */
         virtual CoordSys::Ptr clone(double date) const = 0;
+
+        /**
+        Return date type
+        */
+        DateTypeEnum getDateType() const { return _dateType; };
 
         /**
         Get the name of this coordinate system (all lowercase)
@@ -183,13 +195,14 @@ namespace coordConv {
     protected:
         std::string _name;  /// name of coordinate system
         double _date;       /// date of coordinate system (units depend on coordinate system)
+        DateTypeEnum _dateType; /// date type
         bool _isMean;       /// true for mean coordinate systems
         bool _canConvert;   /// true if the coordinate system can convert coordinates
     };
     
     class MeanCoordSys: public CoordSys {
     public:
-        explicit MeanCoordSys(std::string const &name, double date);
+        explicit MeanCoordSys(std::string const &name, double date, DateTypeEnum dateType=DateType_Julian);
         virtual ~MeanCoordSys() {};
         virtual double dateFromTAI(double tai) const;
         virtual Coord removePM(Coord const &coord, double tai) const;
@@ -197,7 +210,7 @@ namespace coordConv {
     
     class ApparentCoordSys: public CoordSys {
     public:
-        explicit ApparentCoordSys(std::string const &name, double date);
+        explicit ApparentCoordSys(std::string const &name, double date, DateTypeEnum dateType=DateType_TAI);
         virtual ~ApparentCoordSys() {};
         virtual double dateFromTAI(double tai) const;
         virtual Coord removePM(Coord const &coord, double tai) const { return coord; };
@@ -470,7 +483,7 @@ namespace coordConv {
         @param[in] date: date as TAI (MJD, seconds)
         @param[in] isMean: is this a mean system?
         */
-        explicit OtherCoordSys(std::string const &name, double date=0, bool isMean=false);
+        explicit OtherCoordSys(std::string const &name, double date=0, DateTypeEnum dateType=DateType_None, bool isMean=false);
         virtual ~OtherCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;

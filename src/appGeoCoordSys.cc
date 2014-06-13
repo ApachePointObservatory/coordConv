@@ -11,7 +11,7 @@ namespace coordConv {
 
     AppGeoCoordSys::AppGeoCoordSys(double date, double maxAge)
     :
-        ApparentCoordSys("appgeo", date),
+        ApparentCoordSys("appgeo", date, DateType_Julian),
         _maxAge(maxAge),
         _cachedDate(DoubleNaN)
     {
@@ -23,7 +23,7 @@ namespace coordConv {
     }
 
     CoordSys::Ptr AppGeoCoordSys::clone(double date) const {
-        return CoordSys::Ptr(new AppGeoCoordSys(date));
+        return CoordSys::Ptr(new AppGeoCoordSys(date, _maxAge));
     };
     
     void AppGeoCoordSys::setDate(double date) {

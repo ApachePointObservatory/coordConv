@@ -73,7 +73,7 @@ namespace coordConv {
 
     FK4CoordSys::FK4CoordSys(double date)
     :
-        MeanCoordSys("fk4", date),
+        MeanCoordSys("fk4", date, DateType_Besselian),
         _eTerms(),
         _From1950PrecMat(),
         _To1950PrecMat()

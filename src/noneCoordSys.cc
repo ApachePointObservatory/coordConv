@@ -7,7 +7,7 @@ namespace coordConv {
 
     NoneCoordSys::NoneCoordSys(double date)
     :
-        OtherCoordSys("none", date, false)
+        OtherCoordSys("none", date)
     {};
     
     CoordSys::Ptr NoneCoordSys::clone() const {

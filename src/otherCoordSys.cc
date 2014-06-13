@@ -5,9 +5,9 @@
 
 namespace coordConv {
 
-    OtherCoordSys::OtherCoordSys(std::string const &name, double date, bool isMean)
+    OtherCoordSys::OtherCoordSys(std::string const &name, double date, DateTypeEnum dateType, bool isMean)
     :
-        CoordSys(name, date, isMean, false)
+        CoordSys(name, date, dateType, isMean, false)
     {};
     
     CoordSys::Ptr OtherCoordSys::clone() const {
@@ -15,7 +15,7 @@ namespace coordConv {
     }
 
     CoordSys::Ptr OtherCoordSys::clone(double date) const {
-        return CoordSys::Ptr(new OtherCoordSys(_name, date, _isMean));
+        return CoordSys::Ptr(new OtherCoordSys(_name, date, _dateType, _isMean));
     };
 
     double OtherCoordSys::dateFromTAI(double tai) const {

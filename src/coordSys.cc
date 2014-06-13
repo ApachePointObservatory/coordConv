@@ -11,13 +11,14 @@ namespace {
     *
     * @param[in] coordSys: the CoordSys to copy
     * @param[in] taiDate: TAI (MJD sec) date to use if CoordSys is apparent
-    * @return a clone of coordSys; if apparent then date is computed from taiDate, else the date is left alone
+    * @return a clone of coordSys; if coordinate system date type is TAI (apparent topocentric or observed)
+        then set date of clone to taiDate; otherwise preserve the date.
     */
     inline coordConv::CoordSys::Ptr copyCoordSys(coordConv::CoordSys const &coordSys, double taiDate) {
-        if (coordSys.isMean()) {
-            return coordSys.clone();
+        if (coordSys.getDateType() == coordConv::DateType_TAI) {
+            return coordSys.clone(taiDate);
         } else {
-            return coordSys.clone(coordSys.dateFromTAI(taiDate));
+            return coordSys.clone();
         }
     }
 }
