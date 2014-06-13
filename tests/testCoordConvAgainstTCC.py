@@ -89,7 +89,9 @@ class TestCoordConv(unittest.TestCase):
                 nTested += 1
 
                 fromCoord = coordConv.Coord(fromPos1, fromPos2, fromParallax, fromPM1, fromPM2, fromRadVel)
-        
+                fromPVTCoord = coordConv.PVTCoord(fromCoord, 0, 0, tai)
+                fromPVTDir = coordConv.PVT(fromDir, 0, tai)
+
                 fromCoordSys = getCoordSys(fromSysCode, fromDate, tai)
                 toCoordSys = getCoordSys(toSysCode, toDate, tai)
                 site.refCoA = refCoA
@@ -97,6 +99,8 @@ class TestCoordConv(unittest.TestCase):
         
                 try:
                     toCoord, toDir, scaleChange = toCoordSys.convertFrom(fromCoordSys, fromCoord, fromDir, site)
+                    toPVTDir = coordConv.PVT()
+                    toPVTCoord, scaleChange2 = toCoordSys.convertFrom(toPVTDir, fromCoordSys, fromPVTCoord, fromPVTDir, site, tai)
                 except Exception:
                     print "Failed on line %s: %s\n" % (lineInd + 1, line)
                     raise
@@ -123,13 +127,16 @@ class TestCoordConv(unittest.TestCase):
                         # the error is most noticeable for the precession/nutation matrix.
                         atol = 2e-4
                     self.assertLess(toCoord.angularSeparation(refToCoord), atol)
+                    self.assertLess(toPVTCoord.getCoord(tai).angularSeparation(refToCoord), atol)
                     self.assertTrue(numpy.allclose(predList, refList, atol=atol))
                     self.assertAlmostEqual(refToDir, coordConv.wrapNear(toDir, refToDir), places=2)
+                    self.assertAlmostEqual(refToDir, coordConv.wrapNear(toPVTDir.getPos(tai), refToDir), places=2)
 # scale change bears very little resemblance between old and new.
 # I believe this is a bug in the old TCC, since mean->mean should be 1.0
 # and the new code is significantly closer to 1.0 than the old code.
 # However, if it is a bug in the TCC I would like to find it.
 #                    self.assertAlmostEqual(refScaleChange, scaleChange, places=5)
+                    self.assertAlmostEqual(scaleChange, scaleChange2, places=5)
                     if (fromSysCode > 0) and (toSysCode > 0):
                         self.assertAlmostEqual(scaleChange, 1.0, places=5)
                 
