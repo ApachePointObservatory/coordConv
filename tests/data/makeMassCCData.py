@@ -36,8 +36,7 @@ def getDateIter(sysCode):
         # mean
         dateList = (1960, 2010)
     elif sysCode == -1:
-        # apparent geocentric; non-current times are not accurate on the old TCC
-        dateList = (0,)
+        dateList = (0, 1960)
     else:
         # apparent topocentric or focal plane; 0 is the only reasonable choice
         dateList = (0,)
@@ -72,7 +71,7 @@ def getPMPxRVIter(sysCode):
     if fromSysCode > 0:
         # from mean; parallax, etc. are relevant
         valList += [
-            (0,  0, 82505922,  0), # reasonable lunar values
+            (0,  0, 203249,  0), # reasonable lunar values
             (5, -3, 7, 10),
         ]
     if fromSysCode == -1:
