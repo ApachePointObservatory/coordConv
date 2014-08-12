@@ -20,6 +20,8 @@ ignores blank lines and lines beginning with #
 """
 DataFile = os.path.join(os.path.dirname(__file__), "data", "masscc_out.dat")
 
+ContinueOnError = True
+
 CSysDict = {
      4: coordConv.ICRSCoordSys,
      3: coordConv.GalCoordSys,
@@ -81,11 +83,7 @@ class TestCoordConv(unittest.TestCase):
                 if (fromSysCode == 1) and (fromRadVel != 0) and (fromPM1 == 0) and (fromPM2 == 0):
                     print "Skipping line %s; FK4 with zero PM and nonzero radVel" % (lineInd + 1,)
                     continue
-                # if (fromSysCode < -2) or (toSysCode < -2):
-                #     print "*** TEMPORARILY SKIPPING line %s" % (lineInd + 1,)
-                #     continue
 
-                
                 nTested += 1
 
                 fromCoord = coordConv.Coord(fromPos1, fromPos2, fromParallax, fromPM1, fromPM2, fromRadVel)
@@ -155,7 +153,10 @@ class TestCoordConv(unittest.TestCase):
                         self.assertAlmostEqual(zpmToPM2, 0)
                         self.assertAlmostEqual(zpmToRadVel, 0)
 
-                except Exception:
+                except Exception, e:
+                    if ContinueOnError:
+                        print
+                        print str(e)
                     print "Failed on line %s: %s" % (lineInd + 1, line)
                     print "fromCoordSys=(%s, %s); toCoordSys=(%s, %s)" % (fromCoordSys.getName(), fromCoordSys.getDate(), toCoordSys.getName(), toCoordSys.getDate())
                     print "toSphPos=   ", toPos1, toPos2
@@ -166,7 +167,8 @@ class TestCoordConv(unittest.TestCase):
                     print "from parallax, PM and radVel=", (fromParallax, fromPM1, fromPM2, fromRadVel)
                     print "from vec pos, vel=", fromCoord.getVecPos(), fromCoord.getVecPM()
                     print "to   vec pos, vel=", toCoord.getVecPos(),  toCoord.getVecPM()
-                    raise
+                    if not ContinueOnError:
+                        raise
         duration = time.time() - startTime
         print "Tested %d conversions in %0.2f seconds: %0.0f conversions/second" % \
             (nTested, duration, nTested/duration)

@@ -51,7 +51,7 @@ namespace coordConv {
         azCorr = azCorrRad / RadPerDeg;
         double polarDist;   ///< distance of observatory from Earth's axis (au)
         double zDist;   ///< distance of observatory from plane of Earth's equator (au)
-        slaGeoc(corrLongRad, elev, &polarDist, &zDist);
+        slaGeoc(corrLatRad, elev, &polarDist, &zDist);
         
         pos << polarDist, 0.0, zDist;
 

@@ -36,8 +36,8 @@ def getDateIter(sysCode):
         # mean
         dateList = (1960, 2010)
     elif sysCode == -1:
-        # apparent geocentric; 0 is relevant
-        dateList = (0, 1999.5, 2015)
+        # apparent geocentric; non-current times are not accurate on the old TCC
+        dateList = (0,)
     else:
         # apparent topocentric or focal plane; 0 is the only reasonable choice
         dateList = (0,)
@@ -72,26 +72,39 @@ def getPMPxRVIter(sysCode):
     if fromSysCode > 0:
         # from mean; parallax, etc. are relevant
         valList += [
+            (0,  0, 82505922,  0), # reasonable lunar values
             (5, -3, 7, 10),
+        ]
+    if fromSysCode == -1:
+        # apparent geocentric; make sure to try a lunar distance
+        valList += [
+            (0,  0, 82505922,  0), # reasonable lunar values
+            (5, -3,   800000, 10),
         ]
     return valList
 
 def getRefCoIter(fromSysCode, toSysCode):
     if fromSysCode > -2 and toSysCode > -2:
         # convert between mean, apparent geocentric or apparent topocentric coordinates; refraction coefficients not used
-        return [(1.2e-2,  -1.3e-5)]
+        return [
+            (1.2e-2,  -1.3e-5),
+        ]
     else:
         # refraction coefficients will (probably) be used
-        return [(1.2e-2,  -1.3e-5), (2.2e-2, -1.7e-5)]
+        return [
+            (1.2e-2,  -1.3e-5),
+            (2.2e-2, -1.7e-5),
+        ]
 
-coordSysList = (-3, -2, -1, 1, 2, 3, 4)
+# use reverse order so non-zero parallax is tested for mean and geo -> topo and observed
+coordSysList = (4, 3, 2, 1, -1, -2, -3)
 
-for fromSysInd, fromSysCode in enumerate(coordSysList):
+for fromSysCode in coordSysList:
     for fromDate in getDateIter(fromSysCode):
         for fromPos1, fromPos2 in getPosIter(fromSysCode):
             for fromPM1, fromPM2, fromParallax, fromRadVel in getPMPxRVIter(fromSysCode):
                 for fromDir in getFromDirIter():
-                    for toSysCode in coordSysList[fromSysInd:]:
+                    for toSysCode in coordSysList:
                         for toDate in getDateIter(toSysCode):
                             for refCoA, refCoB in getRefCoIter(fromSysCode, toSysCode):
                                 print fromSysCode, fromDate, fromPos1, fromPos2, \
