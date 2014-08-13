@@ -19,7 +19,7 @@ namespace coordConv {
         @param[in] vel: speed of motion along arc of great circle (deg/sec)
         @param[in] tai: TAI date of coord (MJD seconds)
 
-        @raise std::runtime_error if coord is at pole at time tai and vel nonzero.
+        @throw std::runtime_error if coord is at pole at time tai and vel nonzero.
         */
         explicit PVTCoord(Coord const &coord, double orient, double vel, double tai);
 
@@ -34,7 +34,7 @@ namespace coordConv {
             cannot be computed then orientation=defOrient and vel=0
             See Coord.offset for an explanation of orientation
         
-        @raise std::runtime_error if:
+        @throw std::runtime_error if:
         - deltaT = 0
         - coord0 is at pole and vel nonzero.
         */
@@ -43,8 +43,8 @@ namespace coordConv {
         /**
         Construct a PVTCoord from spherical PVTs
 
-        @param[in] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
-        @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
+        @param[in] equatPVT: equatorial angle (e.g. RA, Long, Az) (degrees)
+        @param[in] polarPVT: polar angle (e.g. Dec, Latitude, Alt) (degrees)
         @param[in] tai: date at which to evaluate equatAng and polarAng, and initial TAI date of PVTCoord (MJD seconds)
         @param[in] parallax: parallax (arcsec)
         @param[in] defOrient: default orientation (deg); if the velocity is so low that orientation
@@ -56,15 +56,15 @@ namespace coordConv {
         - velocity = hypot(equat space vel, polar vel)
         where equat space vel = equat vel * cosd(polar pos at tai)
 
-        @raise std::runtime_error if coord is at pole at time tai and vel nonzero.
+        @throw std::runtime_error if coord is at pole at time tai and vel nonzero.
         */
         explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax=0, double defOrient=0);
 
         /**
         Construct a PVTCoord from spherical PVTs and proper motion
         
-        @param[in] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
-        @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
+        @param[in] equatPVT: equatorial angle (e.g. RA, Long, Az) (degrees)
+        @param[in] polarPVT: polar angle (e.g. Dec, Latitude, Alt) (degrees)
         @param[in] tai: date at which to evaluate equatAng and polarAng, and initial TAI date of PVTCoord (MJD seconds)
         @param[in] parallax: parallax (arcsec)
         @param[in] equatPM: equatorial proper motion (arcsec/century);
@@ -80,7 +80,7 @@ namespace coordConv {
         - velocity = hypot(equat space vel, polar vel)
         where equat space vel = equat vel * cosd(polar pos at tai)
 
-        @raise std::runtime_error if coord is at pole at time tai and vel nonzero.
+        @throw std::runtime_error if coord is at pole at time tai and vel nonzero.
         */
         explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax, double equatPM, double polarPM, double radVel, double defOrient=0);
         
@@ -136,7 +136,7 @@ namespace coordConv {
         /**
         Compute the angular separation from another PVTCoord
 
-        @param[in] coord: PVT coord to which to measure angular separation
+        @param[in] pvtCoord: PVT coord to which to measure angular separation
         @param[in] tai: TAI date at which to retrieve position (MJD, sec)
         
         @return angular separation (deg)
@@ -168,7 +168,7 @@ namespace coordConv {
         
         @note The result is PVTCoord at tai, offset by dist at tai in direction fromOrient at tai.
 
-        @raise std::runtime_error if this PVT coord is too near a pole at tai
+        @throw std::runtime_error if this PVT coord is too near a pole at tai
         */
         PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const;
 
@@ -197,7 +197,7 @@ namespace coordConv {
         /**
         Sanity check, e.g. to make sure _vel is 0 if at pole
 
-        @raise std::runtime_error if PVTCoord invalid
+        @throw std::runtime_error if PVTCoord invalid
         */
         void _checkCoord() const;
 
@@ -215,7 +215,7 @@ namespace coordConv {
         - velocity = hypot(equatSpaceVel, polarVel)
         where equatSpaceVel = equatVel * cosd(polarPos)
 
-        @raise std::runtime_error if _coord.atPole() and |equatVel| or |polarVel| > DoubleEpsilon.
+        @throw std::runtime_error if _coord.atPole() and |equatVel| or |polarVel| > DoubleEpsilon.
         */
         void _setOrientVelFromSph(double polarPos, double equatVel, double polarVel, double defOrient);
     };

@@ -83,8 +83,8 @@ namespace coordConv {
         /**
         Convert a coordinate to FK5 at date of observation J2000 from this coordinate system at this date
         
-        @param[in] coord: position in this coordinate system at this date
-        @param[in] site: site information
+        @param[in] coord  position in this coordinate system at this date
+        @param[in] site  site information
         @return position in ICRS coordinates at date of observation J2000
         */
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const = 0;
@@ -92,8 +92,8 @@ namespace coordConv {
         /**
         Convert a coordinate from FK5 at date of observation J2000 to this system at this date
         
-        @param[in] coord: position in ICRS coordinates at date of observation J2000
-        @param[in] site: site information
+        @param[in] coord  position in ICRS coordinates at date of observation J2000
+        @param[in] site  site information
         @return position in this coordinate system at this date
         */
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const = 0;
@@ -101,9 +101,9 @@ namespace coordConv {
         /**
         Convert a coordinate from another coordinate system to this system
         
-        @param[in] fromCoordSys: initial coordinate system and date
-        @param[in] fromCoord: initial position
-        @param[in] site: site information
+        @param[in] fromCoordSys  initial coordinate system and date
+        @param[in] fromCoord  initial position
+        @param[in] site  site information
         @return position in this coordinate system at this date
         */
         virtual Coord convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site) const;
@@ -111,9 +111,9 @@ namespace coordConv {
         /**
         Convert a PVTCoord from another coordinate system to this system
         
-        @param[in] fromCoordSys: initial coordinate system and date
-        @param[in] fromPVTCoord: initial PVTCoord
-        @param[in] site: site information
+        @param[in] fromCoordSys  initial coordinate system and date
+        @param[in] fromPVTCoord  initial PVTCoord
+        @param[in] site  site information
         @param[in] tai at which to evaluate this coordSys and fromCoordSys if either is apparent, and PVTs (MJD, sec)
         @return PVTCoord in this coordinate system at this date
         */
@@ -122,12 +122,12 @@ namespace coordConv {
         /**
         Convert a coordinate from another coordinate system to this system, including orientation
         
-        @param[out] toDir: orientation in this coordinate system (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
-        @param[out] scaleChange: change in scale: output delta sky/input delta sky, measured along the specified direction
-        @param[in] fromCoordSys: initial coordinate system
-        @param[in] fromCoord: initial position
-        @param[in] fromDir: initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
-        @param[in] site: site information
+        @param[out] toDir  orientation in this coordinate system (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
+        @param[out] scaleChange  change in scale: output delta sky/input delta sky, measured along the specified direction
+        @param[in] fromCoordSys  initial coordinate system
+        @param[in] fromCoord  initial position
+        @param[in] fromDir  initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
+        @param[in] site  site information
         @return position in this coordinate system
         */
         virtual Coord convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const;
@@ -135,12 +135,12 @@ namespace coordConv {
         /**
         Convert a PVTCoord from another coordinate system to this system, including orientation
         
-        @param[out] toDir: orientation in this coordinate system (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
-        @param[out] scaleChange: change in scale: output delta sky/input delta sky, measured along the specified direction
-        @param[in] fromCoordSys: initial coordinate system
-        @param[in] fromCoord: initial position
-        @param[in] fromDir: initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
-        @param[in] site: site information
+        @param[out] toDir  orientation in this coordinate system (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
+        @param[out] scaleChange  change in scale: output delta sky/input delta sky, measured along the specified direction
+        @param[in] fromCoordSys  initial coordinate system
+        @param[in] fromPVTCoord  initial position
+        @param[in] fromDir  initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
+        @param[in] site  site information
         @param[in] tai at which to evaluate this coordSys and fromCoordSys if either is apparent, and PVTs (MJD, sec)
         @return position in this coordinate system
         */
@@ -151,8 +151,8 @@ namespace coordConv {
         
         @warning This is a no-op for apparent coordinate systems.
         
-        @param[in] coord: coordinate from which to remove proper motion and radial velocity
-        @param[in] tai: TAI date to which to remove proper motion and radial velocity (MJD, seconds)
+        @param[in] coord  coordinate from which to remove proper motion and radial velocity
+        @param[in] tai  TAI date to which to remove proper motion and radial velocity (MJD, seconds)
         @return coord with proper motion and radial velocity removed
         */
         virtual Coord removePM(Coord const &coord, double tai) const = 0;
@@ -162,17 +162,17 @@ namespace coordConv {
         
         @warning This is a no-op for apparent coordinate systems.
         
-        @param[in] pvtCoord: PVT coordinate from which to remove proper motion and radial velocity
-        @param[in] tai: TAI date to which to remove proper motion and radial velocity (MJD, seconds)
+        @param[in] pvtCoord  PVT coordinate from which to remove proper motion and radial velocity
+        @param[in] tai  TAI date to which to remove proper motion and radial velocity (MJD, seconds)
         @return PVTCoord with proper motion and radial velocity removed;
             the date of the returned PVTCoord matches the input PVTCoord, not the tai argument.
         */
-        virtual PVTCoord removePM(PVTCoord const &coord, double tai);
+        virtual PVTCoord removePM(PVTCoord const &pvtCoord, double tai);
         
         /**
         Convert TAI (MJD, seconds) to a suitable date for this coordinate system
         
-        @param[in] tai: TAI date (MJD, seconds)
+        @param[in] tai  TAI date (MJD, seconds)
         @return date in appropriate units for this coordinate system
         */
         virtual double dateFromTAI(double tai) const = 0;
@@ -224,7 +224,7 @@ namespace coordConv {
         /**
         Construct an ICRSCoordSys
         
-        @param[in] date: date of observation in Julian years
+        @param[in] date  date of observation in Julian years
         */
         explicit ICRSCoordSys(double date=2000.0);
         virtual ~ICRSCoordSys() {};
@@ -243,7 +243,7 @@ namespace coordConv {
         /**
         Construct an FK5CoordSys
         
-        @param[in] date: date of equinox and date of observation in Julian years
+        @param[in] date  date of equinox and date of observation in Julian years
         */
         explicit FK5CoordSys(double date=2000.0);
         virtual ~FK5CoordSys() {};
@@ -261,7 +261,7 @@ namespace coordConv {
     /**
     FK4 RA, Dec; date is Besselian years, and is both the date of observation and the date of equinox
     
-    @warning: the FK4 system has significant fictitious proper motion. Coords will be treated as fixed
+    @warning  the FK4 system has significant fictitious proper motion. Coords will be treated as fixed
     (the fictitious proper motion removed) if you specify proper motion AND radial velocity as zero.
     If any component of propoer motion or radial velocity is nonzero, then all components are treated
     as correct. Thus it is usually safest not to specify radial velocity for FK4 targets.
@@ -271,7 +271,7 @@ namespace coordConv {
         /**
         Construct an FK4CoordSys
         
-        @param[in] date: date of equinox and date of observation in Besselian years
+        @param[in] date  date of equinox and date of observation in Besselian years
         */
         explicit FK4CoordSys(double date=1950.0);
         virtual ~FK4CoordSys() {};
@@ -300,7 +300,7 @@ namespace coordConv {
         /**
         Construct a GalCoordSys
         
-        @param[in] date: date of observation in Julian years
+        @param[in] date  date of observation in Julian years
         */
         explicit GalCoordSys(double date=2000.0);
         virtual ~GalCoordSys() {};
@@ -331,8 +331,8 @@ namespace coordConv {
         /**
         Construct an AppGeoCoordSys
         
-        @param[in] date: TDB date in Julian years (but TT will always do)
-        @param[in] maxAge: maximum delta date (years) before setDate will update an internal cache
+        @param[in] date  TDB date in Julian years (but TT will always do)
+        @param[in] maxAge  maximum delta date (years) before setDate will update an internal cache
         */
         explicit AppGeoCoordSys(double date=std::numeric_limits<double>::quiet_NaN(), double maxAge=1.5e-5);
         virtual ~AppGeoCoordSys() {};
@@ -369,7 +369,7 @@ namespace coordConv {
         /**
         Construct an AppTopoCoordSys
         
-        @param[in] date: date as TAI (MJD, seconds)
+        @param[in] date  date as TAI (MJD, seconds)
         */
         explicit AppTopoCoordSys(double date=std::numeric_limits<double>::quiet_NaN());
         virtual ~AppTopoCoordSys() {};
@@ -383,8 +383,8 @@ namespace coordConv {
         /**
         Set the date and optionally freeze cached apparent geocentric data
         
-        @param[in] date: date as TAI (MJD, seconds)
-        @param[in] freezeCache: if true, do not update cached apparent geocentric data
+        @param[in] date  date as TAI (MJD, seconds)
+        @param[in] freezeCache  if true, do not update cached apparent geocentric data
         
         The reason for freezeCache is to support computing velocity by computing position at two nearby times.
         Set freezeCache true for the second computation to avoid an unexpected cache update causing
@@ -392,7 +392,7 @@ namespace coordConv {
         
         @note The standard setDate, with no freezeCache, argument does not freeze the cache.
         
-        @raise std::runtime_error if freezeCache true and delta date > AppGeoCoordSys's default MaxAge * 2;
+        @throw std::runtime_error if freezeCache true and delta date > AppGeoCoordSys's default MaxAge * 2;
         this is only intended to catch gross errors
         */
         virtual void setDate(double date, bool freezeCache);
@@ -400,8 +400,8 @@ namespace coordConv {
         /**
         Convert from apparent geocentric coordinates at this date
 
-        @param[in] coord: initial position
-        @param[in] site: site information
+        @param[in] coord  initial position
+        @param[in] site  site information
         @return position in this coordinate system at this date
         */
         virtual Coord fromAppGeo(Coord const &coord, Site const &site) const;
@@ -409,8 +409,8 @@ namespace coordConv {
         /**
         Convert to apparent geocentric coordinates at this date
 
-        @param[in] coord: initial position
-        @param[in] site: site information
+        @param[in] coord  initial position
+        @param[in] site  site information
         @return position in apparent geocentric coordinates at this date
         */
         virtual Coord toAppGeo(Coord const &coord, Site const &site) const;
@@ -427,7 +427,7 @@ namespace coordConv {
         /**
         Construct an ObsCoordSys
         
-        @param[in] date: date as TAI (MJD, seconds)
+        @param[in] date  date as TAI (MJD, seconds)
         */
         explicit ObsCoordSys(double date=std::numeric_limits<double>::quiet_NaN());
         virtual ~ObsCoordSys() {};
@@ -443,8 +443,8 @@ namespace coordConv {
         /**
         Set the date and optionally freeze cached apparent geocentric data
         
-        @param[in] date: date as TAI (MJD, seconds)
-        @param[in] freezeCache: if true, do not update cached apparent geocentric data
+        @param[in] date  date as TAI (MJD, seconds)
+        @param[in] freezeCache  if true, do not update cached apparent geocentric data
         
         The reason for freezeCache is to support computing velocity by computing position at two nearby times.
         Set freezeCache true for the second computation to avoid an unexpected cache update causing
@@ -452,7 +452,7 @@ namespace coordConv {
         
         @note The standard setDate, with no freezeCache, argument does not freeze the cache.
         
-        @raise std::runtime_error if freezeCache true and delta date > AppGeoCoordSys's default MaxAge * 2;
+        @throw std::runtime_error if freezeCache true and delta date > AppGeoCoordSys's default MaxAge * 2;
         this is only intended to catch gross errors
         */
         virtual void setDate(double date, bool freezeCache);
@@ -479,9 +479,10 @@ namespace coordConv {
         /**
         Construct an OtherCoordSys
         
-        @param[in] name: name of coordinate system
-        @param[in] date: date as TAI (MJD, seconds)
-        @param[in] isMean: is this a mean system?
+        @param[in] name  name of coordinate system
+        @param[in] date  date as TAI (MJD, seconds)
+        @param[in] dateType  date type
+        @param[in] isMean  is this a mean system?
         */
         explicit OtherCoordSys(std::string const &name, double date=0, DateTypeEnum dateType=DateType_None, bool isMean=false);
         virtual ~OtherCoordSys() {};
@@ -504,7 +505,7 @@ namespace coordConv {
         /**
         Construct a NoneCoordSys
         
-        @param[in] date: date as TAI (MJD, seconds)
+        @param[in] date  date as TAI (MJD, seconds)
         */
         explicit NoneCoordSys(double date=0);
         virtual ~NoneCoordSys() {};
@@ -516,12 +517,12 @@ namespace coordConv {
     /**
     Return a coordinate system given its name
     
-    @param[in] name: name of coordinate system (case matters)
-    @param[in] date: date of coordinate system (units depend on the coordinate system)
+    @param[in] name  name of coordinate system (case matters)
+    @param[in] date  date of coordinate system (units depend on the coordinate system)
     @return the specified coordinate system at the specified date
-    @raise std::invalid_argument (ValueError in python) if name is not recognized.
+    @throw std::invalid_argument (ValueError in python) if name is not recognized.
 
-    @warning: this will not construct an OtherCoordSys, since those have arbitary names
+    @warning  this will not construct an OtherCoordSys, since those have arbitary names
     (but it will construct a NoneCoordSys)
     */
     CoordSys::Ptr makeCoordSys(std::string const &name, double date);

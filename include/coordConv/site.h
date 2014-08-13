@@ -39,7 +39,7 @@ namespace coordConv {
         @param[in] meanLat;     ///< site latitude, ignoring pole wander (deg)
         @param[in] elev;        ///< site elevation (meters above sea level)
         
-        @raise std::range_error if meanLat is not in range [-90, 90]
+        @throw std::range_error if meanLat is not in range [-90, 90]
         */
         Site(double meanLong, double meanLat, double elev);
         

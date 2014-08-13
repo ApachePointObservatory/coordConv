@@ -18,7 +18,7 @@ namespace coordConv {
     not be computed; angA and angC are set to 90 (hence their sum is 180, which is essentially correct)
     and sideB will be 0 or 180 (again, essentially correct).
 
-    @raise runtime_error if the inputs are too small to allow computation
+    @throw runtime_error if the inputs are too small to allow computation
 
     Special Cases (in the order they are handled):
      sideA    angB    sideC       angA        sideB        angC

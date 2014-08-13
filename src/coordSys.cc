@@ -66,9 +66,9 @@ namespace coordConv {
         return PVTCoord(coord0, coord1, tai, DeltaT);
     }
 
-    PVTCoord CoordSys::removePM(PVTCoord const &coord, double tai) {
-        Coord zpmCoord = removePM(coord.getCoord(), tai);
-        return PVTCoord(zpmCoord, coord.getOrient(), coord.getVel(), coord.getTAI());
+    PVTCoord CoordSys::removePM(PVTCoord const &pvtCoord, double tai) {
+        Coord zpmCoord = removePM(pvtCoord.getCoord(), tai);
+        return PVTCoord(zpmCoord, pvtCoord.getOrient(), pvtCoord.getVel(), pvtCoord.getTAI());
     }
 
     CoordSys::Ptr makeCoordSys(std::string const &name, double date) {

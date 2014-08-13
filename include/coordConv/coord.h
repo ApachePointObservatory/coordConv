@@ -168,7 +168,7 @@ namespace coordConv {
         @param[in] dist: offset distance as the length of the arc of a great circle (deg)
         @return offset coord
 
-        @raise runtime_error if this coord is too near a pole
+        @throw runtime_error if this coord is too near a pole
     
         This diagram may help:
 

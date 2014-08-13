@@ -249,6 +249,18 @@ namespace coordConv {
         return ret;
     }
 
+    /**
+    Append a formatted PVT to a stream
+
+    The format is:
+    > PVT(_pos_, _vel_, _time_)
+    where all values are shown in decimal format (rather than exponential notation):
+    - pos and vel are shown to 7 digits after the decimal point (0.0003 arcsec resolution)
+    - time is shown to 6 digits (because time is commonly given to the nearest microsecond)
+
+    @param[in,out] os   stream to which to append the formatted value
+    @param[in] pvt  PVT to format and append to the stream
+    */
     std::ostream &operator<<(std::ostream &os, PVT const &pvt);
 
 }
