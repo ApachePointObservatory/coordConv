@@ -5,13 +5,13 @@ from .coordConvLib import wrapCtr
 def assertPVTsAlmostEqual(pvt1, pvt2, doWrap=False, posPlaces=7, velPlaces=7, tPlaces=7):
     """Assert that two PVTs are almost equal
 
-    @param[in] pvt1: first coordConv.PVT
-    @param[in] pvt2: second coordConv.PVT
-    @param[in] doWrap: if True then wrap position difference to [-180, 180] before comparing
+    @param[in] pvt1  first coordConv.PVT
+    @param[in] pvt2  second coordConv.PVT
+    @param[in] doWrap  if True then wrap position difference to [-180, 180] before comparing
         (ignored for velocity and time comparison).
-    @param[in] posPlaces: number of decimal places for position difference
-    @param[in] velPlaces: number of decimal places for velocity difference
-    @param[in] tPlaces: number of decimal places for time difference
+    @param[in] posPlaces  number of decimal places for position difference
+    @param[in] velPlaces  number of decimal places for velocity difference
+    @param[in] tPlaces  number of decimal places for time difference
 
     For the places arguments the associated value must be less than 10^-places
     """
@@ -29,10 +29,10 @@ def assertPVTsAlmostEqual(pvt1, pvt2, doWrap=False, posPlaces=7, velPlaces=7, tP
 def assertAnglesAlmostEqual(angle1, angle2, places=7):
     """Assert that two PVTs are almost equal
 
-    @param[in] angle1: first angle
-    @param[in] angle: second angle
-    @param[in] places: number of decimal places for position difference
-    @raise AssertionError if abs(angle1 - angle2) > 10.0**-places
+    @param[in] angle1  first angle
+    @param[in] angle  second angle
+    @param[in] places  number of decimal places for position difference
+    @throw AssertionError if abs(angle1 - angle2) > 10.0**-places
     """
     if abs(wrapCtr(angle1 - angle2)) > 10.0**-places:
         raise AssertionError("%r != %r to within %s places (wrapped)" % (angle1, angle2, places))

@@ -26,8 +26,8 @@ namespace coordConv {
     /**
     Rotate a 2-dimensional vector by a given angle.
 
-    @param[out] rotX: rotated x value
-    @param[out] rotY: rotated y value
+    @param[out] rotX  rotated x value
+    @param[out] rotY  rotated y value
     @param[in]  x: unrotated x value
     @param[in]  y: unrotated y value
     @param[in]  ang: angle by which to rotate (deg)
@@ -45,7 +45,7 @@ namespace coordConv {
     /**
     Compute angle wrapped into range: 0 <= wrapped ang < 360 deg
     
-    @param[in] ang: angle to wrap (deg)
+    @param[in] ang  angle to wrap (deg)
     @return wrapped angle (deg)
     */
     double wrapPos(double ang);
@@ -53,7 +53,7 @@ namespace coordConv {
     /**
     Compute angle wrapped into range: -180 <= wrapped ang < 180 deg
     
-    @param[in] ang: angle to wrap (deg)
+    @param[in] ang  angle to wrap (deg)
     @return wrapped angle (deg)
     */
     double wrapCtr(double ang);
@@ -61,8 +61,8 @@ namespace coordConv {
     /**
     Wrap one angle to be within 180 degrees of a reference angle: 180 <= wrapped ang - refAng < 180
     
-    @param[in] ang: angle to wrap (deg)
-    @param[in] refAng: result is wrapped to be near this reference angle (deg)
+    @param[in] ang  angle to wrap (deg)
+    @param[in] refAng  result is wrapped to be near this reference angle (deg)
     @return wrapped angle (deg)
     */
     inline double wrapNear(double ang, double refAng);
@@ -91,11 +91,11 @@ namespace coordConv {
     /**
     Convert cartesian coordinates to polar coordinates.
 
-    @param[out] r: magnitude of vector (same units as "x" and "y")
-    @param[out] theta: angle of vector (degrees)
+    @param[out] r  magnitude of vector (same units as "x" and "y")
+    @param[out] theta  angle of vector (degrees)
                0 along x, 90 along y and in the range (-180, 180)
-    @param[in] x: x component of vector (arbitrary units)
-    @param[in] y: y component of vector (same units as "x")
+    @param[in] x  x component of vector (arbitrary units)
+    @param[in] y  y component of vector (same units as "x")
     @return true if |r| is so small that theta cannot be computed and sets theta to 0
     */
     bool polarFromXY(double &r, double &theta, double x, double y);
@@ -103,19 +103,19 @@ namespace coordConv {
     /**
     Convert polar coordinates to cartesian coordinates.
 
-    @param[out] x: x component of vector (same units as "r")
-    @param[out] y: y component of vector (same units as "r")
-    @param[in] r: magnitude of vector (arbitrary units)
-    @param[in] theta: angle of vector from x axis (degrees)
+    @param[out] x  x component of vector (same units as "r")
+    @param[out] y  y component of vector (same units as "r")
+    @param[in] r  magnitude of vector (arbitrary units)
+    @param[in] theta  angle of vector from x axis (degrees)
     */
     void xyFromPolar(double &x, double &y, double r, double theta);
         
     /**
     Compute a rotation matrix given an axis and rotation angle
     
-    @param[out] rotMat: rotation matrix
-    @param[in] axis: axis of rotation (magnitude is ignored, but must be finite and nonzero)
-    @param[in] rotAngle: rotation angle (deg)
+    @param[out] rotMat  rotation matrix
+    @param[in] axis  axis of rotation (magnitude is ignored, but must be finite and nonzero)
+    @param[in] rotAngle  rotation angle (deg)
     */
     void computeRotationMatrix(Eigen::Matrix3d &rotMat, Eigen::Vector3d const &axis, double rotAngle);
 

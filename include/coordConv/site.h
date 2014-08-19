@@ -46,8 +46,8 @@ namespace coordConv {
         /**
         Set current pole wander, based on the USNO earth orientation bulletin
         
-        @param[in] x: x correction (deg)
-        @param[in] y: y correction (deg)
+        @param[in] x  x correction (deg)
+        @param[in] y  y correction (deg)
         
         Updates the following fields:
         - poleX

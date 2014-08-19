@@ -34,8 +34,8 @@ def makeSite():
 def timeFK5ToAppTopo(alt, niter):
     """Time FK5 to apparent geocentric at the specified altitude
     
-    @param[in] alt: initial altitude (degrees)
-    @param[in] niter: number of iterations
+    @param[in] alt  initial altitude (degrees)
+    @param[in] niter  number of iterations
     
     The coordinate conversion code presently does not have a special branch
     for zero proper motion, so no attempt is made to provide proper motion.
@@ -61,8 +61,8 @@ def timeFK5ToAppTopo(alt, niter):
 def timeAppTopoToFK5(alt, niter):
     """Time apparent topocentric to FK5 at the specified altitude
     
-    @param[in] alt: initial altitude (degrees)
-    @param[in] niter: number of iterations
+    @param[in] alt  initial altitude (degrees)
+    @param[in] niter  number of iterations
     
     The coordinate conversion code presently does not have a special branch
     for zero proper motion, so no attempt is made to provide proper motion.

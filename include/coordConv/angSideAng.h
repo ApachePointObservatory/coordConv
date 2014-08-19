@@ -7,12 +7,12 @@ namespace coordConv {
     /**
     Solve for two sides and the included angle of a spherical triangle
 
-    @param[out] angA: interior angle opposite side A (deg)
-    @param[out] sideB: length of side B (deg)
-    @param[out] angC: interior angle opposite side C (deg)
-    @param[in] sideA: length of side A (deg)
-    @param[in] angB: interior angle opposite side B (deg)
-    @param[in] sideC: length of side C (deg)
+    @param[out] angA  interior angle opposite side A (deg)
+    @param[out] sideB  length of side B (deg)
+    @param[out] angC  interior angle opposite side C (deg)
+    @param[in] sideA  length of side A (deg)
+    @param[in] angB  interior angle opposite side B (deg)
+    @param[in] sideC  length of side C (deg)
 
     @return unknownAng: if true: sideB is so near 0 or 180 (see Special Cases below) that angA and angC cannot
     not be computed; angA and angC are set to 90 (hence their sum is 180, which is essentially correct)

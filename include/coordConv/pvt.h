@@ -22,9 +22,9 @@ namespace coordConv {
         /**
         Construct from specified position, velocity and time
         
-        @param pos: position (deg)
-        @param vel: velocity (deg/sec)
-        @param t:   TAI date (MJD, sec)
+        @param pos  position (deg)
+        @param vel  velocity (deg/sec)
+        @param t    TAI date (MJD, sec)
         */
         explicit PVT(double pos, double vel, double t)
         :
@@ -161,12 +161,12 @@ namespace coordConv {
         /**
         Set from a pair of positions or angles computed at different times
         
-        @param[in] posPair: pair of positions, where:
+        @param[in] posPair  pair of positions, where:
             posPair[0] is computed at time t
             posPair[1] is computed at time t + deltaT
-        @param[in] t: time at which posPair[0] is computed
-        @param[in] deltaT: time difference between the two positions
-        @param[in] isAngle: if true then posPair values are treated as angles, in degrees,
+        @param[in] t  time at which posPair[0] is computed
+        @param[in] deltaT  time difference between the two positions
+        @param[in] isAngle  if true then posPair values are treated as angles, in degrees,
             and the resulting velocity is computed using:
             posPair[1] - posPair[0] wrapped into the range [-180, 180)
         
@@ -186,12 +186,12 @@ namespace coordConv {
     /**
     Convert cartesian coordinates to polar coordinates.
 
-    @param[out] r: magnitude of vector (same units as "x" and "y")
-    @param[out] theta: angle of vector (degrees)
+    @param[out] r  magnitude of vector (same units as "x" and "y")
+    @param[out] theta  angle of vector (degrees)
                0 along x, 90 along y and in the range (-180, 180)
-    @param[in] x: x component of vector (arbitrary units)
-    @param[in] y: y component of vector (same units as "x")
-    @param[in] tai: TAI date (MJD, sec)
+    @param[in] x  x component of vector (arbitrary units)
+    @param[in] y  y component of vector (same units as "x")
+    @param[in] tai  TAI date (MJD, sec)
     @return true if |r| is so small that theta cannot be computed and sets theta to 0
     */
     bool polarFromXY(PVT &r, PVT &theta, PVT const &x, PVT const &y, double tai);
@@ -199,23 +199,23 @@ namespace coordConv {
     /**
     Convert polar coordinates to cartesian coordinates.
 
-    @param[out] x: x component of vector (same units as "r")
-    @param[out] y: y component of vector (same units as "r")
-    @param[in] r: magnitude of vector (arbitrary units)
-    @param[in] theta: angle of vector from x axis (degrees)
-    @param[in] tai: TAI date (MJD, sec)
+    @param[out] x  x component of vector (same units as "r")
+    @param[out] y  y component of vector (same units as "r")
+    @param[in] r  magnitude of vector (arbitrary units)
+    @param[in] theta  angle of vector from x axis (degrees)
+    @param[in] tai  TAI date (MJD, sec)
     */
     void xyFromPolar(PVT &x, PVT &y, PVT const &r, PVT const &theta, double tai);
 
     /**
     Rotate a 2-dimensional PVT vector by a given angle.
 
-    @param[out] rotX: rotated x value
-    @param[out] rotY: rotated y value
+    @param[out] rotX  rotated x value
+    @param[out] rotY  rotated y value
     @param[in]  x: unrotated x value
     @param[in]  y: unrotated y value
     @param[in]  ang: angle by which to rotate (deg)
-    @param[in] tai: TAI date (MJD, sec)
+    @param[in] tai  TAI date (MJD, sec)
 
     Using rot2D to change coordinate systems:
     Given a coordinate system A and a coordinate system B, such that:

@@ -13,11 +13,11 @@ namespace coordConv {
         /**
         Construct a PVTCoord from a coord, orientation, velocity and time
         
-        @param[in] coord: coordinate at time tai
-        @param[in] orient: orientation of arc of motion at coord (deg)
+        @param[in] coord  coordinate at time tai
+        @param[in] orient  orientation of arc of motion at coord (deg)
             see Coord.offset for an explanation of orientation
-        @param[in] vel: speed of motion along arc of great circle (deg/sec)
-        @param[in] tai: TAI date of coord (MJD seconds)
+        @param[in] vel  speed of motion along arc of great circle (deg/sec)
+        @param[in] tai  TAI date of coord (MJD seconds)
 
         @throw std::runtime_error if coord is at pole at time tai and vel nonzero.
         */
@@ -26,11 +26,11 @@ namespace coordConv {
         /**
         Construct a PVTCoord from a pair of coords
         
-        @param[in] coord0: coordinate at time tai
-        @param[in] coord1: coordinate at time tai + deltaT; proper motion and radial velocity are ignored
-        @param[in] tai: initial TAI date of PVTCoord (MJD seconds)
-        @param[in] deltaT: TAI of coord1 - TAI of coord0; must be nonzero
-        @param[in] defOrient: default orientation (deg); if the velocity is so low that orientation
+        @param[in] coord0  coordinate at time tai
+        @param[in] coord1  coordinate at time tai + deltaT; proper motion and radial velocity are ignored
+        @param[in] tai  initial TAI date of PVTCoord (MJD seconds)
+        @param[in] deltaT  TAI of coord1 - TAI of coord0; must be nonzero
+        @param[in] defOrient  default orientation (deg); if the velocity is so low that orientation
             cannot be computed then orientation=defOrient and vel=0
             See Coord.offset for an explanation of orientation
         
@@ -43,11 +43,11 @@ namespace coordConv {
         /**
         Construct a PVTCoord from spherical PVTs
 
-        @param[in] equatPVT: equatorial angle (e.g. RA, Long, Az) (degrees)
-        @param[in] polarPVT: polar angle (e.g. Dec, Latitude, Alt) (degrees)
-        @param[in] tai: date at which to evaluate equatAng and polarAng, and initial TAI date of PVTCoord (MJD seconds)
-        @param[in] parallax: parallax (arcsec)
-        @param[in] defOrient: default orientation (deg); if the velocity is so low that orientation
+        @param[in] equatPVT  equatorial angle (e.g. RA, Long, Az) (degrees)
+        @param[in] polarPVT  polar angle (e.g. Dec, Latitude, Alt) (degrees)
+        @param[in] tai  date at which to evaluate equatAng and polarAng, and initial TAI date of PVTCoord (MJD seconds)
+        @param[in] parallax  parallax (arcsec)
+        @param[in] defOrient  default orientation (deg); if the velocity is so low that orientation
             cannot be computed then orientation=defOrient and vel=0
             See Coord.offset for an explanation of orientation
 
@@ -63,15 +63,15 @@ namespace coordConv {
         /**
         Construct a PVTCoord from spherical PVTs and proper motion
         
-        @param[in] equatPVT: equatorial angle (e.g. RA, Long, Az) (degrees)
-        @param[in] polarPVT: polar angle (e.g. Dec, Latitude, Alt) (degrees)
-        @param[in] tai: date at which to evaluate equatAng and polarAng, and initial TAI date of PVTCoord (MJD seconds)
-        @param[in] parallax: parallax (arcsec)
-        @param[in] equatPM: equatorial proper motion (arcsec/century);
+        @param[in] equatPVT  equatorial angle (e.g. RA, Long, Az) (degrees)
+        @param[in] polarPVT  polar angle (e.g. Dec, Latitude, Alt) (degrees)
+        @param[in] tai  date at which to evaluate equatAng and polarAng, and initial TAI date of PVTCoord (MJD seconds)
+        @param[in] parallax  parallax (arcsec)
+        @param[in] equatPM  equatorial proper motion (arcsec/century);
             this is dEquatAng/dt, so it gets large near the pole
-        @param[in] polarPM: polar proper motion (arcsec/century)
-        @param[in] radVel: radial velocity (km/sec, positive receding)
-        @param[in] defOrient: default orientation (deg); if the velocity is so low that orientation
+        @param[in] polarPM  polar proper motion (arcsec/century)
+        @param[in] radVel  radial velocity (km/sec, positive receding)
+        @param[in] defOrient  default orientation (deg); if the velocity is so low that orientation
             cannot be computed then orientation=defOrient and vel=0
             See Coord.offset for an explanation of orientation
 
@@ -112,7 +112,7 @@ namespace coordConv {
         /**
         Compute the coord at a specified TAI date
         
-        @param[in] tai: TAI date at which to compute coord (MJD, sec)
+        @param[in] tai  TAI date at which to compute coord (MJD, sec)
         */
         Coord getCoord(double tai) const;
     
@@ -126,9 +126,9 @@ namespace coordConv {
         
         The returned velocities are the instantaneous dEquat/dt and dPolar/dt along the great circle arc
         
-        @param[out] equatPVT: equatorial PVT (deg, deg/sec, TAI date)
-        @param[out] polarPVT: polar PVT (deg, deg/sec, TAI date)
-        @param[in] tai: TAI date at which to retrieve position (MJD, sec)
+        @param[out] equatPVT  equatorial PVT (deg, deg/sec, TAI date)
+        @param[out] polarPVT  polar PVT (deg, deg/sec, TAI date)
+        @param[in] tai  TAI date at which to retrieve position (MJD, sec)
         @return atPole: true if so near the pole that equatorial angle could not be computed.
         */
         bool getSphPVT(PVT &equatPVT, PVT &polarPVT, double tai) const;
@@ -136,8 +136,8 @@ namespace coordConv {
         /**
         Compute the angular separation from another PVTCoord
 
-        @param[in] pvtCoord: PVT coord to which to measure angular separation
-        @param[in] tai: TAI date at which to retrieve position (MJD, sec)
+        @param[in] pvtCoord  PVT coord to which to measure angular separation
+        @param[in] tai  TAI date at which to retrieve position (MJD, sec)
         
         @return angular separation (deg)
         */
@@ -146,8 +146,8 @@ namespace coordConv {
         /**
         Compute the orientation of a great circle offset to another PVTCoord
 
-        @param[in] pvtCoord: PVT coord to which to measure orientation
-        @param[in] tai: TAI date at which to retrieve position (MJD, sec)
+        @param[in] pvtCoord  PVT coord to which to measure orientation
+        @param[in] tai  TAI date at which to retrieve position (MJD, sec)
         
         In detail: computes the orientation at this point of a great circle connecting this PVT coord
         to another PVT coord. The orientation is 0 if the great circle lies along the direction of
@@ -160,10 +160,10 @@ namespace coordConv {
         /**
         Offset a PVTCoord; see Coord::offset for a full explanation.
 
-        @param[out] toOrient: orientation of offset arc at offset position (deg)
-        @param[in] fromOrient: orientation of offset arc at this position (deg)
-        @param[in] dist: offset distance as the length of the arc of a great circle (deg)
-        @param[in] tai: TAI date at which to compute offset (MJD, sec)
+        @param[out] toOrient  orientation of offset arc at offset position (deg)
+        @param[in] fromOrient  orientation of offset arc at this position (deg)
+        @param[in] dist  offset distance as the length of the arc of a great circle (deg)
+        @param[in] tai  TAI date at which to compute offset (MJD, sec)
         @return offset PVT coord
         
         @note The result is PVTCoord at tai, offset by dist at tai in direction fromOrient at tai.
@@ -204,10 +204,10 @@ namespace coordConv {
         /**
         Set _orient and _vel from spherical info
         
-        @param[in] polarPos: polar angle
-        @param[in] equatVel: equatorial velocity (dEquatPos/dt)
-        @param[in] polarVel: polar velocity
-        @param[in] defOrient: default orientation (deg); if _coord.atPole()
+        @param[in] polarPos  polar angle
+        @param[in] equatVel  equatorial velocity (dEquatPos/dt)
+        @param[in] polarVel  polar velocity
+        @param[in] defOrient  default orientation (deg); if _coord.atPole()
             then orientation=defOrient and vel=0
 
         The provided velocities are treated as the instantaneous dEquat/dt and dPolar/dt along the great circle arc, so:

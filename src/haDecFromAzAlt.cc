@@ -6,9 +6,9 @@ namespace coordConv {
     /**
     Compute HA/Dec position from alt/az position
 
-    @param[out] haDec: cartesian -HA, Dec (same units as azAlt)
-    @param[in] lat: latitude (degrees)
-    @param[in] azAlt: cartesian Az/Alt (any units)
+    @param[out] haDec  cartesian -HA, Dec (same units as azAlt)
+    @param[in] lat  latitude (degrees)
+    @param[in] azAlt  cartesian Az/Alt (any units)
         Sign convention: (1,0,0) is south, (0,1,0) is east.
     */
     void haDecFromAzAlt(

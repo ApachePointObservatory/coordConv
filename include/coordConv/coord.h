@@ -25,29 +25,29 @@ namespace coordConv {
         /**
         Construct a Coord from spherical position
         
-        @param[in] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
-        @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
-        @param[in] parallax: parallax (arcsec)
+        @param[in] equatAng  equatorial angle (e.g. RA, Long, Az) (degrees)
+        @param[in] polarAng  polar angle (e.g. Dec, Latitude, Alt) (degrees)
+        @param[in] parallax  parallax (arcsec)
         */
         explicit Coord(double equatAng, double polarAng, double parallax=0);
 
         /**
         Construct a Coord from spherical position and proper motion
         
-        @param[in] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
-        @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
-        @param[in] parallax: parallax (arcsec)
-        @param[in] equatPM: equatorial proper motion (arcsec/century);
+        @param[in] equatAng  equatorial angle (e.g. RA, Long, Az) (degrees)
+        @param[in] polarAng  polar angle (e.g. Dec, Latitude, Alt) (degrees)
+        @param[in] parallax  parallax (arcsec)
+        @param[in] equatPM  equatorial proper motion (arcsec/century);
             this is dEquatAng/dt, so it gets large near the pole
-        @param[in] polarPM: polar proper motion (arcsec/century)
-        @param[in] radVel: radial velocity (km/sec, positive receding)
+        @param[in] polarPM  polar proper motion (arcsec/century)
+        @param[in] radVel  radial velocity (km/sec, positive receding)
         */
         explicit Coord(double equatAng, double polarAng, double parallax, double equatPM, double polarPM, double radVel);
         
         /**
         Construct a Coord from cartesian position
         
-        @param[in] pos: cartesian position (AU)
+        @param[in] pos  cartesian position (AU)
         @warning: distance is not constrained
         */
         explicit Coord(Eigen::Vector3d const &pos);
@@ -55,8 +55,8 @@ namespace coordConv {
         /**
         Construct a Coord from cartesian position and velocity
         
-        @param[in] pos: cartesian position (AU)
-        @param[in] vel: cartesian velocity (AU/year)
+        @param[in] pos  cartesian position (AU)
+        @param[in] vel  cartesian velocity (AU/year)
         @warning: distance is not constrained
         */
         explicit Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &vel);
@@ -99,8 +99,8 @@ namespace coordConv {
         /**
         Get spherical position
         
-        @param[out] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
-        @param[out] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
+        @param[out] equatAng  equatorial angle (e.g. RA, Long, Az) (degrees)
+        @param[out] polarAng  polar angle (e.g. Dec, Latitude, Alt) (degrees)
         @return atPole; if true then equatAng is arbitrarily set to 0
         */
         bool getSphPos(double &equatAng, double &polarAng) const;
@@ -108,8 +108,8 @@ namespace coordConv {
         /**
         Get proper motion
         
-        @param[out] equatPM: equatorial component of proper motion (e.g. dRA/dt) (arcsec/century)
-        @param[out] polarPM: polar component of proper motion (e.g. dDec/dt) (arcsec/century)
+        @param[out] equatPM  equatorial component of proper motion (e.g. dRA/dt) (arcsec/century)
+        @param[out] polarPM  polar component of proper motion (e.g. dDec/dt) (arcsec/century)
         @return atPole; if true then equatPM and polarPM are arbitrarily set to 0
         */
         bool getPM(double &equatPM, double &polarPM) const;
@@ -163,9 +163,9 @@ namespace coordConv {
         /**
         Compute a new coord offset from this coord along the arc of a great circle
         
-        @param[out] toOrient: orientation of offset arc at offset position (deg)
-        @param[in] fromOrient: orientation of offset arc at this position (deg)
-        @param[in] dist: offset distance as the length of the arc of a great circle (deg)
+        @param[out] toOrient  orientation of offset arc at offset position (deg)
+        @param[in] fromOrient  orientation of offset arc at this position (deg)
+        @param[in] dist  offset distance as the length of the arc of a great circle (deg)
         @return offset coord
 
         @throw runtime_error if this coord is too near a pole
@@ -207,9 +207,9 @@ namespace coordConv {
         /**
         Set _pos from spherical position; used by several constructors
         
-        @param[in] equatAng: equatorial angle (e.g. RA, Long, Az) (degrees)
-        @param[in] polarAng: polar angle (e.g. Dec, Latitude, Alt) (degrees)
-        @param[in] parallax: parallax (arcsec)
+        @param[in] equatAng  equatorial angle (e.g. RA, Long, Az) (degrees)
+        @param[in] polarAng  polar angle (e.g. Dec, Latitude, Alt) (degrees)
+        @param[in] parallax  parallax (arcsec)
 
         @warning Does not set _pm
         */

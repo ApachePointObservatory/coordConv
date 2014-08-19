@@ -9,8 +9,8 @@ namespace {
     /**
     * Return a copy of a CoordSys, setting the date if coordSys is apparent, else leaving the date unchanged
     *
-    * @param[in] coordSys: the CoordSys to copy
-    * @param[in] taiDate: TAI (MJD sec) date to use if CoordSys is apparent
+    * @param[in] coordSys  the CoordSys to copy
+    * @param[in] taiDate  TAI (MJD sec) date to use if CoordSys is apparent
     * @return a clone of coordSys; if coordinate system date type is TAI (apparent topocentric or observed)
         then set date of clone to taiDate; otherwise preserve the date.
     */
