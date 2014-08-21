@@ -7,13 +7,14 @@ Measure the time required to perform coordinate conversions relevant to telescop
 Also measure the time required to recompute cached apparent geocentric data.
 """
 _TimeTupleJ2000 = (2000, 1, 1, 12, 0, 0, 5, 1, 0)
-def utcFromPySec(pySec = None):
+
+def utcFromPySec(pySec=None):
     """Returns the UTC (MJD) corresponding to the supplied python time, or now if none.
     """
     global _TimeTupleJ2000
 
     if pySec == None:
-        pySec = getCurrPySec()
+        pySec = time.time()
     
     # python time (in seconds) corresponding to 2000-01-01 00:00:00
     # this is probably constant, but there's some chance
@@ -89,12 +90,13 @@ def timeAppGeoData(niter):
     
     Space the time out far enough for a cache miss; I'm using a year
     """
-    epoch = 2000
+    epoch = 1950
     appGeoSys = coordConv.AppGeoCoordSys(epoch)
-    site = makeSite()
     startTime = time.time()
     for i in range(niter):
-        epoch += 1
+        epoch += 0.1
+        if epoch > 2500:
+            epoch = 1950
         appGeoSys.setDate(epoch)
     duration = time.time() - startTime
     print "AppGeo data: %0.1f computations/second (%d computations in %0.2f sec)" % (niter/duration, niter, duration)
@@ -107,4 +109,3 @@ if __name__ == '__main__':
         timeAppTopoToFK5(alt, 10000)
     print
     timeAppGeoData(10000)
-    
