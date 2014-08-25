@@ -41,9 +41,9 @@ The following packages are required, and all but slalib are available in the LSS
 The simplest way to build this package is:
 * Install slalib.
 * Install the minimal version of the current stable LSST software stack <https://dev.lsstcorp.org/trac/wiki/Installing>, which includes all dependencies other than slalib. As of 2014-05-01 coordConv is known to run with the Summer 2013 LSST software.
-* Type the following commands, substituting appropriate values for terms in diamonds brackets:
-    * cd <package root>
+* Type the following commands:
+    * cd <i>package_root</i>
     * setup -r .                                    # setup the package in eups
-    * scons install version=<version> declare       # build the software, run unit tests and copy it into the LSST stack
-    * eups declare coordConv <version> -t current   # declare the newly installed software current, so it will be setup default if no version is specified
+    * scons install version=<i>version</i> declare       # build the software, run unit tests and copy it into the LSST stack
+    * eups declare coordConv <i>version</i> -t current   # declare the newly installed software current, so it will be setup default if no version is specified
 */

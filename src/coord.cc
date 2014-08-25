@@ -51,10 +51,10 @@ namespace coordConv {
         _setCache();
     }
 
-    Coord::Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &vel)
+    Coord::Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &pm)
     :
         _pos(pos),
-        _pm(vel)
+        _pm(pm)
     {
         _setCache();
     }

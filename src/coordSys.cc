@@ -42,13 +42,12 @@ namespace coordConv {
     }
 
     Coord CoordSys::convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const {
+        double const OffsetLength = 1e-3;
         Coord toCoord = convertFrom(fromCoordSys, fromCoord, site);
-
-        double const FromDist = 1e-3;
         double dumDir;
-        Coord offFromCoord = fromCoord.offset(dumDir, fromDir, FromDist);
+        Coord offFromCoord = fromCoord.offset(dumDir, fromDir, OffsetLength);
         Coord offToCoord = convertFrom(fromCoordSys, offFromCoord, site);
-        scaleChange = toCoord.angularSeparation(offToCoord) / FromDist;
+        scaleChange = toCoord.angularSeparation(offToCoord) / OffsetLength;
         toDir = toCoord.orientationTo(offToCoord);
         return toCoord;
     }

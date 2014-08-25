@@ -129,6 +129,9 @@ namespace coordConv {
         @param[in] fromDir  initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
         @param[in] site  site information
         @return position in this coordinate system
+
+        @warning the computed orientation will not round trip if converting a very nearby object
+        from apparent topocentric or observed to apparent geocentric or mean coordinates.
         */
         virtual Coord convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const;
         
@@ -213,7 +216,7 @@ namespace coordConv {
         explicit ApparentCoordSys(std::string const &name, double date, DateTypeEnum dateType=DateType_TAI);
         virtual ~ApparentCoordSys() {};
         virtual double dateFromTAI(double tai) const;
-        virtual Coord removePM(Coord const &coord, double tai) const { return coord; };
+        virtual Coord removePM(Coord const &coord, double tai) const { return Coord(coord.getVecPos()); };
     };
 
     /**

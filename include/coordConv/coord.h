@@ -56,10 +56,10 @@ namespace coordConv {
         Construct a Coord from cartesian position and velocity
         
         @param[in] pos  cartesian position (AU)
-        @param[in] vel  cartesian velocity (AU/year)
+        @param[in] pm   cartesian proper motion (AU/year)
         @warning: distance is not constrained
         */
-        explicit Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &vel);
+        explicit Coord(Eigen::Vector3d const &pos, Eigen::Vector3d const &pm);
         
         /**
         Construct a Coord with unknown position and proper motion

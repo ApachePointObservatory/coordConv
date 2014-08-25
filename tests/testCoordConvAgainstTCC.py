@@ -137,26 +137,46 @@ class TestCoordConv(unittest.TestCase):
 # scale change bears very little resemblance between old and new.
 # I believe this is a bug in the old TCC, since mean->mean should be 1.0
 # and the new code is significantly closer to 1.0 than the old code.
-# However, if it is a bug in the TCC I would like to find it.
 #                    self.assertAlmostEqual(refScaleChange, scaleChange, places=5)
                     self.assertAlmostEqual(scaleChange, scaleChange2, places=5)
                     if (fromSysCode > 0) and (toSysCode > 0):
                         self.assertAlmostEqual(scaleChange, 1.0, places=5)
                 
-                    # if (fromSysCode > 0) and (toSysCode < -1):
-                    #     zpmFromCoord = fromCoordSys.removePM(fromCoord, tai)
-                    #     altToCoord, altToDir, altScaleChange = toCoordSys.convertFrom(fromCoordSys, zpmFromCoord, fromDir, site)
-                    #     altAtPole, altToPos1, altToPos2 = altToCoord.getSphPos()
-                    #     altAtPole, zpmToPM1, zpmToPM2 = toCoord.getPM()
-                    #     zpmToRadVel = toCoord.getRadVel()
+                    if toCoordSys.getDateType() == coordConv.DateType_TAI:
+                        # "to" system uses tai as its time; try various strategies that remove proper motion to the given tai date
+
+                        # test the removePM function (which removes proper motion and radial velocity, but not parallax)
+                        zpmFromCoord = fromCoordSys.removePM(fromCoord, tai)
+
+                        if fromCoordSys.getName() != "fk4":
+                            # FK4 coordinates have fictitious space motion
+                            zpmFromAtPole, zpmFromPM1, zpmFromPM2 = zpmFromCoord.getPM()
+                            self.assertEqual(fromCoord.atPole(), zpmFromAtPole)
+                            self.assertEqual(zpmFromPM1, 0)
+                            self.assertEqual(zpmFromPM2, 0)
+                            zpmFromRadVel = zpmFromCoord.getRadVel()
+                            self.assertEqual(zpmFromRadVel, 0)
+
+                        # zpmFromAtPole, zpmFromPM1, zpmFromPM2 = zpmFromCoord.getPM()
+                        # self.assertEqual(fromCoord.atPole(), zpmFromAtPole)
+                        # zpmFromRadVel = zpmFromCoord.getRadVel()
+                        # self.assertEqual(zpmFromPM1, 0)
+                        # self.assertEqual(zpmFromPM2, 0)
+                        # self.assertEqual(zpmFromRadVel, 0)
+
+                        zpmToCoord, zpmToDir, zpmScaleChange = toCoordSys.convertFrom(fromCoordSys, zpmFromCoord, fromDir, site)
+                        zpmToAtPole, zpmToPos1, zpmToPos2 = zpmToCoord.getSphPos()
+                        self.assertEqual(atPole, zpmToAtPole)
+                        zpmToAtPole, zpmToPM1, zpmToPM2 = zpmToCoord.getPM()
+                        self.assertEqual(atPole, zpmToAtPole)
+                        zpmToRadVel = zpmToCoord.getRadVel()
                         
-                    #     self.assertEqual(atPole, altAtPole)
-                    #     self.assertAlmostEqual(toDir, altToDir, places=4)
-                    #     self.assertAlmostEqual(scaleChange, altScaleChange)
-                    #     self.assertLess(toCoord.angularSeparation(altToCoord), 1e-7)
-                    #     self.assertAlmostEqual(zpmToPM1, 0)
-                    #     self.assertAlmostEqual(zpmToPM2, 0)
-                    #     self.assertAlmostEqual(zpmToRadVel, 0)
+                        self.assertAlmostEqual(toDir, zpmToDir, places=2) # why so poor?
+                        self.assertAlmostEqual(scaleChange, zpmScaleChange, places=6)
+                        self.assertLess(toCoord.angularSeparation(zpmToCoord), 1e-7)
+                        self.assertEqual(zpmToPM1, 0)
+                        self.assertEqual(zpmToPM2, 0)
+                        self.assertEqual(zpmToRadVel, 0)
 
                 except Exception, e:
                     if ContinueOnError:

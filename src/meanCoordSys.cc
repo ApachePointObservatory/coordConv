@@ -19,7 +19,7 @@ namespace coordConv {
     Coord MeanCoordSys::removePM(Coord const &coord, double tai) const {
         // convert to this coord at tai date, zero velocity and convert back;
         // this is fancier than just adding vecPM to vecPos, but handles fictitious proper motion (e.g. FK4).
-        if ((coord.getVecPos().array() == 0.0).all()) {
+        if ((coord.getVecPM().array() == 0.0).all()) {
             // no proper motion to correct; return the coord unchanged
             return coord;
         }
