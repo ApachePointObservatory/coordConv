@@ -6,22 +6,22 @@
 namespace coordConv {
     
     /**
-    PVT coordinates represent a coordinate moving at constant speed along a great circle
+    A coordinate moving at a constant cartesian velocity
+
+    Primarily intended for computing instantaneous velocity by comparing two Coord at nearby time.
     */
     class PVTCoord {
     public:
         /**
-        Construct a PVTCoord from a coord, orientation, velocity and time
+        Construct a PVTCoord from a coord, vector velocity and time
         
         @param[in] coord  coordinate at time tai
-        @param[in] orient  orientation of arc of motion at coord (deg)
-            see Coord.offset for an explanation of orientation
-        @param[in] vel  speed of motion along arc of great circle (deg/sec)
+        @param[in] vel  cartesian velocity (deg/sec)
         @param[in] tai  TAI date of coord (MJD seconds)
 
         @throw std::runtime_error if coord is at pole at time tai and vel nonzero.
         */
-        explicit PVTCoord(Coord const &coord, double orient, double vel, double tai);
+        explicit PVTCoord(Coord const &coord, Eigen::Vector3d const &vel, double tai);
 
         /**
         Construct a PVTCoord from a pair of coords
@@ -30,59 +30,37 @@ namespace coordConv {
         @param[in] coord1  coordinate at time tai + deltaT; proper motion and radial velocity are ignored
         @param[in] tai  initial TAI date of PVTCoord (MJD seconds)
         @param[in] deltaT  TAI of coord1 - TAI of coord0; must be nonzero
-        @param[in] defOrient  default orientation (deg); if the velocity is so low that orientation
-            cannot be computed then orientation=defOrient and vel=0
-            See Coord.offset for an explanation of orientation
         
-        @throw std::runtime_error if:
-        - deltaT = 0
-        - coord0 is at pole and vel nonzero.
+        @throw std::runtime_error if deltaT = 0
         */
-        explicit PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT, double defOrient=0);
+        explicit PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT);
 
         /**
-        Construct a PVTCoord from spherical PVTs
+        Construct a PVTCoord from spherical PVTs and parallax at TAI date equatPVT.t
 
         @param[in] equatPVT  equatorial angle (e.g. RA, Long, Az) (degrees)
         @param[in] polarPVT  polar angle (e.g. Dec, Latitude, Alt) (degrees)
-        @param[in] tai  date at which to evaluate equatAng and polarAng, and initial TAI date of PVTCoord (MJD seconds)
         @param[in] parallax  parallax (arcsec)
-        @param[in] defOrient  default orientation (deg); if the velocity is so low that orientation
-            cannot be computed then orientation=defOrient and vel=0
-            See Coord.offset for an explanation of orientation
 
-        The provided velocities are treated as the instantaneous dEquat/dt and dPolar/dt along the great circle arc, so:
-        - orientation = atan2d(equat space vel, polar vel)
-        - velocity = hypot(equat space vel, polar vel)
-        where equat space vel = equat vel * cosd(polar pos at tai)
-
-        @throw std::runtime_error if coord is at pole at time tai and vel nonzero.
+        @throw std::runtime_error if equatPVT.t != polarPVT.t
         */
-        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax=0, double defOrient=0);
+        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double parallax=0);
 
         /**
-        Construct a PVTCoord from spherical PVTs and proper motion
+        Construct a PVTCoord from spherical PVTs, parallax, proper motion and radial velocity
+        at TAI date equatPVT.t
         
         @param[in] equatPVT  equatorial angle (e.g. RA, Long, Az) (degrees)
         @param[in] polarPVT  polar angle (e.g. Dec, Latitude, Alt) (degrees)
-        @param[in] tai  date at which to evaluate equatAng and polarAng, and initial TAI date of PVTCoord (MJD seconds)
         @param[in] parallax  parallax (arcsec)
         @param[in] equatPM  equatorial proper motion (arcsec/century);
             this is dEquatAng/dt, so it gets large near the pole
         @param[in] polarPM  polar proper motion (arcsec/century)
         @param[in] radVel  radial velocity (km/sec, positive receding)
-        @param[in] defOrient  default orientation (deg); if the velocity is so low that orientation
-            cannot be computed then orientation=defOrient and vel=0
-            See Coord.offset for an explanation of orientation
 
-        The PVT velocities are treated as the instantaneous dEquat/dt and dPolar/dt along the great circle arc:
-        - orientation = atan2d(equat space vel, polar vel)
-        - velocity = hypot(equat space vel, polar vel)
-        where equat space vel = equat vel * cosd(polar pos at tai)
-
-        @throw std::runtime_error if coord is at pole at time tai and vel nonzero.
+        @throw std::runtime_error if equatPVT.t != polarPVT.t
         */
-        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double tai, double parallax, double equatPM, double polarPM, double radVel, double defOrient=0);
+        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double parallax, double equatPM, double polarPM, double radVel);
         
         /**
         Construct a PVTCoord with all NaN data
@@ -90,14 +68,21 @@ namespace coordConv {
         explicit PVTCoord();
         
         /**
+        Copy PVTCoord at the specified date
+
+        @param[in] tai  TAI date at which to retrieve position (MJD, sec)
+        */
+        PVTCoord copy(double tai) const;
+
+        /**
         Get orientation at initial TAI date
         */
-        double getOrient() const { return _orient; };
+//        double getOrient() const { return _orient; };
         
         /**
         Get velocity
         */
-        double getVel() const { return _vel; };
+        Eigen::Vector3d getVel() const { return _vel; };
         
         /**
         Get initial TAI date
@@ -115,39 +100,40 @@ namespace coordConv {
         @param[in] tai  TAI date at which to compute coord (MJD, sec)
         */
         Coord getCoord(double tai) const;
-    
+
         /**
         Return True if all values are finite
         */
         bool isfinite() const;
        
         /**
-        Retrieve spherical position at a specified TAI date
+        Retrieve spherical position
         
-        The returned velocities are the instantaneous dEquat/dt and dPolar/dt along the great circle arc
+        The returned velocities are the dEquat/dt and dPolar/dt at the pvtCoord's TAI date
         
         @param[out] equatPVT  equatorial PVT (deg, deg/sec, TAI date)
         @param[out] polarPVT  polar PVT (deg, deg/sec, TAI date)
-        @param[in] tai  TAI date at which to retrieve position (MJD, sec)
         @return atPole: true if so near the pole that equatorial angle could not be computed.
         */
-        bool getSphPVT(PVT &equatPVT, PVT &polarPVT, double tai) const;
+        bool getSphPVT(PVT &equatPVT, PVT &polarPVT) const;
 
         /**
         Compute the angular separation from another PVTCoord
 
+        The separation is computed at the date of this pvtCoord
+
         @param[in] pvtCoord  PVT coord to which to measure angular separation
-        @param[in] tai  TAI date at which to retrieve position (MJD, sec)
         
         @return angular separation (deg)
         */
-        PVT angularSeparation(PVTCoord const &pvtCoord, double tai) const;
+        PVT angularSeparation(PVTCoord const &pvtCoord) const;
 
         /**
         Compute the orientation of a great circle offset to another PVTCoord
 
+        The orientation is computed at the date of this pvtCoord
+
         @param[in] pvtCoord  PVT coord to which to measure orientation
-        @param[in] tai  TAI date at which to retrieve position (MJD, sec)
         
         In detail: computes the orientation at this point of a great circle connecting this PVT coord
         to another PVT coord. The orientation is 0 if the great circle lies along the direction of
@@ -155,26 +141,22 @@ namespace coordConv {
         
         @return orientation (deg), or NaN if the angular separation is too near 0 or 180 at tai
         */
-        PVT orientationTo(PVTCoord const &pvtCoord, double tai) const;
+        PVT orientationTo(PVTCoord const &pvtCoord) const;
         
         /**
-        Offset a PVTCoord; see Coord::offset for a full explanation.
+        Offset a PVTCoord by a specified distance in a specified direction; see Coord::offset for a full explanation.
 
         @param[out] toOrient  orientation of offset arc at offset position (deg)
         @param[in] fromOrient  orientation of offset arc at this position (deg)
         @param[in] dist  offset distance as the length of the arc of a great circle (deg)
-        @param[in] tai  TAI date at which to compute offset (MJD, sec)
         @return offset PVT coord
-        
-        @note The result is PVTCoord at tai, offset by dist at tai in direction fromOrient at tai.
 
-        @throw std::runtime_error if this PVT coord is too near a pole at tai
+        @throw std::runtime_error if this PVTCoord is too near a pole to be offset
         */
-        PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist, double tai) const;
+        PVTCoord offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist) const;
 
         bool operator==(PVTCoord const &rhs) {
             return (this->getCoord()  == rhs.getCoord())
-                && (this->getOrient() == rhs.getOrient())
                 && (this->getVel()    == rhs.getVel())
                 && (this->getTAI()    == rhs.getTAI());
         }
@@ -190,34 +172,27 @@ namespace coordConv {
     
     private:
         Coord _coord;   // coordinate at initial time
-        double _orient; // orientation of great circle arc at initial time (deg)
-        double _vel;    // velocity along the great circle (deg/sec)
+        Eigen::Vector3d _vel;    // vector velocity (AU/sec)
         double _tai;    // initial TAI date (MJD, seconds)
 
         /**
-        Sanity check, e.g. to make sure _vel is 0 if at pole
-
-        @throw std::runtime_error if PVTCoord invalid
-        */
-        void _checkCoord() const;
-
-        /**
-        Set _orient and _vel from spherical info
+        Set fields based on a pair of coords
         
-        @param[in] polarPos  polar angle
-        @param[in] equatVel  equatorial velocity (dEquatPos/dt)
-        @param[in] polarVel  polar velocity
-        @param[in] defOrient  default orientation (deg); if _coord.atPole()
-            then orientation=defOrient and vel=0
+        @param[in] coord0  coordinate at time tai
+        @param[in] coord1  coordinate at time tai + deltaT; proper motion and radial velocity are ignored
+        @param[in] tai  initial TAI date of PVTCoord (MJD seconds)
+        @param[in] deltaT  TAI of coord1 - TAI of coord0; must be nonzero
+        @param[in] defOrient  default orientation (deg); if the velocity is so low that orientation
+            cannot be computed then orientation=defOrient and vel=0
+            See Coord.offset for an explanation of orientation
+        
+        @throw std::runtime_error if:
+        - deltaT = 0
 
-        The provided velocities are treated as the instantaneous dEquat/dt and dPolar/dt along the great circle arc, so:
-        - orientation = atan2d(equatSpaceVel, polarVel)
-        - velocity = hypot(equatSpaceVel, polarVel)
-        where equatSpaceVel = equatVel * cosd(polarPos)
-
-        @throw std::runtime_error if _coord.atPole() and |equatVel| or |polarVel| > DoubleEpsilon.
+        @note this method can go away once we switch to C++11 and can have one constructor call another.
         */
-        void _setOrientVelFromSph(double polarPos, double equatVel, double polarVel, double defOrient);
+        void _setFromCoordPair(Coord const &coord0, Coord const &coord1, double tai, double deltaT);
+
     };
 
 

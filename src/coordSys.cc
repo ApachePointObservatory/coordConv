@@ -1,5 +1,6 @@
 #include <sstream>
 #include <stdexcept>
+#include <vector>
 #include "boost/make_shared.hpp"
 #include "coordConv/coordSys.h"
 
@@ -30,15 +31,16 @@ namespace coordConv {
         return fromFK5J2000(icrsCoord, site);
     }
 
-    PVTCoord CoordSys::convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site, double tai) const {
-        double const tai1 = tai + DeltaT;
-        CoordSys::ConstPtr fromSys0Ptr = copyCoordSys(fromCoordSys, tai);
+    PVTCoord CoordSys::convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site) const {
+        double const tai0 = fromPVTCoord.getTAI();
+        double const tai1 = tai0 + DeltaT;
+        CoordSys::ConstPtr fromSys0Ptr = copyCoordSys(fromCoordSys, tai0);
         CoordSys::ConstPtr fromSys1Ptr = copyCoordSys(fromCoordSys, tai1);
-        CoordSys::ConstPtr toSys0Ptr = copyCoordSys(*this, tai);
+        CoordSys::ConstPtr toSys0Ptr = copyCoordSys(*this, tai0);
         CoordSys::ConstPtr toSys1Ptr = copyCoordSys(*this, tai1);
-        Coord coord0 = toSys0Ptr->convertFrom(*fromSys0Ptr, fromPVTCoord.getCoord(tai),  site);
-        Coord coord1 = toSys1Ptr->convertFrom(*fromSys1Ptr, fromPVTCoord.getCoord(tai1), site);
-        return PVTCoord(coord0, coord1, tai, DeltaT);
+        Coord toCoord0 = toSys0Ptr->convertFrom(*fromSys0Ptr, fromPVTCoord.getCoord(tai0), site);
+        Coord toCoord1 = toSys1Ptr->convertFrom(*fromSys1Ptr, fromPVTCoord.getCoord(tai1), site);
+        return PVTCoord(toCoord0, toCoord1, tai0, DeltaT);
     }
 
     Coord CoordSys::convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const {
@@ -52,22 +54,28 @@ namespace coordConv {
         return toCoord;
     }
 
-    PVTCoord CoordSys::convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site, double tai) const {
-        double const tai1 = tai + DeltaT;
+    PVTCoord CoordSys::convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site) const {
+        double const tai0 = fromPVTCoord.getTAI();
+        double const tai1 = tai0 + DeltaT;
         double toDirPair[2], dumScaleCh;
-        CoordSys::ConstPtr fromSys0Ptr = copyCoordSys(fromCoordSys, tai);
+        CoordSys::ConstPtr fromSys0Ptr = copyCoordSys(fromCoordSys, tai0);
         CoordSys::ConstPtr fromSys1Ptr = copyCoordSys(fromCoordSys, tai1);
-        CoordSys::ConstPtr toSys0Ptr = copyCoordSys(*this, tai);
+        CoordSys::ConstPtr toSys0Ptr = copyCoordSys(*this, tai0);
         CoordSys::ConstPtr toSys1Ptr = copyCoordSys(*this, tai1);
-        Coord coord0 = toSys0Ptr->convertFrom(toDirPair[0], scaleChange, *fromSys0Ptr, fromPVTCoord.getCoord(tai),  fromDir.getPos(tai),  site);
+        Coord coord0 = toSys0Ptr->convertFrom(toDirPair[0], scaleChange, *fromSys0Ptr, fromPVTCoord.getCoord(tai0), fromDir.getPos(tai0), site);
         Coord coord1 = toSys1Ptr->convertFrom(toDirPair[1], dumScaleCh,  *fromSys1Ptr, fromPVTCoord.getCoord(tai1), fromDir.getPos(tai1), site);
-        toDir.setFromPair(toDirPair, tai, DeltaT, true);
-        return PVTCoord(coord0, coord1, tai, DeltaT);
+        toDir.setFromPair(toDirPair, tai0, DeltaT, true);
+        return PVTCoord(coord0, coord1, tai0, DeltaT);
     }
 
-    PVTCoord CoordSys::removePM(PVTCoord const &pvtCoord, double tai) {
-        Coord zpmCoord = removePM(pvtCoord.getCoord(), tai);
-        return PVTCoord(zpmCoord, pvtCoord.getOrient(), pvtCoord.getVel(), pvtCoord.getTAI());
+    PVTCoord CoordSys::removePM(PVTCoord const &pvtCoord) {
+        std::vector<Coord> coordArr;
+        double const tai = pvtCoord.getTAI();
+        for (int i = 0; i < 2; ++i) {
+            double tempTAI = tai + (i * DeltaT);
+            coordArr.push_back(removePM(pvtCoord.getCoord(tempTAI), tempTAI));
+        }
+        return PVTCoord(coordArr[0], coordArr[1], tai, DeltaT);
     }
 
     CoordSys::Ptr makeCoordSys(std::string const &name, double date) {

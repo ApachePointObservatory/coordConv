@@ -110,14 +110,16 @@ namespace coordConv {
         
         /**
         Convert a PVTCoord from another coordinate system to this system
+
+        The conversion is performed at the TAI date of fromPVTCoord; that date is also used
+        for this coordSys and fromCoordSys, if either is apparent topocentric or observed.
         
         @param[in] fromCoordSys  initial coordinate system and date
         @param[in] fromPVTCoord  initial PVTCoord
         @param[in] site  site information
-        @param[in] tai at which to evaluate this coordSys and fromCoordSys if either is apparent, and PVTs (MJD, sec)
-        @return PVTCoord in this coordinate system at this date
+        @return position in this coordinate system at this date
         */
-        virtual PVTCoord convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site, double tai) const;
+        virtual PVTCoord convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site) const;
         
         /**
         Convert a coordinate from another coordinate system to this system, including orientation
@@ -137,6 +139,9 @@ namespace coordConv {
         
         /**
         Convert a PVTCoord from another coordinate system to this system, including orientation
+
+        The conversion is performed at the TAI date of fromPVTCoord; that date is also used
+        for this coordSys and fromCoordSys, if either is apparent topocentric or observed.
         
         @param[out] toDir  orientation in this coordinate system (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
         @param[out] scaleChange  change in scale: output delta sky/input delta sky, measured along the specified direction
@@ -144,10 +149,9 @@ namespace coordConv {
         @param[in] fromPVTCoord  initial position
         @param[in] fromDir  initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
         @param[in] site  site information
-        @param[in] tai at which to evaluate this coordSys and fromCoordSys if either is apparent, and PVTs (MJD, sec)
         @return position in this coordinate system
         */
-        virtual PVTCoord convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site, double tai) const;
+        virtual PVTCoord convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site) const;
 
         /**
         Remove the effects of proper motion and radial velocity to the specified TAI date
@@ -161,16 +165,15 @@ namespace coordConv {
         virtual Coord removePM(Coord const &coord, double tai) const = 0;
 
         /**
-        Remove the effects of proper motion and radial velocity to the specified TAI date
+        Remove the effects of proper motion and radial velocity to the date of the pvtCoord
         
         @warning This is a no-op for apparent coordinate systems.
         
         @param[in] pvtCoord  PVT coordinate from which to remove proper motion and radial velocity
-        @param[in] tai  TAI date to which to remove proper motion and radial velocity (MJD, seconds)
         @return PVTCoord with proper motion and radial velocity removed;
             the date of the returned PVTCoord matches the input PVTCoord, not the tai argument.
         */
-        virtual PVTCoord removePM(PVTCoord const &pvtCoord, double tai);
+        virtual PVTCoord removePM(PVTCoord const &pvtCoord);
         
         /**
         Convert TAI (MJD, seconds) to a suitable date for this coordinate system

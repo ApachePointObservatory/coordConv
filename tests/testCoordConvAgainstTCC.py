@@ -88,7 +88,7 @@ class TestCoordConv(unittest.TestCase):
                 nTested += 1
 
                 fromCoord = coordConv.Coord(fromPos1, fromPos2, fromParallax, fromPM1, fromPM2, fromRadVel)
-                fromPVTCoord = coordConv.PVTCoord(fromCoord, 0, 0, tai)
+                fromPVTCoord = coordConv.PVTCoord(fromCoord, fromCoord, tai, 0.01)
                 fromPVTDir = coordConv.PVT(fromDir, 0, tai)
 
                 fromCoordSys = getCoordSys(fromSysCode, fromDate, tai)
@@ -99,7 +99,7 @@ class TestCoordConv(unittest.TestCase):
                 try:
                     toCoord, toDir, scaleChange = toCoordSys.convertFrom(fromCoordSys, fromCoord, fromDir, site)
                     toPVTDir = coordConv.PVT()
-                    toPVTCoord, scaleChange2 = toCoordSys.convertFrom(toPVTDir, fromCoordSys, fromPVTCoord, fromPVTDir, site, tai)
+                    toPVTCoord, scaleChange2 = toCoordSys.convertFrom(toPVTDir, fromCoordSys, fromPVTCoord, fromPVTDir, site)
                 except Exception:
                     print "Failed on line %s: %s\n" % (lineInd + 1, line)
                     raise
