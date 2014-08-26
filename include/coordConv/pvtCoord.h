@@ -36,15 +36,15 @@ namespace coordConv {
         explicit PVTCoord(Coord const &coord0, Coord const &coord1, double tai, double deltaT);
 
         /**
-        Construct a PVTCoord from spherical PVTs and parallax at TAI date equatPVT.t
+        Construct a PVTCoord from spherical PVTs and distance at TAI date equatPVT.t
 
         @param[in] equatPVT  equatorial angle (e.g. RA, Long, Az) (degrees)
         @param[in] polarPVT  polar angle (e.g. Dec, Latitude, Alt) (degrees)
-        @param[in] parallax  parallax (arcsec)
+        @param[in] distPVT  distance (AU); if invalid (!distPVT.isfinite()) then infinity is assumed
 
         @throw std::runtime_error if equatPVT.t != polarPVT.t
         */
-        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double parallax=0);
+        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, PVT const &distPVT=PVT());
 
         /**
         Construct a PVTCoord from spherical PVTs, parallax, proper motion and radial velocity
@@ -52,7 +52,7 @@ namespace coordConv {
         
         @param[in] equatPVT  equatorial angle (e.g. RA, Long, Az) (degrees)
         @param[in] polarPVT  polar angle (e.g. Dec, Latitude, Alt) (degrees)
-        @param[in] parallax  parallax (arcsec)
+        @param[in] distPVT  distance (AU)
         @param[in] equatPM  equatorial proper motion (arcsec/century);
             this is dEquatAng/dt, so it gets large near the pole
         @param[in] polarPM  polar proper motion (arcsec/century)
@@ -60,7 +60,7 @@ namespace coordConv {
 
         @throw std::runtime_error if equatPVT.t != polarPVT.t
         */
-        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double parallax, double equatPM, double polarPM, double radVel);
+        explicit PVTCoord(PVT const &equatPVT, PVT const &polarPVT, PVT const &distPVT, double equatPM, double polarPM, double radVel);
         
         /**
         Construct a PVTCoord with all NaN data
@@ -107,7 +107,7 @@ namespace coordConv {
         bool isfinite() const;
        
         /**
-        Retrieve spherical position
+        Get spherical position
         
         The returned velocities are the dEquat/dt and dPolar/dt at the pvtCoord's TAI date
         
@@ -116,6 +116,14 @@ namespace coordConv {
         @return atPole: true if so near the pole that equatorial angle could not be computed.
         */
         bool getSphPVT(PVT &equatPVT, PVT &polarPVT) const;
+
+        /**
+        Get distance in AU
+        
+        @return distance, in AU; if getCoord().atInfinity() then the value is not inf,
+        but will often be approximately AUPerParsec/MinParallax.
+        */
+        PVT getDistance() const;
 
         /**
         Compute the angular separation from another PVTCoord

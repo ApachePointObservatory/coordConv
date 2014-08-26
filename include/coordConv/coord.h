@@ -8,7 +8,11 @@
 namespace coordConv {
     
     const double MinParallax = 1e-7; // minimum parallax (arcsec)
-    
+
+    double distanceFromParallax(double parallax);
+
+    double parallaxFromDistance(double dist);
+
     /**
     Coordinates represent target position and proper motion.
     
@@ -87,7 +91,7 @@ namespace coordConv {
         @return distance, in AU; if atInfinity() then the value is not inf, but will often be approximately
         AUPerParsec/MinParallax.
         */
-        double getDist() const { return _dist; }
+        double getDistance() const { return _dist; }
         
         /**
         Get parallax in arcsec

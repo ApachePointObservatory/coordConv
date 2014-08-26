@@ -32,7 +32,7 @@ class TestCoord(unittest.TestCase):
 
                                 # check vector position
                                 vecPos = coord.getVecPos()
-                                dist = coord.getDist()
+                                dist = coord.getDistance()
                                 self.assertAlmostEqual(numpy.linalg.norm(vecPos), dist, 2)
                                 predVecPos = (
                                     dist * cosd(polarAng) * cosd(equatAng),
@@ -111,7 +111,7 @@ class TestCoord(unittest.TestCase):
             for polarAng in (0, -89.999, 89.999, 89.9999999, -89.9999999):
                 coord = Coord(equatAng, polarAng)
                 vec = coord.getVecPos()
-                fracXYMag = math.hypot(vec[0], vec[1]) / coord.getDist()
+                fracXYMag = math.hypot(vec[0], vec[1]) / coord.getDistance()
                 predAtPole = fracXYMag**2 < DoubleEpsilon
                 self.assertEqual(predAtPole, coord.atPole())
     
@@ -126,7 +126,7 @@ class TestCoord(unittest.TestCase):
                 Coord(43, 23, parallax),
                 Coord(-32, 89.99, parallax, 3, 5, 2),
             ):
-                self.assertAlmostEqual(coord.getDist(), predDist, 2)
+                self.assertAlmostEqual(coord.getDistance(), predDist, 2)
                 self.assertEqual(predAtInf, coord.atInfinity())
 
     def testOffsetSmall(self):

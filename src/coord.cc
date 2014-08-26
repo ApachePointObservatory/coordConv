@@ -9,6 +9,14 @@
 
 namespace coordConv {
 
+    double distanceFromParallax(double parallax) {
+        return AUPerParsec / std::max(parallax, MinParallax);
+    }
+
+    double parallaxFromDistance(double dist) {
+        return std::max(AUPerParsec / dist, MinParallax);
+    }
+
     Coord::Coord(double equatAng, double polarAng, double parallax) {
         _setPosFromSph(equatAng, polarAng, parallax);
         _setCache();
@@ -229,7 +237,7 @@ namespace coordConv {
             throw std::runtime_error(os.str());
         }
         
-        double dist = AUPerParsec / std::max(parallax, MinParallax);
+        double const dist = distanceFromParallax(parallax);
 
         _pos <<
             dist * cosd(polarAng) * cosd(equatAng),

@@ -22,32 +22,50 @@ namespace coordConv {
         _setFromCoordPair(coord0, coord1, tai, deltaT);
     }
 
-    PVTCoord::PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double parallax) {
+    PVTCoord::PVTCoord(PVT const &equatPVT, PVT const &polarPVT, PVT const &distPVT) {
         if (equatPVT.t != polarPVT.t) {
             std::ostringstream os;
             os << "equatPVT.t = " << equatPVT.t << " != " << polarPVT.t << " = polarPVT.t";
             throw std::runtime_error(os.str());
         }
+        if (distPVT.isfinite() and (distPVT.t != equatPVT.t)) {
+            std::ostringstream os;
+            os << "distPVT is finite and distPVT.t = " << distPVT.t << " != " << equatPVT.t << " = equatPVT.t";
+            throw std::runtime_error(os.str());
+        }
         double const tai = equatPVT.t;
         std::vector<Coord> coordArr;
         for (int i = 0; i < 2; ++i) {
-            double tempTAI = tai + (i * DeltaT);
-            coordArr.push_back(Coord(equatPVT.getPos(tempTAI), polarPVT.getPos(tempTAI), parallax));
+            double evalTAI = tai + (i * DeltaT);
+            double parallax = 0;
+            if (distPVT.isfinite()) {
+                parallax = parallaxFromDistance(distPVT.getPos(evalTAI));
+            }
+            coordArr.push_back(Coord(equatPVT.getPos(evalTAI), polarPVT.getPos(evalTAI), parallax));
         }
         _setFromCoordPair(coordArr[0], coordArr[1], tai, DeltaT);
     }
 
-    PVTCoord::PVTCoord(PVT const &equatPVT, PVT const &polarPVT, double parallax, double equatPM, double polarPM, double radVel) {
+    PVTCoord::PVTCoord(PVT const &equatPVT, PVT const &polarPVT, PVT const &distPVT, double equatPM, double polarPM, double radVel) {
         if (equatPVT.t != polarPVT.t) {
             std::ostringstream os;
             os << "equatPVT.t = " << equatPVT.t << " != " << polarPVT.t << " = polarPVT.t";
             throw std::runtime_error(os.str());
         }
+        if (distPVT.isfinite() and (distPVT.t != equatPVT.t)) {
+            std::ostringstream os;
+            os << "distPVT is finite and distPVT.t = " << distPVT.t << " != " << equatPVT.t << " = equatPVT.t";
+            throw std::runtime_error(os.str());
+        }
         std::vector<Coord> coordArr;
         double const tai = equatPVT.t;
         for (int i = 0; i < 2; ++i) {
-            double tempTAI = tai + (i * DeltaT);
-            coordArr.push_back(Coord(equatPVT.getPos(tempTAI), polarPVT.getPos(tempTAI), parallax, equatPM, polarPM, radVel));
+            double evalTAI = tai + (i * DeltaT);
+            double parallax = 0;
+            if (distPVT.isfinite()) {
+                parallax = parallaxFromDistance(distPVT.getPos(evalTAI));
+            }
+            coordArr.push_back(Coord(equatPVT.getPos(evalTAI), polarPVT.getPos(evalTAI), parallax, equatPM, polarPM, radVel));
         }
         _setFromCoordPair(coordArr[0], coordArr[1], tai, DeltaT);
     }
@@ -82,7 +100,18 @@ namespace coordConv {
         polarPVT.setFromPair(polarPos, _tai, DeltaT, false);
         return atPole;
     }
-    
+
+    PVT PVTCoord::getDistance() const {
+        double dist[2];
+        for (int i = 0; i < 2; ++i) {
+            double evalTAI = _tai + (i * DeltaT);
+            dist[i] = getCoord(evalTAI).getDistance();
+        }
+        PVT distPVT;
+        distPVT.setFromPair(dist, _tai, DeltaT, false);
+        return distPVT;
+    }
+
     bool PVTCoord::isfinite() const {
         return _coord.isfinite()
             && std::isfinite(_vel(0)) && std::isfinite(_vel(1)) && std::isfinite(_vel(2))
@@ -92,9 +121,9 @@ namespace coordConv {
     PVT PVTCoord::angularSeparation(PVTCoord const &pvtCoord) const {
         double posArr[2];
         for (int i = 0; i < 2; ++i) {
-            double tempTAI = _tai + (i * DeltaT);
-            Coord thisCoord = getCoord(tempTAI);
-            Coord otherCoord = pvtCoord.getCoord(tempTAI);
+            double evalTAI = _tai + (i * DeltaT);
+            Coord thisCoord = getCoord(evalTAI);
+            Coord otherCoord = pvtCoord.getCoord(evalTAI);
             posArr[i] = thisCoord.angularSeparation(otherCoord);
         }
         PVT res = PVT();
@@ -105,9 +134,9 @@ namespace coordConv {
     PVT PVTCoord::orientationTo(PVTCoord const &pvtCoord) const {
         double posArr[2];
         for (int i = 0; i < 2; ++i) {
-            double tempTAI = _tai + (i * DeltaT);
-            Coord thisCoord = getCoord(tempTAI);
-            Coord otherCoord = pvtCoord.getCoord(tempTAI);
+            double evalTAI = _tai + (i * DeltaT);
+            Coord thisCoord = getCoord(evalTAI);
+            Coord otherCoord = pvtCoord.getCoord(evalTAI);
             posArr[i] = thisCoord.orientationTo(otherCoord);
         }
         PVT res = PVT();
@@ -134,12 +163,13 @@ namespace coordConv {
 
     PVTCoord PVTCoord::offset(PVT &toOrient, PVT const &fromOrient, PVT const &dist) const {
         std::vector<Coord> coordArr;
-        double dumToOrient;
+        double toOrientArr[2];
         for (int i = 0; i < 2; ++i) {
-            double tempTAI = _tai + (i * DeltaT);
-            Coord unoffCoord = getCoord(tempTAI);
-            coordArr.push_back(unoffCoord.offset(dumToOrient, fromOrient.getPos(tempTAI), dist.getPos(tempTAI)));
+            double evalTAI = _tai + (i * DeltaT);
+            Coord unoffCoord = getCoord(evalTAI);
+            coordArr.push_back(unoffCoord.offset(toOrientArr[i], fromOrient.getPos(evalTAI), dist.getPos(evalTAI)));
         }
+        toOrient.setFromPair(toOrientArr, _tai, DeltaT, true);
         return PVTCoord(coordArr[0], coordArr[1], _tai, DeltaT);
     }
 
