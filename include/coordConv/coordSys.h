@@ -65,6 +65,11 @@ namespace coordConv {
         Return true for a mean coordinate system, false for an apparent coordinate system
         */
         bool isMean() const { return _isMean; };
+
+        /**
+        Return true for a current coordinate system
+        */
+        bool isCurrent() const { return (_date == 0); };
         
         /**
         Get the date of this coordinate system
@@ -79,7 +84,7 @@ namespace coordConv {
         The units depend on the specific coordinate system
         */
         virtual void setDate(double date) { _date = date; };
-        
+
         /**
         Convert a coordinate to FK5 at date of observation J2000 from this coordinate system at this date
         
@@ -94,7 +99,7 @@ namespace coordConv {
         
         @param[in] coord  position in ICRS coordinates at date of observation J2000
         @param[in] site  site information
-        @return position in this coordinate system at this date
+        @return position in this coordinate system
         */
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const = 0;
         
@@ -104,25 +109,27 @@ namespace coordConv {
         @param[in] fromCoordSys  initial coordinate system and date
         @param[in] fromCoord  initial position
         @param[in] site  site information
-        @return position in this coordinate system at this date
+        @param[in] tai  TAI date (MJD, sec); used as the date of this coorSys and fromCoordSys,
+           if either is current (ignored otherwise)
+        @return position in this coordinate system
         */
-        virtual Coord convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site) const;
+        virtual Coord convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site, double taiDate=0) const;
         
         /**
         Convert a PVTCoord from another coordinate system to this system
 
         The conversion is performed at the TAI date of fromPVTCoord; that date is also used
-        for this coordSys and fromCoordSys, if either is apparent topocentric or observed.
+        for this coordSys and fromCoordSys, if either is current.
         
         @param[in] fromCoordSys  initial coordinate system and date
         @param[in] fromPVTCoord  initial PVTCoord
         @param[in] site  site information
-        @return position in this coordinate system at this date
+        @return position in this coordinate system
         */
         virtual PVTCoord convertFrom(CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, Site const &site) const;
         
         /**
-        Convert a coordinate from another coordinate system to this system, including orientation
+        Convert a PVT coordinate from another coordinate system to this system
         
         @param[out] toDir  orientation in this coordinate system (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
         @param[out] scaleChange  change in scale: output delta sky/input delta sky, measured along the specified direction
@@ -130,12 +137,14 @@ namespace coordConv {
         @param[in] fromCoord  initial position
         @param[in] fromDir  initial orientation (deg; 0 along increasing equatorial angle, 90 along increasing polar angle)
         @param[in] site  site information
+        @param[in] tai  TAI date (MJD, sec); used as the date of this coorSys and fromCoordSys,
+           if either is current (ignored otherwise)
         @return position in this coordinate system
 
         @warning the computed orientation will not round trip if converting a very nearby object
         from apparent topocentric or observed to apparent geocentric or mean coordinates.
         */
-        virtual Coord convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site) const;
+        virtual Coord convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site, double tai=0) const;
         
         /**
         Convert a PVTCoord from another coordinate system to this system, including orientation
@@ -232,7 +241,7 @@ namespace coordConv {
         
         @param[in] date  date of observation in Julian years
         */
-        explicit ICRSCoordSys(double date=2000.0);
+        explicit ICRSCoordSys(double date=0);
         virtual ~ICRSCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
@@ -340,7 +349,7 @@ namespace coordConv {
         @param[in] date  TDB date in Julian years (but TT will always do)
         @param[in] maxAge  maximum delta date (years) before setDate will update an internal cache
         */
-        explicit AppGeoCoordSys(double date=std::numeric_limits<double>::quiet_NaN(), double maxAge=1.5e-5);
+        explicit AppGeoCoordSys(double date=0, double maxAge=1.5e-5);
         virtual ~AppGeoCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
@@ -377,7 +386,7 @@ namespace coordConv {
         
         @param[in] date  date as TAI (MJD, seconds)
         */
-        explicit AppTopoCoordSys(double date=std::numeric_limits<double>::quiet_NaN());
+        explicit AppTopoCoordSys(double date=0);
         virtual ~AppTopoCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
@@ -435,7 +444,7 @@ namespace coordConv {
         
         @param[in] date  date as TAI (MJD, seconds)
         */
-        explicit ObsCoordSys(double date=std::numeric_limits<double>::quiet_NaN());
+        explicit ObsCoordSys(double date=0);
         virtual ~ObsCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;

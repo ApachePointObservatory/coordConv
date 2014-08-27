@@ -287,22 +287,23 @@ class TestCoord(unittest.TestCase):
         taiDate = 4889900000.205
         site = coordConv.Site(-105.822616, 32.780988, 2788)
         icrsCoordSys = coordConv.ICRSCoordSys()
-        appTopoCoordSys = coordConv.AppTopoCoordSys(taiDate)
+        appTopoCoordSys = coordConv.AppTopoCoordSys()
 
         # find ICRS coordinate of a sidereal point on the equator along the meridion
         appTopoCoord = coordConv.Coord(0, 90 - site.meanLat)
-        icrsCoord = icrsCoordSys.convertFrom(appTopoCoordSys, appTopoCoord, site)
+        icrsCoord = icrsCoordSys.convertFrom(appTopoCoordSys, appTopoCoord, site, taiDate)
 
         icrsPVTCoord = coordConv.PVTCoord(icrsCoord, icrsCoord, taiDate, 0.001)
 
         appTopoPVTCoord = appTopoCoordSys.convertFrom(icrsCoordSys, icrsPVTCoord, site)
+
         equatPVT = coordConv.PVT()
         polarPVT = coordConv.PVT()
         appTopoPVTCoord.getSphPVT(equatPVT, polarPVT)
         self.assertEqual(equatPVT.t, taiDate)
         self.assertEqual(polarPVT.t, taiDate)
-        self.assertAlmostEqual(polarPVT.vel, 0)
         equatSpaceVel = equatPVT.vel * coordConv.cosd(polarPVT.pos)
+        self.assertAlmostEqual(polarPVT.vel, 0, places=3)
         self.assertAlmostEqual(equatSpaceVel, -1/240.0, places=3) # 360 deg/day
 
     def testConvertFrom(self):
@@ -331,9 +332,34 @@ class TestCoord(unittest.TestCase):
             fromCoordPair = [fromPVTCoord.getCoord(t) for t in taiPair]
             toPVTCoord = toCoordSys.convertFrom(fromCoordSys, fromPVTCoord, site)
             for fromCoord, tai in itertools.izip(fromCoordPair, taiPair):
-                predToCoord = toCoordSys.convertFrom(fromCoordSys, fromCoord, site)
+                predToCoord = toCoordSys.convertFrom(fromCoordSys, fromCoord, site, tai)
                 measToCoord = toPVTCoord.getCoord(tai)
                 self.assertAlmostEqual(predToCoord.angularSeparation(measToCoord), 0)
+
+    def testLunarVel(self):
+        """Sanity-check lunar tracking velocity
+
+        This checks for an issue we had with tracking close objects: position was right,
+        but velocity was not. This was because Apparent Geocentric date was not being updated
+        inside the PVTCoord version of CoordSys.convertFrom.
+        """
+        tai = 4914602887
+        dt = 0.1
+        site = coordConv.Site(-105.822616, 32.780988, 2788)
+        geoCoordSys = coordConv.AppGeoCoordSys()
+        topoCoordSys = coordConv.AppTopoCoordSys()
+        geoCoord = coordConv.Coord(0, 75, 82505922)
+        topoPVTList = []
+        for evalTAI in (tai, tai + dt):
+            geoPVTCoord = coordConv.PVTCoord(geoCoord, geoCoord, evalTAI, 0.01)
+            topoPVTCoord = topoCoordSys.convertFrom(geoCoordSys, geoPVTCoord, site)
+            topoPVTPair = [coordConv.PVT() for i in range(2)]
+            topoPVTCoord.getSphPVT(topoPVTPair[0], topoPVTPair[1])
+            topoPVTList.append(topoPVTPair)
+        for i in range(2):
+            pvt0 = topoPVTList[0][i]
+            pvt1 = topoPVTList[1][i]
+            coordConv.assertPVTsAlmostEqual(pvt0.copy(pvt1.t), pvt1)
 
 def makePVTFromPair(posPair, tai, deltaT, isAngle):
     pos = posPair[0];

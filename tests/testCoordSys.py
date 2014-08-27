@@ -114,16 +114,21 @@ class TestCoordSys(unittest.TestCase):
         """
         for csysName in FullNameList:
             predIsMean = csysName in set(MeanNameList)
-            for date in (1000.5, 2001):
+            for date in (0, 1000.5, 2001):
                 csys = coordConv.makeCoordSys(csysName, date)
                 self.assertEqual(csys.getDate(), date)
                 self.assertEqual(csys.isMean(), predIsMean)
                 self.assertEqual(csys.getName(), csysName)
                 self.assertEqual(csys.canConvert(), csysName != "none")
+                if date == 0:
+                    self.assertTrue(csys.isCurrent())
+                else:
+                    self.assertFalse(csys.isCurrent())
                 
                 csysClone = csys.clone()
                 self.assertEqual(csys.getDate(), csysClone.getDate())
                 self.assertEqual(csys.isMean(),  csysClone.isMean())
+                self.assertEqual(csys.isCurrent(), csysClone.isCurrent())
                 self.assertEqual(csys.getName(), csysClone.getName())
 
     def testCopyConstructor(self):
@@ -139,7 +144,7 @@ class TestCoordSys(unittest.TestCase):
                 self.assertEqual(csys.getName(), csysCopy.getName())
                 
     def testNoneAndOtherCoordSys(self):
-        """Test that conversions to and from NoneCoordSys and OtherCoordSys yield a null result
+        """Test that conversions to and from NoneCoordSys and OtherCoordSys fail
         """
         for nullSys in (
             coordConv.NoneCoordSys(),
@@ -150,11 +155,8 @@ class TestCoordSys(unittest.TestCase):
             fromCoord = coordConv.Coord(10, 30)
             for csysName in FullNameList:
                 otherSys = coordConv.makeCoordSys(csysName, 2001)
-                toCoord = nullSys.convertFrom(otherSys, fromCoord, site)
-                self.assertFalse(toCoord.isfinite())
-                
-                toCoord = otherSys.convertFrom(nullSys, fromCoord, site)
-                self.assertFalse(toCoord.isfinite())
+                self.assertRaises(Exception, nullSys.convertFrom, otherSys, fromCoord, site)
+                self.assertRaises(Exception, otherSys.convertFrom, nullSys, fromCoord, site)
     
     def testInvalidCoordSys(self):
         """Test that makeCoordSys raises ValueError for invalid coordinate system name
