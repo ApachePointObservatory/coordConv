@@ -23,6 +23,25 @@ AppTopo To FK5    Coord with dir: 37644.0 conversions/second (10000 conversions 
 AppTopo To FK5 PVTCoord with dir: 19529.0 conversions/second (10000 conversions in 0.51 sec) at alt=45.0
 
 AppGeo data: 60515.5 computations/second (10000 computations in 0.17 sec)
+
+Results for coordConv 0.9.7 on my work MacBook Pro 2014-0-27
+
+FK5 to AppTopo    Coord with dir:  65218.9 conversions/second (10000 conversions in 0.15 sec) at alt=0.0
+FK5 to AppTopo PVTCoord with dir:  12527.9 conversions/second (10000 conversions in 0.80 sec) at alt=0.0
+FK5 to AppTopo    Coord with dir:  65355.6 conversions/second (10000 conversions in 0.15 sec) at alt=5.0
+FK5 to AppTopo PVTCoord with dir:  12671.5 conversions/second (10000 conversions in 0.79 sec) at alt=5.0
+FK5 to AppTopo    Coord with dir:  65600.1 conversions/second (10000 conversions in 0.15 sec) at alt=45.0
+FK5 to AppTopo PVTCoord with dir:  12614.2 conversions/second (10000 conversions in 0.79 sec) at alt=45.0
+
+AppTopo To FK5    Coord with dir: 63912.4 conversions/second (10000 conversions in 0.16 sec) at alt=0.0
+AppTopo To FK5 PVTCoord with dir: 12551.0 conversions/second (10000 conversions in 0.80 sec) at alt=0.0
+AppTopo To FK5    Coord with dir: 64275.2 conversions/second (10000 conversions in 0.16 sec) at alt=5.0
+AppTopo To FK5 PVTCoord with dir: 12604.1 conversions/second (10000 conversions in 0.79 sec) at alt=5.0
+AppTopo To FK5    Coord with dir: 61479.1 conversions/second (10000 conversions in 0.16 sec) at alt=45.0
+AppTopo To FK5 PVTCoord with dir: 12567.7 conversions/second (10000 conversions in 0.80 sec) at alt=45.0
+
+AppGeo data: 63721.8 computations/second (10000 computations in 0.16 sec)
+
 """
 _TimeTupleJ2000 = (2000, 1, 1, 12, 0, 0, 5, 1, 0)
 
