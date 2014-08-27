@@ -48,7 +48,7 @@ CnvList = (int,) + (float,)*10 + (int,) + (float,)*9 + (cnvBool,)*3 + (float,)*2
 class TestCoordConv(unittest.TestCase):
     def testFile(self):
         """Test file of coordinate conversions from TCC (data/masscc_out.dat)
-        
+
         Known issues:
         - radVel does not match; the TCC seems to zero radVel if at infinity, but why?
           Also, the TCC seems to be able to round trip RadVel even if at infinity, but how,
@@ -95,7 +95,7 @@ class TestCoordConv(unittest.TestCase):
                 toCoordSys = getCoordSys(toSysCode, toDate, tai)
                 site.refCoA = refCoA
                 site.refCoB = refCoB
-        
+
                 try:
                     toCoord, toDir, scaleChange = toCoordSys.convertFrom(fromCoordSys, fromCoord, fromDir, site)
                     toPVTDir = coordConv.PVT()
@@ -141,7 +141,7 @@ class TestCoordConv(unittest.TestCase):
                     self.assertAlmostEqual(scaleChange, scaleChange2, places=5)
                     if (fromSysCode > 0) and (toSysCode > 0):
                         self.assertAlmostEqual(scaleChange, 1.0, places=5)
-                
+
                     if toCoordSys.getDateType() == coordConv.DateType_TAI:
                         # "to" system uses tai as its time; try various strategies that remove proper motion to the given tai date
 
@@ -170,7 +170,7 @@ class TestCoordConv(unittest.TestCase):
                         zpmToAtPole, zpmToPM1, zpmToPM2 = zpmToCoord.getPM()
                         self.assertEqual(atPole, zpmToAtPole)
                         zpmToRadVel = zpmToCoord.getRadVel()
-                        
+
                         self.assertAlmostEqual(toDir, zpmToDir, places=2) # why so poor?
                         self.assertAlmostEqual(scaleChange, zpmScaleChange, places=6)
                         self.assertLess(toCoord.angularSeparation(zpmToCoord), 1e-7)

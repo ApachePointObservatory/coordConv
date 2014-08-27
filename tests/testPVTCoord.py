@@ -50,7 +50,7 @@ class TestCoord(unittest.TestCase):
                                             self.assertAlmostEqual(equatPM, checkEquatPM)
                                             self.assertAlmostEqual(polarPM, checkPolarPM)
                                         self.assertAlmostEqual(parallax, coordToCheck.getParallax())
-    
+
     def testTwoCoordConstructor(self):
         """Test PVTCoord(coord0, coord1, tai, deltaT, defOrient)
         """
@@ -69,7 +69,7 @@ class TestCoord(unittest.TestCase):
                             self.assertTrue(numpy.allclose(pvtCoordA.getVel(), (0,0,0)))
                             self.assertEqual(pvtCoordA.getCoord(), coord0)
                             self.assertEqual(pvtCoordA.getCoord(tai), coord0)
-                            
+
                             # test cases where coord1 may not equal coord0
                             for dist in (0, 0.001, 0.01, 0.1, 1, 10, 100, 179):
                                 predVel = dist / float(deltaT)
@@ -213,7 +213,7 @@ class TestCoord(unittest.TestCase):
                     offCoordAtTAI = offPVTCoord.getCoord(tai)
                     coordAtTAI = pvtCoord.getCoord(tai)
                     predOffCoord, predToOrient = coordAtTAI.offset(offOrientAtTAI, offDistAtTAI)
-                    
+
                     self.assertAlmostEqual(toOrientAtTAI, predToOrient)
                     self.assertAlmostEqual(offCoordAtTAI.angularSeparation(predOffCoord), 0)
 
@@ -306,9 +306,20 @@ class TestCoord(unittest.TestCase):
         self.assertAlmostEqual(polarPVT.vel, 0, places=3)
         self.assertAlmostEqual(equatSpaceVel, -1/240.0, places=3) # 360 deg/day
 
+        # check round trip of scale and orientation
+        for fromDir in (0, 45):
+            for fromVel in (0, 0.01):
+                fromDirPVT = coordConv.PVT(fromDir, fromVel, taiDate)
+                toDirPVT = coordConv.PVT()
+                fromDir2PVT = coordConv.PVT()
+                at2PVTCoord, scaleChange = appTopoCoordSys.convertFrom(toDirPVT, icrsCoordSys, icrsPVTCoord, fromDirPVT, site)
+                icrs2PVTCoord, scaleChange2 = icrsCoordSys.convertFrom(fromDir2PVT, appTopoCoordSys, at2PVTCoord, toDirPVT, site)
+                self.assertAlmostEqual(scaleChange, 1.0/scaleChange2, places=7)
+                coordConv.assertPVTsAlmostEqual(fromDirPVT, fromDir2PVT, doWrap=True, velPlaces=6)
+
     def testConvertFrom(self):
         """Test a few instances of CoordSys.convertFrom on PVTCoords
-        
+
         This test assumes that CoordSys.convertFrom works on Coords (tested elsewhere)
         """
         site = coordConv.Site(-105.822616, 32.780988, 2788)
