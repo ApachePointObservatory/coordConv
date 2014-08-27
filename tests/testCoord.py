@@ -4,8 +4,8 @@ from __future__ import absolute_import, division
 import unittest
 import math
 import numpy
-from coordConv import Coord, sind, cosd, wrapPos, wrapNear, angSideAng, \
-    DoubleEpsilon, MinParallax, AUPerParsec, RadPerDeg, ArcsecPerDeg, SecPerDay, DaysPerYear, KmPerAU
+from coordConv import Coord, sind, cosd, wrapPos, wrapNear, angSideAng, distanceFromParallax, \
+    DoubleEpsilon, MinParallax, RadPerDeg, ArcsecPerDeg, SecPerDay, DaysPerYear, KmPerAU
 
 class TestCoord(unittest.TestCase):
     def testBasics(self):
@@ -120,7 +120,7 @@ class TestCoord(unittest.TestCase):
         """
         for parallax in (0, MinParallax / 0.899999999, MinParallax / 0.900000001, MinParallax, 1, 3.4, 75.3):
             adjParallax = max(parallax, MinParallax)
-            predDist = AUPerParsec / adjParallax
+            predDist = distanceFromParallax(adjParallax)
             predAtInf = parallax < MinParallax / 0.9
             for coord in ( # test one with space motion, one without
                 Coord(43, 23, parallax),
