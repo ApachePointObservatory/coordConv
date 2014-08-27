@@ -7,8 +7,12 @@
 #include "coordConv/site.h"
 #include "coordConv/coord.h"
 #include "coordConv/pvtCoord.h"
+#include "coordConv/physConst.h"
 
 namespace coordConv {
+
+    const double DeltaTForPos = 0.01; ///< delta time to use when computing velocity
+        ///< by computing position at two nearby times (sec)
 
     enum DateTypeEnum {
         DateType_Julian,    ///< Julian years
@@ -69,22 +73,33 @@ namespace coordConv {
         /**
         Return true for a current coordinate system
         */
-        bool isCurrent() const { return (_date == 0); };
+        bool isCurrent() const { return _isCurrent; };
         
         /**
         Get the date of this coordinate system
         
         The units depend on the specific coordinate system
         */
-        double getDate() const { return _date; };
+        double getDate() const { return _isCurrent ? 0 : _date; };
         
         /**
         Set the date of this coordinate system
         
         The units depend on the specific coordinate system
         */
-        virtual void setDate(double date) { _date = date; };
+        void setDate(double date) {
+            _setDate(date); // do this before updating _isCurrent, in case it is rejected
+            _isCurrent = bool(date == 0);
+        };
 
+        /**
+        Set the current TAI date of this coordinate system; only valid if isCurrent()
+
+        @param[in] tai  TAI date (MJD, sec)
+        @throw std::runtime_error if isCurrent() false
+        */
+        void setCurrTAI(double tai) const;
+        
         /**
         Convert a coordinate to FK5 at date of observation J2000 from this coordinate system at this date
         
@@ -210,10 +225,18 @@ namespace coordConv {
         virtual std::string __repr__() const = 0;
     
     protected:
+        /**
+        Set the date of this coordinate system
+        
+        The units depend on the specific coordinate system
+        */
+        virtual void _setDate(double date) const { _date = date; };
+
         std::string _name;  /// name of coordinate system
-        double _date;       /// date of coordinate system (units depend on coordinate system)
+        mutable double _date;       /// date of coordinate system (units depend on coordinate system)
         DateTypeEnum _dateType; /// date type
         bool _isMean;       /// true for mean coordinate systems
+        bool _isCurrent;    /// true if coordinate system is current
         bool _canConvert;   /// true if the coordinate system can convert coordinates
     };
     
@@ -243,7 +266,7 @@ namespace coordConv {
         
         @param[in] date  date of observation in Julian years
         */
-        explicit ICRSCoordSys(double date=0);
+        explicit ICRSCoordSys(double date=2000.0);
         virtual ~ICRSCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
@@ -269,13 +292,15 @@ namespace coordConv {
         virtual ~FK5CoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
-        virtual void setDate(double date);
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual std::string __repr__() const;
 
+    protected:
+        virtual void _setDate(double date) const;
+
     private:
-        Eigen::Matrix3d _to2000PrecMat; /// precession matrix from date to J2000.0
+        mutable Eigen::Matrix3d _to2000PrecMat; /// precession matrix from date to J2000.0
     };
     
     /**
@@ -300,15 +325,15 @@ namespace coordConv {
         virtual ~FK4CoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
-        virtual void setDate(double date);
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual double dateFromTAI(double tai) const;
         virtual std::string __repr__() const;
 
     private:
-        Eigen::Vector3d _eTerms;
-        Eigen::Matrix3d _From1950PrecMat, _To1950PrecMat;
+        virtual void _setDate(double date) const;
+        mutable Eigen::Vector3d _eTerms;
+        mutable Eigen::Matrix3d _From1950PrecMat, _To1950PrecMat;
     };
 
     /**
@@ -355,33 +380,45 @@ namespace coordConv {
         Construct an AppGeoCoordSys
         
         @param[in] date  TDB date in Julian years (but TT will always do)
-        @param[in] maxAge  maximum delta date (years) before setDate will update an internal cache
+        @param[in] maxAge  maximum cache age (years) before setDate or setCurrTAI will update an internal cache
+        @param[in] maxDDate  minimum delta date (date - current date) (years) before setDate or setCurrTAI
+            will update an internal cache.
+            The intent is to never update the cache while computing velocity by computing position at two nearby times,
+            since updating the cache may introduce a small jump in position, which may result in unacceptable velocity error.
+            Thus this must be larger than your delta-T for computing velocity, but larger than the interval
+            between position updates.
         */
-        explicit AppGeoCoordSys(double date=0, double maxAge=1.5e-5);
+        explicit AppGeoCoordSys(double date=0, double maxAge=300.0/(SecPerDay*DaysPerYear), double maxDDate=2*DeltaTForPos/(SecPerDay*DaysPerYear));
         virtual ~AppGeoCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
-        virtual void setDate(double date);
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual double dateFromTAI(double tai) const;
         virtual std::string __repr__() const;
         
-        /// return maximum delta date (years) before setDate will update the internal cache
-        virtual double getMaxAge() const { return _maxAge; };
-        /// return date of cache (TDB, Julian years); 0 if never computed
-        virtual double getCacheDate() const { return _cachedDate; };
+        /// return maximum cache age (years)
+        double getMaxAge() const { return _maxAge; };
+        /// return maximum delta date (years)
+        double getMaxDDate() const { return _maxAge; };
+        /// return date of cache (TDB, Julian years); nan
+        double getCacheDate() const { return _cachedDate; };
+        /// return true if cache is valid
+        bool cacheOK() const { return std::isfinite(_cachedDate); };
 
     private:
-        double _maxAge;             ///< maximum date differential to reuse cache (years)
-	    double _cachedDate;         ///< date at which data computed (TDB, Julian years); 0 if never computed
-	    double _pmSpan;             ///< time over which to correct for proper motion (Julian years)
-	    Eigen::Vector3d _bcPos;     ///< barycentric position of Earth (au)
-	    Eigen::Vector3d _hcDir;     ///< heliocentric position of Earth (unit vector)
-	    double _gravRad;            ///< gravitational radius of sun * 2 / sun-earth distance
-	    Eigen::Vector3d _bcBeta;    ///< barycentric velocity of the Earth (c)
-	    double _gammaI;             ///< sqrt(1 - bcBeta^2)
-	    Eigen::Matrix3d _pnMat;     ///< precession/nutation matrix
+        virtual void _setDate(double date) const;
+        double _maxAge;     ///< maximum cache age (date - cached date) to reuse cache (years)
+        double _maxDDate;   ///< maximum date differential (date - current date) to reuse cache (years)
+                            ///< 
+	    mutable double _cachedDate;         ///< date at which data computed (TDB, Julian years); 0 if never computed
+	    mutable double _pmSpan;             ///< time over which to correct for proper motion (Julian years)
+	    mutable Eigen::Vector3d _bcPos;     ///< barycentric position of Earth (au)
+	    mutable Eigen::Vector3d _hcDir;     ///< heliocentric position of Earth (unit vector)
+	    mutable double _gravRad;            ///< gravitational radius of sun * 2 / sun-earth distance
+	    mutable Eigen::Vector3d _bcBeta;    ///< barycentric velocity of the Earth (c)
+	    mutable double _gammaI;             ///< sqrt(1 - bcBeta^2)
+	    mutable Eigen::Matrix3d _pnMat;     ///< precession/nutation matrix
     };
 
     /**
@@ -398,27 +435,9 @@ namespace coordConv {
         virtual ~AppTopoCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
-        virtual void setDate(double date) { setDate(date, false); };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual std::string __repr__() const;
-
-        /**
-        Set the date and optionally freeze cached apparent geocentric data
-        
-        @param[in] date  date as TAI (MJD, seconds)
-        @param[in] freezeCache  if true, do not update cached apparent geocentric data
-        
-        The reason for freezeCache is to support computing velocity by computing position at two nearby times.
-        Set freezeCache true for the second computation to avoid an unexpected cache update causing
-        a mis-computation of velocity.
-        
-        @note The standard setDate, with no freezeCache, argument does not freeze the cache.
-        
-        @throw std::runtime_error if freezeCache true and delta date > AppGeoCoordSys's default MaxAge * 2;
-        this is only intended to catch gross errors
-        */
-        virtual void setDate(double date, bool freezeCache);
 
         /**
         Convert from apparent geocentric coordinates at this date
@@ -438,6 +457,9 @@ namespace coordConv {
         */
         virtual Coord toAppGeo(Coord const &coord, Site const &site) const;
 
+    protected:
+        virtual void _setDate(double date) const;
+
     private:
         AppGeoCoordSys _appGeoCoordSys;
     };
@@ -456,29 +478,14 @@ namespace coordConv {
         virtual ~ObsCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
-        virtual void setDate(double date) { setDate(date, false); };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord fromAppTopo(Coord const &coord, Site const &site) const;
         virtual Coord toAppTopo(Coord const &coord, Site const &site) const;
         virtual std::string __repr__() const;
 
-        /**
-        Set the date and optionally freeze cached apparent geocentric data
-        
-        @param[in] date  date as TAI (MJD, seconds)
-        @param[in] freezeCache  if true, do not update cached apparent geocentric data
-        
-        The reason for freezeCache is to support computing velocity by computing position at two nearby times.
-        Set freezeCache true for the second computation to avoid an unexpected cache update causing
-        a mis-computation of velocity.
-        
-        @note The standard setDate, with no freezeCache, argument does not freeze the cache.
-        
-        @throw std::runtime_error if freezeCache true and delta date > AppGeoCoordSys's default MaxAge * 2;
-        this is only intended to catch gross errors
-        */
-        virtual void setDate(double date, bool freezeCache);
+    protected:
+        virtual void _setDate(double date) const;
 
     private:
         AppTopoCoordSys _appTopoCoordSys;

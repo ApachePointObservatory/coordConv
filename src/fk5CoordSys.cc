@@ -17,7 +17,7 @@ namespace coordConv {
         setDate(date);
     };
     
-    void FK5CoordSys::setDate(double date) {
+    void FK5CoordSys::_setDate(double date) const {
         if (date == 0) {
             throw std::runtime_error("date must not be 0 for FK5CoordSys");
         }

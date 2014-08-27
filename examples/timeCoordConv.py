@@ -5,6 +5,24 @@ import coordConv
 Measure the time required to perform coordinate conversions relevant to telescope tracking
 
 Also measure the time required to recompute cached apparent geocentric data.
+
+Results for coordConv 0.9.9 on my work MacBook Pro 2014-0-27
+
+FK5 to AppTopo    Coord with dir:  35941.0 conversions/second (10000 conversions in 0.28 sec) at alt=0.0
+FK5 to AppTopo PVTCoord with dir:  20191.1 conversions/second (10000 conversions in 0.50 sec) at alt=0.0
+FK5 to AppTopo    Coord with dir:  37964.8 conversions/second (10000 conversions in 0.26 sec) at alt=5.0
+FK5 to AppTopo PVTCoord with dir:  20222.7 conversions/second (10000 conversions in 0.49 sec) at alt=5.0
+FK5 to AppTopo    Coord with dir:  37711.9 conversions/second (10000 conversions in 0.27 sec) at alt=45.0
+FK5 to AppTopo PVTCoord with dir:  19928.8 conversions/second (10000 conversions in 0.50 sec) at alt=45.0
+
+AppTopo To FK5    Coord with dir: 38032.2 conversions/second (10000 conversions in 0.26 sec) at alt=0.0
+AppTopo To FK5 PVTCoord with dir: 20321.2 conversions/second (10000 conversions in 0.49 sec) at alt=0.0
+AppTopo To FK5    Coord with dir: 36495.7 conversions/second (10000 conversions in 0.27 sec) at alt=5.0
+AppTopo To FK5 PVTCoord with dir: 20194.1 conversions/second (10000 conversions in 0.50 sec) at alt=5.0
+AppTopo To FK5    Coord with dir: 37644.0 conversions/second (10000 conversions in 0.27 sec) at alt=45.0
+AppTopo To FK5 PVTCoord with dir: 19529.0 conversions/second (10000 conversions in 0.51 sec) at alt=45.0
+
+AppGeo data: 60515.5 computations/second (10000 computations in 0.17 sec)
 """
 _TimeTupleJ2000 = (2000, 1, 1, 12, 0, 0, 5, 1, 0)
 

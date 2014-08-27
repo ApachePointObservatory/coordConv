@@ -9,10 +9,11 @@
 
 namespace coordConv {
 
-    AppGeoCoordSys::AppGeoCoordSys(double date, double maxAge)
+    AppGeoCoordSys::AppGeoCoordSys(double date, double maxAge, double maxDDate)
     :
         ApparentCoordSys("appgeo", date, DateType_Julian),
         _maxAge(maxAge),
+        _maxDDate(maxDDate),
         _cachedDate(DoubleNaN)
     {
         setDate(date);
@@ -26,7 +27,7 @@ namespace coordConv {
         return CoordSys::Ptr(new AppGeoCoordSys(date, _maxAge));
     };
     
-    void AppGeoCoordSys::setDate(double date) {
+    void AppGeoCoordSys::_setDate(double date) const {
         // sanity-check the date, since very large values can cause NaNs
         // and since a common mistake is to call with TAI, MJD seconds
         if (date > 9999) {
@@ -34,9 +35,8 @@ namespace coordConv {
             os << "date = " << date << " too large; should be TDB years";
             throw std::runtime_error(os.str());
         }
-        this->_date = date;
-        if (std::isfinite(date)) {
-            if (std::abs(date - _cachedDate) < _maxAge) {
+        if (std::isfinite(date) && (date != 0)) {
+            if (cacheOK() && ((std::abs(date - _cachedDate) < _maxAge) || (std::abs(date - this->_date) < _maxDDate))) {
                 return;
             }
             double tdbDays = slaEpj2d(date);
@@ -56,10 +56,13 @@ namespace coordConv {
             }
             _cachedDate = date;
         }
+        this->_date = date;
     }
 
     Coord AppGeoCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
-        
+        if (!cacheOK()) {
+            throw std::runtime_error("cache not valid");
+        }
         Eigen::Vector3d fk5J2000Pos = coord.getVecPos();
         Eigen::Vector3d fk5J2000PM = coord.getVecPM();
 
@@ -98,9 +101,12 @@ namespace coordConv {
       *these use physical units instead of direction cosines
     */    
     Coord AppGeoCoordSys::toFK5J2000(Coord const &coord, Site const &site) const {
+        if (!cacheOK()) {
+            throw std::runtime_error("cache not valid");
+        }
         Eigen::Vector3d appGeoPos = coord.getVecPos();
 
-        /// if the number of iterations exceeds "MaxIter" before converging, raise an exception
+        /// if the number of iterations exceeds "MaxIter" before converging, throw an exception
         const int MaxIter = 20;
         /// if all three components of (P this iter - P last iter) / |P|
         /// are less than "Accuracy", then the iteration has converged.

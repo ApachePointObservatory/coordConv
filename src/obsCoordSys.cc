@@ -13,9 +13,11 @@ namespace coordConv {
         setDate(date);
     };
     
-    void ObsCoordSys::setDate(double date, bool freezeCache) {
+    void ObsCoordSys::_setDate(double date) const {
+        if (date > 0) {
+            _appTopoCoordSys.setCurrTAI(date);
+        }
         this->_date = date;
-        _appTopoCoordSys.setDate(date, freezeCache);
     }
     
     CoordSys::Ptr ObsCoordSys::clone() const {

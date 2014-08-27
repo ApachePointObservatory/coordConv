@@ -89,7 +89,7 @@ namespace coordConv {
         return CoordSys::Ptr(new FK4CoordSys(date));
     };
     
-    void FK4CoordSys::setDate(double date) {
+    void FK4CoordSys::_setDate(double date) const {
         if (date == 0) {
             throw std::runtime_error("date must not be 0 for FK5CoordSys");
         }

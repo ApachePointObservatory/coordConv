@@ -15,14 +15,11 @@ namespace coordConv {
         setDate(date);
     };
     
-    void AppTopoCoordSys::setDate(double date, bool freezeCache) {
-        this->_date = date;
-        double ttEpoch = _appGeoCoordSys.dateFromTAI(date);
-        if (!freezeCache) {
-            _appGeoCoordSys.setDate(ttEpoch);
-        } else if (std::abs(_appGeoCoordSys.getDate() - ttEpoch) > (_appGeoCoordSys.getMaxAge() * 2)) {
-            throw std::runtime_error("Cached AppGeo data too old");
+    void AppTopoCoordSys::_setDate(double date) const {
+        if (date > 0) {
+            _appGeoCoordSys.setCurrTAI(date);
         }
+        this->_date = date;
     }
     
     CoordSys::Ptr AppTopoCoordSys::clone() const {
