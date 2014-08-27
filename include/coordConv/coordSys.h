@@ -262,8 +262,8 @@ namespace coordConv {
         /**
         Construct an FK5CoordSys
         
-        @param[in] date  date of equinox and date of observation in Julian years; 0 results in 2000
-            (since this coordinate system cannot be current)
+        @param[in] date  date of equinox and date of observation in Julian years
+        @throw std::runtime_error if date=0 (since FK5CoordSys cannot be current)
         */
         explicit FK5CoordSys(double date=2000.0);
         virtual ~FK5CoordSys() {};
@@ -293,8 +293,8 @@ namespace coordConv {
         /**
         Construct an FK4CoordSys
         
-        @param[in] date  date of equinox and date of observation in Besselian years; 0 results in 1950
-            (since this coordinate system cannot be current)
+        @param[in] date  date of equinox and date of observation in Besselian years
+        @throw std::runtime_error if date=0 (since FK5CoordSys cannot be current)
         */
         explicit FK4CoordSys(double date=1950.0);
         virtual ~FK4CoordSys() {};

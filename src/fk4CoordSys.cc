@@ -73,12 +73,12 @@ namespace coordConv {
 
     FK4CoordSys::FK4CoordSys(double date)
     :
-        MeanCoordSys("fk4", date==0 ? 1950 : date, DateType_Besselian),
+        MeanCoordSys("fk4", date, DateType_Besselian),
         _eTerms(),
         _From1950PrecMat(),
         _To1950PrecMat()
     {
-        setDate(date==0 ? 1950 : date);
+        setDate(date);
     };
 
     CoordSys::Ptr FK4CoordSys::clone() const {
@@ -90,6 +90,9 @@ namespace coordConv {
     };
     
     void FK4CoordSys::setDate(double date) {
+        if (date == 0) {
+            throw std::runtime_error("date must not be 0 for FK5CoordSys");
+        }
         this->_date = date;
         if (std::isfinite(date)) {
             // note: slaEtrms and slaPrebn both want Besselian date

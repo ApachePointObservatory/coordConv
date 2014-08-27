@@ -11,13 +11,16 @@ namespace coordConv {
 
     FK5CoordSys::FK5CoordSys(double date)
     :
-        MeanCoordSys("fk5", date == 0 ? 2000 : date),
+        MeanCoordSys("fk5", date),
         _to2000PrecMat()
     {
-        setDate(date == 0 ? 2000 : date);
+        setDate(date);
     };
     
     void FK5CoordSys::setDate(double date) {
+        if (date == 0) {
+            throw std::runtime_error("date must not be 0 for FK5CoordSys");
+        }
         this->_date = date;
         if (std::isfinite(date)) {
             double precMatCArr[3][3];

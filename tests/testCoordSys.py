@@ -115,25 +115,24 @@ class TestCoordSys(unittest.TestCase):
         for csysName in FullNameList:
             predIsMean = csysName in set(MeanNameList)
             for date in (0, 1000.5, 2001):
-                csys = coordConv.makeCoordSys(csysName, date)
-                if date == 0:
-                    predDate = {"fk4": 1950, "fk5": 2000}.get(csysName, 0)
+                if date == 0 and csysName in ("fk4", "fk5"):
+                    self.assertRaises(Exception, coordConv.makeCoordSys, csysName, date)
                 else:
-                    predDate = date
-                self.assertEqual(csys.getDate(), predDate)
-                self.assertEqual(csys.isMean(), predIsMean)
-                self.assertEqual(csys.getName(), csysName)
-                self.assertEqual(csys.canConvert(), csysName != "none")
-                if date == 0 and csysName not in ("fk4", "fk5"):
-                    self.assertTrue(csys.isCurrent())
-                else:
-                    self.assertFalse(csys.isCurrent())
-                
-                csysClone = csys.clone()
-                self.assertEqual(csys.getDate(), csysClone.getDate())
-                self.assertEqual(csys.isMean(),  csysClone.isMean())
-                self.assertEqual(csys.isCurrent(), csysClone.isCurrent())
-                self.assertEqual(csys.getName(), csysClone.getName())
+                    csys = coordConv.makeCoordSys(csysName, date)
+                    self.assertEqual(csys.getDate(), date)
+                    self.assertEqual(csys.isMean(), predIsMean)
+                    self.assertEqual(csys.getName(), csysName)
+                    self.assertEqual(csys.canConvert(), csysName != "none")
+                    if date == 0:
+                        self.assertTrue(csys.isCurrent())
+                    else:
+                        self.assertFalse(csys.isCurrent())
+                    
+                    csysClone = csys.clone()
+                    self.assertEqual(csys.getDate(), csysClone.getDate())
+                    self.assertEqual(csys.isMean(),  csysClone.isMean())
+                    self.assertEqual(csys.isCurrent(), csysClone.isCurrent())
+                    self.assertEqual(csys.getName(), csysClone.getName())
 
     def testCopyConstructor(self):
         """Test copy constructor
