@@ -47,15 +47,14 @@ def timeFK5ToAppTopo(alt, niter):
     """
     fk5Sys = coordConv.FK5CoordSys(1980)
     currTAI = utcFromPySec(time.time())
-    appTopoSys = coordConv.AppTopoCoordSys(currTAI)
+    appTopoSys = coordConv.AppTopoCoordSys()
     initialAppTopoCoord = coordConv.Coord(120, alt)
     site = makeSite()
-    fk5Coord = fk5Sys.convertFrom(appTopoSys, initialAppTopoCoord, site)
+    fk5Coord = fk5Sys.convertFrom(appTopoSys, initialAppTopoCoord, site, currTAI)
     startTime = time.time()
     for i in range(niter):
         tai = currTAI + (i * 0.1)
-        appTopoSys.setDate(tai)
-        appTopoCoord, dir, scaleChange = appTopoSys.convertFrom(fk5Sys, fk5Coord, 5.0, site)
+        appTopoCoord, dir, scaleChange = appTopoSys.convertFrom(fk5Sys, fk5Coord, 5.0, site, tai)
     duration = time.time() - startTime
     print "FK5 to AppTopo: %0.1f conversions/second (%d conversions in %0.2f sec) at alt=%0.1f" % (niter/duration, niter, duration, alt)
     
@@ -74,14 +73,13 @@ def timeAppTopoToFK5(alt, niter):
     """
     fk5Sys = coordConv.FK5CoordSys(1980)
     currTAI = utcFromPySec(time.time())
-    appTopoSys = coordConv.AppTopoCoordSys(currTAI)
+    appTopoSys = coordConv.AppTopoCoordSys()
     appTopoCoord = coordConv.Coord(120, alt)
     site = makeSite()
     startTime = time.time()
     for i in range(niter):
         tai = currTAI + (i * 0.1)
-        appTopoSys.setDate(tai)
-        fk5Coord, dir, scaleChange = fk5Sys.convertFrom(appTopoSys, appTopoCoord, 5.0, site)
+        fk5Coord, dir, scaleChange = fk5Sys.convertFrom(appTopoSys, appTopoCoord, 5.0, site, tai)
     duration = time.time() - startTime
     print "AppTopo To FK5: %0.1f conversions/second (%d conversions in %0.2f sec) at alt=%0.1f" % (niter/duration, niter, duration, alt)
 

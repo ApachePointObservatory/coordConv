@@ -11,10 +11,10 @@ namespace coordConv {
 
     FK5CoordSys::FK5CoordSys(double date)
     :
-        MeanCoordSys("fk5", date),
+        MeanCoordSys("fk5", date == 0 ? 2000 : date),
         _to2000PrecMat()
     {
-        setDate(date);
+        setDate(date == 0 ? 2000 : date);
     };
     
     void FK5CoordSys::setDate(double date) {

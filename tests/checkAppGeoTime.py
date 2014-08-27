@@ -25,7 +25,7 @@ def runOne(fromCoordSys, coord, site, errDict):
     
 errDict = {}
 site = coordConv.Site(-105.822616, 32.780988, 2.788)
-for fromCoordSys in (coordConv.ICRSCoordSys(),):
+for fromCoordSys in (coordConv.ICRSCoordSys(2010),):
     for equatAng in (0, 45):
         for polarAng in (-85, 0, 30, 89):
             coord = coordConv.Coord(equatAng, polarAng)

@@ -73,12 +73,12 @@ namespace coordConv {
 
     FK4CoordSys::FK4CoordSys(double date)
     :
-        MeanCoordSys("fk4", date, DateType_Besselian),
+        MeanCoordSys("fk4", date==0 ? 1950 : date, DateType_Besselian),
         _eTerms(),
         _From1950PrecMat(),
         _To1950PrecMat()
     {
-        setDate(date);
+        setDate(date==0 ? 1950 : date);
     };
 
     CoordSys::Ptr FK4CoordSys::clone() const {

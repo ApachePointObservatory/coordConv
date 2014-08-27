@@ -113,7 +113,7 @@ namespace coordConv {
            if either is current (ignored otherwise)
         @return position in this coordinate system
         */
-        virtual Coord convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site, double taiDate=0) const;
+        virtual Coord convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site, double tai=0) const;
         
         /**
         Convert a PVTCoord from another coordinate system to this system
@@ -144,7 +144,8 @@ namespace coordConv {
         @warning the computed orientation will not round trip if converting a very nearby object
         from apparent topocentric or observed to apparent geocentric or mean coordinates.
         */
-        virtual Coord convertFrom(double &toDir, double &scaleChange, CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site, double tai=0) const;
+        virtual Coord convertFrom(double &toDir, double &scaleChange,
+            CoordSys const &fromCoordSys, Coord const &fromCoord, double fromDir, Site const &site, double tai=0) const;
         
         /**
         Convert a PVTCoord from another coordinate system to this system, including orientation
@@ -160,7 +161,8 @@ namespace coordConv {
         @param[in] site  site information
         @return position in this coordinate system
         */
-        virtual PVTCoord convertFrom(PVT &toDir, double &scaleChange, CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site) const;
+        virtual PVTCoord convertFrom(PVT &toDir, double &scaleChange,
+            CoordSys const &fromCoordSys, PVTCoord const &fromPVTCoord, PVT const &fromDir, Site const &site) const;
 
         /**
         Remove the effects of proper motion and radial velocity to the specified TAI date
@@ -252,13 +254,16 @@ namespace coordConv {
     
     /**
     FK5 RA, Dec; date is Julian years, and is both the date of observation and the date of equinox
+
+    Cannot be current because it has a date of equinox
     */
     class FK5CoordSys: public MeanCoordSys {
     public:
         /**
         Construct an FK5CoordSys
         
-        @param[in] date  date of equinox and date of observation in Julian years
+        @param[in] date  date of equinox and date of observation in Julian years; 0 results in 2000
+            (since this coordinate system cannot be current)
         */
         explicit FK5CoordSys(double date=2000.0);
         virtual ~FK5CoordSys() {};
@@ -275,6 +280,8 @@ namespace coordConv {
     
     /**
     FK4 RA, Dec; date is Besselian years, and is both the date of observation and the date of equinox
+
+    Cannot be current because it has a date of equinox
     
     @warning  the FK4 system has significant fictitious proper motion. Coords will be treated as fixed
     (the fictitious proper motion removed) if you specify proper motion AND radial velocity as zero.
@@ -286,7 +293,8 @@ namespace coordConv {
         /**
         Construct an FK4CoordSys
         
-        @param[in] date  date of equinox and date of observation in Besselian years
+        @param[in] date  date of equinox and date of observation in Besselian years; 0 results in 1950
+            (since this coordinate system cannot be current)
         */
         explicit FK4CoordSys(double date=1950.0);
         virtual ~FK4CoordSys() {};
@@ -533,7 +541,8 @@ namespace coordConv {
     Return a coordinate system given its name
     
     @param[in] name  name of coordinate system (case matters)
-    @param[in] date  date of coordinate system (units depend on the coordinate system)
+    @param[in] date  date of coordinate system (units depend on the coordinate system);
+        if 0 then the coordSys is current, except FK4 defaults to 1950 and FK5 defaults to 2000
     @return the specified coordinate system at the specified date
     @throw std::invalid_argument (ValueError in python) if name is not recognized.
 
