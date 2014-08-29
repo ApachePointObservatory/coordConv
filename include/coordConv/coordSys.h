@@ -330,8 +330,10 @@ namespace coordConv {
         virtual double dateFromTAI(double tai) const;
         virtual std::string __repr__() const;
 
-    private:
+    protected:
         virtual void _setDate(double date) const;
+
+    private:
         mutable Eigen::Vector3d _eTerms;
         mutable Eigen::Matrix3d _From1950PrecMat, _To1950PrecMat;
     };
@@ -406,8 +408,10 @@ namespace coordConv {
         /// return true if cache is valid
         bool cacheOK() const { return std::isfinite(_cachedDate); };
 
-    private:
+    protected:
         virtual void _setDate(double date) const;
+
+    private:
         double _maxAge;     ///< maximum cache age (date - cached date) to reuse cache (years)
         double _maxDDate;   ///< maximum date differential (date - current date) to reuse cache (years)
                             ///< 
