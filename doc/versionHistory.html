@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>coordConv Version History</title>
+</head>
+<body>
+<h1><a href="index.html">coordConv</a>: Version History</h1>
+
+<h3>0.9.8 2014-08-27</h3>
+
+<p>This is a major refactoring, primarily to fix a bug in computing velocity when converting PVTCoords from apparent geocentric coordinates to apparent topocentric coordinates. Significant changes include:
+<ul>
+    <li>Changed PVTCoord to an object that models linear spatial velocity instead of velocity along a great circle. This is a much simpler model and capable of representing the change in distance with time. However, now PVTCoord is only intended to support computation of instantaneous velocity, not to represent the long-term track of a moving object.
+    <li>Changed CoordSys to support "current" coordinates, which are represented by date=0. This included adding two new methods: isCurrent() and setCurrTAI(tai), the latter of which allows you to set the current TAI date while computing coordinates without visibly changing anything about the CoordSys (it is a const method; the data that is updated is considered an internal cache). This allows setting the current date without copying data, and allows use of cached apparent geocentric data without excessive recomputation, thus significantly speeding up coordinate conversions for PVTCoords.
+    <li>AppGeoCoordSys now automatically avoids recomputing the cache for very nearby times, thus eliminating the need for freezeCache argument of setDate.
+</ul>
+
+<h3>0.9.7 2014-08-25</h3>
+
+<ul>
+    <li>Minor doc and variable name cleanups.
+    <li>Some improvements to tests/testCoordConvAgainstTCC.py.
+    <li>Bug fix: examples/timeCoordConv.py failed while timing the computation of apparent geocentric cached data due to unreasonable dates for large numbers of iterations.
+</ul>
+
+<h3>0.9.6 2014-08-19</h3>
+
+<ul>
+    <li>Enabled generation of Doxygen documentation (by adding missing SConscript and doxygen.config.in files to the doc dir).
+    <li>Update the source documentation to make Doxygen happy.
+</ul>
+
+<h3>0.9.5 2014-08-13</h3>
+
+<ul>
+    <li>Bug fix: parallax was mis-computed, due to using longitude instead of latitude.
+    <li>Enhanced tests/testCoordConvAgainstTCC.py (and in the process discovered and fixed a bug in the old TCC).
+    <li>Updated documentation to make Doxygen happy.
+    <li>Added a separate version.py file.
+</ul>
+
+<h3>0.9.3 2014-07-13</h3>
+
+<p>First version with version history.
+
+</body>
+</html>
