@@ -76,9 +76,9 @@ namespace coordConv {
         bool isCurrent() const { return _isCurrent; };
         
         /**
-        Get the date of this coordinate system
+        Get the date of this coordinate system, or 0 if coordSys is current
         
-        The units depend on the specific coordinate system
+        The units depend on the specific coordinate system; see getDateType.
         */
         double getDate() const { return _isCurrent ? 0 : _date; };
         

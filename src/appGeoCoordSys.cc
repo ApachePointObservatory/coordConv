@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iomanip>
 #include <stdexcept>
 #include <sstream>
 #include "slalib.h"
@@ -35,10 +36,15 @@ namespace coordConv {
             os << "date = " << date << " too large; should be TDB years";
             throw std::runtime_error(os.str());
         }
+        // std::cout << std::fixed << std::setprecision(11) << "AppGeoCoordSys._setDate: date=" << date << "; _date=" << _date << "; _cachedDate=" << _cachedDate;
+        double dDate = date - this->_date;
+        this->_date = date;
         if (std::isfinite(date) && (date != 0)) {
-            if (cacheOK() && ((std::abs(date - _cachedDate) < _maxAge) || (std::abs(date - this->_date) < _maxDDate))) {
+            if (cacheOK() && ((std::abs(date - _cachedDate) < _maxAge) || (std::abs(dDate) < _maxDDate))) {
+                // std::cout << "; NOT updating AppGeo cache" << std::endl;
                 return;
             }
+            // std::cout << "; updating AppGeo cache" << std::endl;
             double tdbDays = slaEpj2d(date);
             double amprms[21];
             slaMappa(2000.0, tdbDays, amprms);
@@ -55,8 +61,9 @@ namespace coordConv {
                 }
             }
             _cachedDate = date;
+        // } else {
+        //     std::cout << "; nothing to update" << std::endl;
         }
-        this->_date = date;
     }
 
     Coord AppGeoCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
