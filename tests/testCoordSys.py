@@ -3,6 +3,8 @@ from __future__ import absolute_import, division
 
 import unittest
 
+import numpy
+
 import coordConv
 
 MeanSysList = (coordConv.ICRSCoordSys, coordConv.FK5CoordSys, coordConv.FK4CoordSys, coordConv.GalCoordSys)
@@ -57,11 +59,21 @@ class TestCoordSys(unittest.TestCase):
         def csysIter():
             for csysClass in FullSysList:
                 for date in (2002, 3001):
-                    yield csysClass(date)
+                    for isCurrent in (False, True):
+                        if isCurrent:
+                            if csysClass in (coordConv.FK4CoordSys, coordConv.FK5CoordSys):
+                                continue
+                            csys = csysClass(0)
+                            csys.setCurrDate(date)
+                            yield csys
+                        else:
+                            yield csysClass(date)
 
         for csys1 in csysIter():
             for csys2 in csysIter():
-                if (csys1.getName() == csys2.getName()) and (csys1.getDate() == csys2.getDate()):
+                if (csys1.getName() == csys2.getName()) \
+                    and (csys1.getDate() == csys2.getDate()) \
+                    and (csys1.isCurrent() == csys2.isCurrent()):
                     self.assertTrue(csys1 == csys2)
                 else:
                     self.assertTrue(csys1 != csys2)
@@ -133,6 +145,72 @@ class TestCoordSys(unittest.TestCase):
                     self.assertEqual(csys.isMean(),  csysClone.isMean())
                     self.assertEqual(csys.isCurrent(), csysClone.isCurrent())
                     self.assertEqual(csys.getName(), csysClone.getName())
+
+    def testsetCurrDate(self):
+        """Test setCurrDate method
+        """
+        currTAI = 123456789.12
+        for csysName in FullNameList:
+            for date in (0, 1000.5):
+                if date == 0 and csysName in ("fk4", "fk5"):
+                    self.assertRaises(Exception, coordConv.makeCoordSys, csysName, date)
+                else:
+                    csys = coordConv.makeCoordSys(csysName, date)
+                    if not csys.isCurrent():
+                        self.assertRaises(Exception, csys.setCurrDate, currTAI)
+                    else:
+                        csys.setCurrDate(csys.dateFromTAI(currTAI))
+                        self.assertEqual(csys.getDate(), 0)
+                        self.assertEqual(csys.getDate(False), csys.dateFromTAI(currTAI))
+
+    def testAppGeoCache(self):
+        """Test that AppGeoCoordSys cache is updated when expected
+        """
+        agSys = coordConv.AppGeoCoordSys()
+        self.assertEqual(agSys.getDate(), 0)
+        self.assertEqual(agSys.getDate(False), 0)
+        self.assertFalse(numpy.isfinite(agSys.getCacheDate()))
+
+        startDate = 2020.12345
+        maxCacheAge = agSys.getMaxAge()
+        maxDDate = agSys.getMaxDDate()
+        nextDate = startDate + (maxCacheAge * 5) # well away from startDate
+        predCacheDate = numpy.nan
+        prevDate = startDate
+        for i, (date, shouldUpdateCache) in enumerate((
+            (startDate, True),
+            (startDate + maxCacheAge - (maxDDate * 2), False),
+            (startDate + maxCacheAge + (maxDDate * 0.01), True),
+            (startDate + (maxCacheAge * 2), False),
+            (nextDate, True),
+            (nextDate + maxCacheAge - (maxDDate * 0.5), False),
+            (nextDate + maxCacheAge + (maxDDate * 0.01), False), # within maxDDate of prev. update
+            (nextDate + maxCacheAge + (maxDDate * 2), True),
+        )):
+            try:
+                agSys.setCurrDate(date)
+                if shouldUpdateCache:
+                    predCacheDate = date
+                self.assertAlmostEqual(agSys.getCacheDate(), predCacheDate)
+                self.assertEqual(agSys.getDate(), 0)
+                self.assertAlmostEqual(agSys.getDate(False), date)
+            except Exception:
+                print "failed on %d when date-prevDate=%0.11f; date-cacheDate=%0.11f, maxCacheAge=%0.11f, maxDDate=%0.11f" % \
+                    (i, date-prevDate, date-agSys.getCacheDate(), maxCacheAge, maxDDate)
+                raise
+            prevDate = date
+
+    def testDefaultConstructor(self):
+        """Test default constructor
+        """
+        for csysClass in FullSysList:
+            csys = csysClass()
+            predDate = dict(
+                fk4 = 1950,
+                fk5 = 2000,
+            ).get(csys.getName(), 0)
+            self.assertEqual(csys.getDate(), predDate)
+            self.assertEqual(csys.isCurrent(), predDate == 0)
 
     def testCopyConstructor(self):
         """Test copy constructor

@@ -76,11 +76,13 @@ namespace coordConv {
         bool isCurrent() const { return _isCurrent; };
         
         /**
-        Get the date of this coordinate system, or 0 if coordSys is current
+        Get the date of this coordinate system, or 0 if coordSys is current and zeroIfCurrent
+
+        @param[in] zeroIfCurrent  if true (default) then return 0 if the coordSys is current
         
         The units depend on the specific coordinate system; see getDateType.
         */
-        double getDate() const { return _isCurrent ? 0 : _date; };
+        double getDate(bool zeroIfCurrent=true) const { return (_isCurrent && zeroIfCurrent) ? 0 : _date; };
         
         /**
         Set the date of this coordinate system
@@ -93,12 +95,12 @@ namespace coordConv {
         };
 
         /**
-        Set the current TAI date of this coordinate system; only valid if isCurrent()
+        Set the current date of this coordinate system; only valid if isCurrent()
 
-        @param[in] tai  TAI date (MJD, sec)
+        @param[in] date  current date, in units given by getDateType
         @throw std::runtime_error if isCurrent() false
         */
-        void setCurrTAI(double tai) const;
+        void setCurrDate(double date) const;
         
         /**
         Convert a coordinate to FK5 at date of observation J2000 from this coordinate system at this date
@@ -211,7 +213,9 @@ namespace coordConv {
 
         /// Equality operator; a method instead of a free function to simplify SWIG wrapping
         bool operator==(CoordSys const &rhs) {
-            return (this->getName() == rhs.getName()) && (this->getDate() == rhs.getDate());
+            return (this->getName() == rhs.getName())
+                && (this->getDate() == rhs.getDate()
+                && (this->isCurrent() == rhs.isCurrent()));
         }
 
         /// Inequality operator; a method instead of a free function to simplify SWIG wrapping
@@ -266,7 +270,7 @@ namespace coordConv {
         
         @param[in] date  date of observation in Julian years
         */
-        explicit ICRSCoordSys(double date=2000.0);
+        explicit ICRSCoordSys(double date=0);
         virtual ~ICRSCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
@@ -352,7 +356,7 @@ namespace coordConv {
         
         @param[in] date  date of observation in Julian years
         */
-        explicit GalCoordSys(double date=2000.0);
+        explicit GalCoordSys(double date=0);
         virtual ~GalCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
@@ -382,8 +386,8 @@ namespace coordConv {
         Construct an AppGeoCoordSys
         
         @param[in] date  TDB date in Julian years (but TT will always do)
-        @param[in] maxAge  maximum cache age (years) before setDate or setCurrTAI will update an internal cache
-        @param[in] maxDDate  minimum delta date (date - current date) (years) before setDate or setCurrTAI
+        @param[in] maxAge  maximum cache age (years) before setDate or setCurrDate will update an internal cache
+        @param[in] maxDDate  minimum delta date (date - current date) (years) before setDate or setCurrDate
             will update an internal cache.
             The intent is to never update the cache while computing velocity by computing position at two nearby times,
             since updating the cache may introduce a small jump in position, which may result in unacceptable velocity error.
@@ -402,7 +406,7 @@ namespace coordConv {
         /// return maximum cache age (years)
         double getMaxAge() const { return _maxAge; };
         /// return maximum delta date (years)
-        double getMaxDDate() const { return _maxAge; };
+        double getMaxDDate() const { return _maxDDate; };
         /// return date of cache (TDB, Julian years); nan
         double getCacheDate() const { return _cachedDate; };
         /// return true if cache is valid
@@ -532,7 +536,7 @@ namespace coordConv {
     /**
     None coordinates
     
-    This coordinate system always converts to NaN. Date is TAI (MJD, seconds)
+    This coordinate system always converts to NaN. Date is TAI (MJD, seconds).
     */
     class NoneCoordSys: public OtherCoordSys {
     public:

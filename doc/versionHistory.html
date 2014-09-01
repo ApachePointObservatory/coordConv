@@ -6,6 +6,16 @@
 <body>
 <h1><a href="index.html">coordConv</a>: Version History</h1>
 
+<h3>0.9.9.2 2014-09-01</h3>
+
+<ul>
+    <li>Changed CoordSys.setCurrTAI to CoordSys.setCurrDate for self-consistency.
+    <li>Changed CoordSys operator== to test isCurrent and updated the unit test accordingly.
+    <li>Changed default date of ICRSCoordSys and GalCoordSys from 2000 to 0 (current date).
+    <li>Added a unit test for AppGeoCoordSys's cache.
+    <li>Added a unit test for coordinate system default constructors.
+</ul>
+
 <h3>0.9.9.1 2014-08-29</h3>
 
 <ul>

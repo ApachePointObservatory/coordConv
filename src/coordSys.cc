@@ -6,21 +6,21 @@
 
 namespace coordConv {
 
-    void CoordSys::setCurrTAI(double tai) const {
+    void CoordSys::setCurrDate(double date) const {
         if (!isCurrent()) {
             throw std::runtime_error("Cannot set current date; coordSys is not current");
-        } else if (tai <= 0) {
-            throw std::runtime_error("tai must be > 0");
+        } else if (date <= 0) {
+            throw std::runtime_error("date must be > 0");
         }
-        _setDate(dateFromTAI(tai));
+        _setDate(date);
     }
     
     Coord CoordSys::convertFrom(CoordSys const &fromCoordSys, Coord const &fromCoord, Site const &site, double tai) const {
         if (isCurrent()) {
-            setCurrTAI(tai);
+            setCurrDate(dateFromTAI(tai));
         };
         if (fromCoordSys.isCurrent()) {
-            fromCoordSys.setCurrTAI(tai);
+            fromCoordSys.setCurrDate(fromCoordSys.dateFromTAI(tai));
         };
         Coord icrsCoord = fromCoordSys.toFK5J2000(fromCoord, site);
         return fromFK5J2000(icrsCoord, site);

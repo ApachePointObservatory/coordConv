@@ -17,7 +17,7 @@ namespace coordConv {
     
     void AppTopoCoordSys::_setDate(double date) const {
         if (date > 0) {
-            _appGeoCoordSys.setCurrTAI(date);
+            _appGeoCoordSys.setCurrDate(_appGeoCoordSys.dateFromTAI(date));
         }
         this->_date = date;
     }

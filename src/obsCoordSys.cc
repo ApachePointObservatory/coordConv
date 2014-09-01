@@ -15,7 +15,7 @@ namespace coordConv {
     
     void ObsCoordSys::_setDate(double date) const {
         if (date > 0) {
-            _appTopoCoordSys.setCurrTAI(date);
+            _appTopoCoordSys.setCurrDate(date);
         }
         this->_date = date;
     }
