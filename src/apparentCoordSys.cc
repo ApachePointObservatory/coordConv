@@ -6,9 +6,5 @@ namespace coordConv {
     :
         CoordSys(name, date, dateType, false, true)
     {}
-    
-    // works for apparent topocentric and observed; override for geocentric
-    double ApparentCoordSys::dateFromTAI(double tai) const {
-        return tai;
-    }
+
 }

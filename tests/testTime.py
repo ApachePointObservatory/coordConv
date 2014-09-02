@@ -9,9 +9,13 @@ ArcSecPerRev = 3600.0 * 360.0
 
 RadPerArcSec = coordConv.RadPerDeg / 3600.0
 
-def julianEpochFromMJDSec(mjdSec):
-    mjdDays = mjdSec / float(3600 * 24)
-    return 2000.0 + ((mjdDays - 51544.5) / 365.25)
+def julianEpochFromTAI(tai):
+    ttDays = (tai + coordConv.TT_TAI) / float(3600 * 24)
+    return 2000.0 + ((ttDays - 51544.5) / 365.25)
+
+def besselianEpochFromTAI(tai):
+    ttDays = (tai + coordConv.TT_TAI) / float(3600 * 24)
+    return 1900.0 + ( ttDays - 15019.81352 ) / 365.242198781
 
 def eqeqx (tdb):
     """The equation of the equinoxes (IAU 1994).
@@ -511,13 +515,21 @@ def lastFromTAI(tai, site):
 class TestTime(unittest.TestCase):
     """Test time functions
     """
-    def testJulianEpochFromMJDSec(self):
-        """Test julianEpochFromMJDSec and inverse
+    def testJulianEpochFromTAI(self):
+        """Test julianEpochFromTAI and inverse
         """
-        for mjdSec in (4232.89, 20000.32, 56350.03, 74222.9):
-            self.assertAlmostEqual(coordConv.julianEpochFromMJDSec(mjdSec), julianEpochFromMJDSec(mjdSec), places=7)
+        for tai in (4232.89, 20000.32, 56350.03, 74222.9):
+            self.assertAlmostEqual(coordConv.julianEpochFromTAI(tai), julianEpochFromTAI(tai), places=7)
             
-            self.assertAlmostEqual(coordConv.mjdSecFromJulianEpoch(coordConv.julianEpochFromMJDSec(mjdSec)), mjdSec, places=5)
+            self.assertAlmostEqual(coordConv.taiFromJulianEpoch(coordConv.julianEpochFromTAI(tai)), tai, places=5)
+
+    def testBesselianEpochFromTAI(self):
+        """Test besselianEpochFromTAI and inverse
+        """
+        for tai in (4232.89, 20000.32, 56350.03, 74222.9):
+            self.assertAlmostEqual(coordConv.besselianEpochFromTAI(tai), besselianEpochFromTAI(tai), places=7)
+            
+            self.assertAlmostEqual(coordConv.taiFromBesselianEpoch(coordConv.besselianEpochFromTAI(tai)), tai, places=5)
     
     def testLastFromTAI(self):
         """Test lastFromTAI

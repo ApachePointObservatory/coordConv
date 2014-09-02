@@ -15,17 +15,31 @@ namespace coordConv {
     double lastFromTAI(double tai, Site const &site);
     
     /**
-    Convert MJD seconds to Julian epoch
+    Convert TAI (MJD seconds) to Julian epoch
 
     @param[in] mjdSec  MJD date (sec)
     */
-    double julianEpochFromMJDSec(double mjdSec);
+    double julianEpochFromTAI(double mjdSec);
     
     /**
-    Convert Julian epoch to MJD seconds
+    Convert Julian epoch to TAI (MJD seconds)
 
     @param[in] julianEpoch  date as a Julian epoch (years)
     */
-    double mjdSecFromJulianEpoch(double julianEpoch);
+    double taiFromJulianEpoch(double julianEpoch);
+
+    /**
+    Convert TAI (MJD seconds) to Besselian epoch
+
+    @param[in] mjdSec  MJD date (sec)
+    */
+    double besselianEpochFromTAI(double mjdSec);
+    
+    /**
+    Convert Besselian epoch to TAI (MJD seconds)
+
+    @param[in] besselianEpoch  date as a Besselian epoch (years)
+    */
+    double taiFromBesselianEpoch(double besselianEpoch);
 
 }

@@ -3,6 +3,16 @@
 #include "coordConv/physConst.h"
 #include "coordConv/time.h"
 
+namespace {
+    inline double ttDaysFromTAI(double tai) {
+        return (tai + coordConv::TT_TAI) / coordConv::SecPerDay;
+    }
+
+    inline double taiFromTTDays(double ttDays) {
+        return (ttDays * coordConv::SecPerDay) - coordConv::TT_TAI;
+    }
+}
+
 namespace coordConv {
 
     double lastFromTAI(double tai, Site const &site) {
@@ -18,14 +28,20 @@ namespace coordConv {
         return wrapPos(gmst + site.corrLong + appMinusMean);
     }
     
-    double julianEpochFromMJDSec(double mjdSec) {
-        double mjdDays = mjdSec / SecPerDay;
-        return 2000.0 + ((mjdDays - MJDJ2000) / DaysPerYear);
+    double julianEpochFromTAI(double tai) {
+        return 2000.0 + ((ttDaysFromTAI(tai) - MJDJ2000) / DaysPerYear);
     }
     
-    double mjdSecFromJulianEpoch(double julianEpoch) {
-        double mjdDays = MJDJ2000 + ((julianEpoch - 2000.0) * DaysPerYear);
-        return mjdDays * SecPerDay;
+    double taiFromJulianEpoch(double julianEpoch) {
+        return taiFromTTDays(MJDJ2000 + ((julianEpoch - 2000.0) * DaysPerYear));
     }
-        
+
+    double besselianEpochFromTAI(double tai) {
+        return 1900.0 + (ttDaysFromTAI(tai) - 15019.81352 ) / 365.242198781;
+    }
+
+    double taiFromBesselianEpoch(double date) {
+        return taiFromTTDays(15019.81352 + (date - 1900.0) * 365.242198781);
+    }
+
 }

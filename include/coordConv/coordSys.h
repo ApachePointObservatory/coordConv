@@ -5,6 +5,7 @@
 #include <string>
 #include "boost/shared_ptr.hpp"
 #include "coordConv/site.h"
+#include "coordConv/time.h"
 #include "coordConv/coord.h"
 #include "coordConv/pvtCoord.h"
 #include "coordConv/physConst.h"
@@ -204,12 +205,20 @@ namespace coordConv {
         virtual PVTCoord removePM(PVTCoord const &pvtCoord);
         
         /**
-        Convert TAI (MJD, seconds) to a suitable date for this coordinate system
+        Convert TAI (MJD, seconds) to a suitable date for this coordinate system, as given by getDateType
         
         @param[in] tai  TAI date (MJD, seconds)
         @return date in appropriate units for this coordinate system
         */
         virtual double dateFromTAI(double tai) const = 0;
+        
+        /**
+        Convert a suitable date for this coordinate system to TAI (MJD, seconds)
+        
+        @param[in] date  date in units suitable to this coordinate system, as given by getDateType
+        @return date in appropriate units for this coordinate system
+        */
+        virtual double taiFromDate(double date) const = 0;
 
         /// Equality operator; a method instead of a free function to simplify SWIG wrapping
         bool operator==(CoordSys const &rhs) {
@@ -248,7 +257,8 @@ namespace coordConv {
     public:
         explicit MeanCoordSys(std::string const &name, double date, DateTypeEnum dateType=DateType_Julian);
         virtual ~MeanCoordSys() {};
-        virtual double dateFromTAI(double tai) const;
+        virtual double dateFromTAI(double tai) const { return julianEpochFromTAI(tai); };
+        virtual double taiFromDate(double date) const { return taiFromJulianEpoch(date); };
         virtual Coord removePM(Coord const &coord, double tai) const;
     };
     
@@ -256,7 +266,8 @@ namespace coordConv {
     public:
         explicit ApparentCoordSys(std::string const &name, double date, DateTypeEnum dateType=DateType_TAI);
         virtual ~ApparentCoordSys() {};
-        virtual double dateFromTAI(double tai) const;
+        virtual double dateFromTAI(double tai) const { return tai; };
+        virtual double taiFromDate(double date) const { return date; };
         virtual Coord removePM(Coord const &coord, double tai) const { return Coord(coord.getVecPos()); };
     };
 
@@ -331,7 +342,8 @@ namespace coordConv {
         virtual CoordSys::Ptr clone(double date) const;
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
-        virtual double dateFromTAI(double tai) const;
+        virtual double dateFromTAI(double tai) const { return besselianEpochFromTAI(tai); };
+        virtual double taiFromDate(double date) const { return taiFromBesselianEpoch(date); };
         virtual std::string __repr__() const;
 
     protected:
@@ -394,13 +406,14 @@ namespace coordConv {
             Thus this must be larger than your delta-T for computing velocity, but larger than the interval
             between position updates.
         */
-        explicit AppGeoCoordSys(double date=0, double maxAge=1.0/(SecPerDay*DaysPerYear), double maxDDate=2*DeltaTForPos/(SecPerDay*DaysPerYear));
+        explicit AppGeoCoordSys(double date=0, double maxAge=0.05/(SecPerDay*DaysPerYear), double maxDDate=2*DeltaTForPos/(SecPerDay*DaysPerYear));
         virtual ~AppGeoCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
-        virtual double dateFromTAI(double tai) const;
+        virtual double dateFromTAI(double tai) const { return julianEpochFromTAI(tai); };
+        virtual double taiFromDate(double date) const { return taiFromJulianEpoch(date); };
         virtual std::string __repr__() const;
         
         /// return maximum cache age (years)
@@ -408,9 +421,9 @@ namespace coordConv {
         /// return maximum delta date (years)
         double getMaxDDate() const { return _maxDDate; };
         /// return date of cache (TDB, Julian years); nan
-        double getCacheDate() const { return _cachedDate; };
+        double getCacheDate() const { return _cacheDate; };
         /// return true if cache is valid
-        bool cacheOK() const { return std::isfinite(_cachedDate); };
+        bool cacheOK() const { return std::isfinite(_cacheDate); };
 
     protected:
         virtual void _setDate(double date) const;
@@ -419,7 +432,7 @@ namespace coordConv {
         double _maxAge;     ///< maximum cache age (date - cached date) to reuse cache (years)
         double _maxDDate;   ///< maximum date differential (date - current date) to reuse cache (years)
                             ///< 
-	    mutable double _cachedDate;         ///< date at which data computed (TDB, Julian years); 0 if never computed
+	    mutable double _cacheDate;         ///< date at which data computed (TDB, Julian years); 0 if never computed
 	    mutable double _pmSpan;             ///< time over which to correct for proper motion (Julian years)
 	    mutable Eigen::Vector3d _bcPos;     ///< barycentric position of Earth (au)
 	    mutable Eigen::Vector3d _hcDir;     ///< heliocentric position of Earth (unit vector)
@@ -447,24 +460,6 @@ namespace coordConv {
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
         virtual std::string __repr__() const;
 
-        /**
-        Convert from apparent geocentric coordinates at this date
-
-        @param[in] coord  initial position
-        @param[in] site  site information
-        @return position in this coordinate system at this date
-        */
-        virtual Coord fromAppGeo(Coord const &coord, Site const &site) const;
-
-        /**
-        Convert to apparent geocentric coordinates at this date
-
-        @param[in] coord  initial position
-        @param[in] site  site information
-        @return position in apparent geocentric coordinates at this date
-        */
-        virtual Coord toAppGeo(Coord const &coord, Site const &site) const;
-
     protected:
         virtual void _setDate(double date) const;
 
@@ -488,8 +483,6 @@ namespace coordConv {
         virtual CoordSys::Ptr clone(double date) const;
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;
-        virtual Coord fromAppTopo(Coord const &coord, Site const &site) const;
-        virtual Coord toAppTopo(Coord const &coord, Site const &site) const;
         virtual std::string __repr__() const;
 
     protected:
@@ -526,7 +519,8 @@ namespace coordConv {
         virtual ~OtherCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
-        virtual double dateFromTAI(double tai) const;
+        virtual double dateFromTAI(double tai) const { return tai; };
+        virtual double taiFromDate(double date) const { return date; };
         virtual Coord removePM(Coord const &coord, double tai) const { return coord; };
         virtual Coord fromFK5J2000(Coord const &coord, Site const &site) const;
         virtual Coord toFK5J2000(Coord const &coord, Site const &site) const;

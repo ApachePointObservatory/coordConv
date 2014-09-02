@@ -11,11 +11,6 @@ namespace coordConv {
         CoordSys(name, date, dateType, true, true)
     {}
     
-    // this works for all mean systems that use Julian epoch (all but FK4)
-    double MeanCoordSys::dateFromTAI(double tai) const {
-        return julianEpochFromMJDSec(tai + TT_TAI);
-    }
-
     Coord MeanCoordSys::removePM(Coord const &coord, double tai) const {
         // convert to this coord at tai date, zero velocity and convert back;
         // this is fancier than just adding vecPM to vecPos, but handles fictitious proper motion (e.g. FK4).

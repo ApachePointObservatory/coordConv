@@ -6,10 +6,20 @@
 <body>
 <h1><a href="index.html">coordConv</a>: Version History</h1>
 
+<h3>1.0.0 2014-09-02</h3>
+
+<ul>
+    <li>Added CoordSys.taiFromDate methods.
+    <li>Added besslianEpochFromTAI and taiFromBesselianEpoch functions.
+    <li>AppGeoCoordSys changed maxAge from 1 second to 0.05 seconds. This will make lunar tracking errors negligible even at a high update rate.
+    <li>Added functions appTopoFromAppGeo, appGeoFromAppTopo, obsFromAppTopo and appTopoFromObs, and removed similar methods from AppTopoCoordSys and ObsCoordSys.
+    <li>Enhanced the documentation, including a working example.
+</ul>
+
 <h3>0.9.9.4 2014-09-01</h3>
 
 <ul>
-    <li>AppGeoCoordSys changed to default maxAge (of the cache) from 300 seconds to 1 second. I did this because lunar tracking was jumping by many arcsec every 4-ish minutes, which was approximately the old maxAge. That did seem to fix the lunar tracking, though I am very puzzled as to why.
+    <li>AppGeoCoordSys changed default maxAge (of the cache) from 300 seconds to 1 second. 300 seconds was too long for more accurate lunar tracking.
 </ul>
 
 <h3>0.9.9.3 2014-09-01</h3>

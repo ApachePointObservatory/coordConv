@@ -15,7 +15,7 @@ namespace coordConv {
         ApparentCoordSys("appgeo", date, DateType_Julian),
         _maxAge(maxAge),
         _maxDDate(maxDDate),
-        _cachedDate(DoubleNaN)
+        _cacheDate(DoubleNaN)
     {
         setDate(date);
     };
@@ -36,11 +36,11 @@ namespace coordConv {
             os << "date = " << date << " too large; should be TDB years";
             throw std::runtime_error(os.str());
         }
-        // std::cout << std::fixed << std::setprecision(11) << "AppGeoCoordSys._setDate: date=" << date << "; _date=" << _date << "; _cachedDate=" << _cachedDate;
+        // std::cout << std::fixed << std::setprecision(11) << "AppGeoCoordSys._setDate: date=" << date << "; _date=" << _date << "; _cacheDate=" << _cacheDate;
         double dDate = date - this->_date;
         this->_date = date;
         if (std::isfinite(date) && (date != 0)) {
-            if (cacheOK() && ((std::abs(date - _cachedDate) < _maxAge) || (std::abs(dDate) < _maxDDate))) {
+            if (cacheOK() && ((std::abs(date - _cacheDate) < _maxAge) || (std::abs(dDate) < _maxDDate))) {
                 // std::cout << "; NOT updating AppGeo cache" << std::endl;
                 return;
             }
@@ -60,7 +60,7 @@ namespace coordConv {
                     _pnMat(i,j) = amprms[12+(i*3)+j];
                 }
             }
-            _cachedDate = date;
+            _cacheDate = date;
         // } else {
         //     std::cout << "; nothing to update" << std::endl;
         }
@@ -154,10 +154,6 @@ namespace coordConv {
         Eigen::Vector3d fk5J2000Pos = pos1 + _bcPos;
         
         return Coord(fk5J2000Pos);
-    }
-
-    double AppGeoCoordSys::dateFromTAI(double tai) const {
-        return julianEpochFromMJDSec(tai + TT_TAI);
     }
 
     std::string AppGeoCoordSys::__repr__() const {

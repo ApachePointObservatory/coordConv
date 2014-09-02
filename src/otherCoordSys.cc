@@ -18,10 +18,6 @@ namespace coordConv {
         return CoordSys::Ptr(new OtherCoordSys(_name, date, _dateType, _isMean));
     };
 
-    double OtherCoordSys::dateFromTAI(double tai) const {
-        return tai;
-    }
-
     Coord OtherCoordSys::fromFK5J2000(Coord const &coord, Site const &site) const {
         return Coord(); // null Coord
     }

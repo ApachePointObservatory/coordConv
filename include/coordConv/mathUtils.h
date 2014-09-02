@@ -24,25 +24,6 @@ namespace coordConv {
     double hypot(double x, double y);
 
     /**
-    Rotate a 2-dimensional vector by a given angle.
-
-    @param[out] rotX  rotated x value
-    @param[out] rotY  rotated y value
-    @param[in]  x: unrotated x value
-    @param[in]  y: unrotated y value
-    @param[in]  ang: angle by which to rotate (deg)
-
-    Using rot2D to change coordinate systems:
-    Given a coordinate system A and a coordinate system B, such that:
-    - B's origin is at B_A_xy in A
-    - B's orientation is B_A_ang in A
-    Then a point P can be transformed as follows between these systems:
-    - P_B_xy = rot2D(P_A_xy - B_A_xy, -B_A_ang)
-    - P_A_xy = B_A_xy + rot2D(P_B_xy, +B_A_ang)
-    */
-    void rot2D(double &rotX, double &rotY, double x, double y, double ang);
-
-    /**
     Compute angle wrapped into range: 0 <= wrapped ang < 360 deg
     
     @param[in] ang  angle to wrap (deg)
@@ -109,7 +90,26 @@ namespace coordConv {
     @param[in] theta  angle of vector from x axis (degrees)
     */
     void xyFromPolar(double &x, double &y, double r, double theta);
-        
+
+    /**
+    Rotate a 2-dimensional vector by a given angle.
+
+    @param[out] rotX  rotated x value
+    @param[out] rotY  rotated y value
+    @param[in]  x: unrotated x value
+    @param[in]  y: unrotated y value
+    @param[in]  ang: angle by which to rotate (deg)
+
+    Using rot2D to change coordinate systems:
+    Given a coordinate system A and a coordinate system B, such that:
+    - B's origin is at B_A_xy in A
+    - B's orientation is B_A_ang in A
+    Then a point P can be transformed as follows between these systems:
+    - P_B_xy = rot2D(P_A_xy - B_A_xy, -B_A_ang)
+    - P_A_xy = B_A_xy + rot2D(P_B_xy, +B_A_ang)
+    */
+    void rot2D(double &rotX, double &rotY, double x, double y, double ang);
+
     /**
     Compute a rotation matrix given an axis and rotation angle
     

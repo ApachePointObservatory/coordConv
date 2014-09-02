@@ -1,30 +1,48 @@
+namespace coordConv {
+
 /**
 \mainpage coordConv: Astronomical Coordinate Conversions
 
-\section coordConv_introduction Introduction
+\section coordConv_packageContents Package Contents
 
-<a href="../index.html">coordConv</a> provides conversion of astronomical coordinates with sufficient accuracy to control large research telescopes.
+The <a href="../index.html">coordConv</a> package provides the following classes and functions. See the <a href="../index.html">main documentation</a> for an overview, example and installation instructions.
 
-Contents include:
-- Coord: represents a position on the sky, with proper motion and radial velocity; provides easy access to spherical and cartesian position.
-- Coordinate system objects, including ICRSCoordSys, FK5CoordSys, AppGeoCoordSys, AppTopoCoordSys and ObsCoordSys (refracted apparent topocentric).
-- PVTCoord: a Coord with nonzero instantaneous cartesian velocity.
-- Site: information about the observatory, current earth orientation data (using the IERS Earth Orientation bulletin if maximum accuracy is wanted) and refraction coefficients. The contents are required for conversions involving apparent coordinates and are ignored otherwise.
-- PVT: an object representing a position, velocity and time.
-
-To convert a position from one coordinate system to another:
-- Construct a Site object.
-- Construct the "from" Coord.
-- Construct the "from" coordinate system (e.g. ICRSCoord).
-- Construct the "to" coordinate system.
-- toCoord = toCoordSys.convertFrom(fromCoordSys, fromCoord, site).
-
-\section coordConv_conventions Conventions
-
-- Spherical positions are in degrees (even right ascension). The first axis is the equatorial angle (e.g. right ascension or azimuth); the second axis is the polar angle (e.g. declination or altitude).
-- Cartesian positions are in astronomical units.
-- Proper motion is arcsec/century; the equatorial component is dEquatAng/dt, so it may be large near the pole.
-- Radial velocity is km/sec, positive receding.
-- All coordinate systems are right-handed, so azimuth os 0 south (which is unusual), 90 east.
-- TAI is MJD, seconds (not days, which is unusual).
+<ul>
+    <li><code>Coord</code>: represents a position on the sky, with proper motion and radial velocity; provides easy access to spherical and cartesian position. Coord includes spherical geometry methods <code>angularSeparation</code>, <code>directionTo</code> and <code>offset</code>.
+    <li>Coordinate system objects, including:
+    <ul>
+        <li><code>ICRSCoordSys</code>
+        <li><code>FK5CoordSys</code>
+        <li><code>FK4CoordSys</code>
+        <li><code>GalCoordSys</code>
+        <li><code>AppGeoCoordSys</code>
+        <li><code>AppTopoCoordSys</code>
+        <li><code>ObsCoordSys</code>: refracted apparent topocentric
+    </ul>
+    <li><code>Site</code>: information about the observatory, current earth orientation data (using the IERS Earth Orientation bulletin if maximum accuracy is wanted) and refraction coefficients. The contents are required for conversions involving apparent coordinates and are ignored otherwise.
+    <li><code>PVT</code>: an object representing a position, velocity and time.
+    <li><code>PVTCoord</code>: a <code>Coord</code> with nonzero instantaneous cartesian velocity.
+    <li>Position conversion functions:
+    <ul>
+        <li><code>::appTopoFromAppGeo</code>, <code>::appGeoFromAppTopo</code>
+        <li><code>::obsFromAppTopo</code>, <code>::appTopoFromObs</code>
+    </ul>
+    <li>Time conversion functions:
+    <ul>
+        <li><code>::julianEpochFromTAI</code> and <code>::taiFromJulianEpoch</code>
+        <li><code>::besselianEpochFromTAI</code> and <code>::taiFromBesselianEpoch</code>
+        <li><code>::lastFromTAI</code>
+    </ul>
+    <li>Utility functions:
+    <ul>
+        <li>2d vector functions: <code>::rot2D</code>, <code>::polarFromXY</code> and <code>::xyFromPolar</code>
+        <li><code>::computeRotationMatrix</code> computes a 3d rotation matrix given an axial vector and amount of rotation
+        <li>Trig functions in degrees: <code>::sind</code>, <code>::cosd</code>, <code>::tand</code>, <code>::asind</code>, <code>::acosd</code>, <code>::atand</code> and <code>::atan2d</code>
+        <li>Functions to wrap angles: <code>::wrapPos</code>, <code>::wrapCtr</code> and <code>::wrapNear</code>
+        <li><code>::distanceFromParallax</code> and <code>::parallaxFromDistance</code>
+        <li><code>::hypot</code> (not standard in C++ until C++11)
+    </ul>
+</ul>
 */
+
+}

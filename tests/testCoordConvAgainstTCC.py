@@ -36,7 +36,7 @@ def getCoordSys(coordSysCode, date, tai):
         # the old TCC use LAST computed from TAI; the new TCC uses TAI
         date = tai
     elif coordSysCode == -1 and date == 0:
-        date = coordConv.julianEpochFromMJDSec(tai + coordConv.TT_TAI)
+        date = coordConv.julianEpochFromTAI(tai)
     return CSysDict[coordSysCode](date)
 
 BoolDict = dict(T=True, F=False)

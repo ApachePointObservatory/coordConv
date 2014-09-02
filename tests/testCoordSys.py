@@ -39,7 +39,7 @@ class TestCoordSys(unittest.TestCase):
         for cls in JulianSysList:
             coordSys = cls(2000)
             for tai in (4232.89, 20000.32, 56350.03, 74222.9):
-                predDate = coordConv.julianEpochFromMJDSec(coordConv.TT_TAI + tai)
+                predDate = coordConv.julianEpochFromTAI(tai)
                 self.assertAlmostEqual(predDate, coordSys.dateFromTAI(tai))
         
         coordSys = coordConv.FK4CoordSys(2000)
