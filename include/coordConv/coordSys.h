@@ -394,7 +394,7 @@ namespace coordConv {
             Thus this must be larger than your delta-T for computing velocity, but larger than the interval
             between position updates.
         */
-        explicit AppGeoCoordSys(double date=0, double maxAge=300.0/(SecPerDay*DaysPerYear), double maxDDate=2*DeltaTForPos/(SecPerDay*DaysPerYear));
+        explicit AppGeoCoordSys(double date=0, double maxAge=1.0/(SecPerDay*DaysPerYear), double maxDDate=2*DeltaTForPos/(SecPerDay*DaysPerYear));
         virtual ~AppGeoCoordSys() {};
         virtual CoordSys::Ptr clone() const;
         virtual CoordSys::Ptr clone(double date) const;
