@@ -178,7 +178,7 @@ class TestCoordConv(unittest.TestCase):
                         self.assertEqual(zpmToPM2, 0)
                         self.assertEqual(zpmToRadVel, 0)
 
-                except Exception, e:
+                except Exception as e:
                     if ContinueOnError:
                         print
                         print str(e)
