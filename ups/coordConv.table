@@ -1,5 +1,6 @@
 setupRequired(eigen)
-setupRequired(ndarray) // for eigen swig
+setupRequired(ndarray) # for eigen swig
+setupRequired(boost)   # for boost::tr1
 
 envPrepend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 envPrepend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)

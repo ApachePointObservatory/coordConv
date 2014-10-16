@@ -3,7 +3,7 @@
 #include <limits>
 #include <stdexcept>
 #include <vector>
-#include <tr1/array>
+#include <boost/tr1/array.hpp> // so array works with old and new compilers
 
 #include "coordConv/mathUtils.h"
 #include "coordConv/pvtCoord.h"
