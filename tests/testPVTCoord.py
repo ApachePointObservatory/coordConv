@@ -373,7 +373,7 @@ class TestCoord(unittest.TestCase):
             coordConv.assertPVTsAlmostEqual(pvt0.copy(pvt1.t), pvt1)
 
 def makePVTFromPair(posPair, tai, deltaT, isAngle):
-    pos = posPair[0];
+    pos = posPair[0]
     if (isAngle):
         vel = coordConv.wrapCtr(posPair[1] - posPair[0]) / deltaT
     else:
