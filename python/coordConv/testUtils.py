@@ -1,6 +1,7 @@
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 from .coordConvLib import wrapCtr
+
 
 def assertPVTsAlmostEqual(pvt1, pvt2, doWrap=False, posPlaces=7, velPlaces=7, tPlaces=7):
     """Assert that two PVTs are almost equal
@@ -15,7 +16,7 @@ def assertPVTsAlmostEqual(pvt1, pvt2, doWrap=False, posPlaces=7, velPlaces=7, tP
 
     For the places arguments the associated value must be less than 10^-places
     """
-    if abs(pvt1.t   - pvt2.t) > 10.0**-tPlaces:
+    if abs(pvt1.t - pvt2.t) > 10.0**-tPlaces:
         raise AssertionError("%s.t != %s.t to within %s places" % (pvt1, pvt2, tPlaces))
     if abs(pvt1.vel - pvt2.vel) > 10.0**-velPlaces:
         raise AssertionError("%s.vel != %s.vel to within %s places" % (pvt1, pvt2, velPlaces))
@@ -25,6 +26,7 @@ def assertPVTsAlmostEqual(pvt1, pvt2, doWrap=False, posPlaces=7, velPlaces=7, tP
     else:
         if abs(pvt1.pos - pvt2.pos) > 10.0**-posPlaces:
             raise AssertionError("%s.pos != %s.pos to within %s places" % (pvt1, pvt2, posPlaces))
+
 
 def assertAnglesAlmostEqual(angle1, angle2, places=7):
     """Assert that two PVTs are almost equal

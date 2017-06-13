@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import unittest
 
@@ -7,6 +7,7 @@ import coordConv
 
 
 class TestSite(unittest.TestCase):
+
     def testBasics(self):
         """Test basic functionality of Site
         """
@@ -28,14 +29,15 @@ class TestSite(unittest.TestCase):
                             y = yArcsec / 3600.0
                             site.setPoleWander(x, y)
                             # the following is an approximation given in the header of slaPolmo
-                            approxCorrLong = long +  (x * coordConv.cosd(long)) - (y * coordConv.sind(long))
-                            approxCorrLat  = lat + (((x * coordConv.sind(long)) + (y * coordConv.cosd(long))) * coordConv.tand(lat))
+                            approxCorrLong = long + (x * coordConv.cosd(long)) - (y * coordConv.sind(long))
+                            approxCorrLat = lat + (((x * coordConv.sind(long)) +
+                                                    (y * coordConv.cosd(long))) * coordConv.tand(lat))
                             self.assertAlmostEqual(approxCorrLong, site.corrLong, 3)
                             self.assertAlmostEqual(approxCorrLat, site.corrLat, 3)
-                        
+
                             siteCopy = coordConv.Site(site)
                             self.assertEqual(repr(site), repr(siteCopy))
-    
+
     def testError(self):
         """Test that constructing with invalid latitude raises an exception
         """
@@ -50,8 +52,7 @@ class TestSite(unittest.TestCase):
                         else:
                             # make sure Site construction raises an exception
                             self.assertRaises(Exception, coordConv.Site, long, lat, elev)
-                    
-        
+
 
 if __name__ == '__main__':
     unittest.main()

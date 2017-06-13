@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import unittest
 
 import coordConv
 
+
 class TestTestUtils(unittest.TestCase):
     """Test the contents of testUtils
     """
+
     def testAnglesAlmostEquals(self):
         for places in (0, 3, 7):
             maxErr = float(10**-places)
@@ -20,8 +22,8 @@ class TestTestUtils(unittest.TestCase):
                         if abs(deltaAngle) <= maxErr:
                             coordConv.assertAnglesAlmostEqual(angle1, angle2, places=places)
                         else:
-                            self.assertRaises(AssertionError,
-                                coordConv.assertAnglesAlmostEqual, angle1, angle2, places=places)
+                            with self.assertRaises(AssertionError):
+                                coordConv.assertAnglesAlmostEqual(angle1, angle2, places=places)
 
     def testPVTsAlmostEqual(self):
         for (posPlaces, velPlaces, tPlaces) in (
@@ -56,8 +58,8 @@ class TestTestUtils(unittest.TestCase):
                                 pvt2.t += deltaT
                                 for doWrap in doWrapList:
                                     if abs(deltaPos) <= maxPosErr \
-                                        and abs(deltaVel) <= maxVelErr \
-                                        and abs(deltaT) <= maxTErr:
+                                            and abs(deltaVel) <= maxVelErr \
+                                            and abs(deltaT) <= maxTErr:
                                         coordConv.assertPVTsAlmostEqual(
                                             pvt1, pvt2,
                                             doWrap = doWrap,
@@ -66,17 +68,14 @@ class TestTestUtils(unittest.TestCase):
                                             tPlaces = tPlaces,
                                         )
                                     else:
-                                        self.assertRaises(
-                                            AssertionError,
-                                            coordConv.assertPVTsAlmostEqual,
-                                            pvt1, pvt2,
-                                            doWrap = doWrap,
-                                            posPlaces = posPlaces,
-                                            velPlaces = velPlaces,
-                                            tPlaces = tPlaces,
-                                        )
-
-
+                                        with self.assertRaises(AssertionError):
+                                            coordConv.assertPVTsAlmostEqual(
+                                                pvt1, pvt2,
+                                                doWrap = doWrap,
+                                                posPlaces = posPlaces,
+                                                velPlaces = velPlaces,
+                                                tPlaces = tPlaces,
+                                            )
 
 
 if __name__ == '__main__':

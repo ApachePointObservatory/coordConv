@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import absolute_import # division breaks PVT / float
+from __future__ import absolute_import  # division breaks PVT / float
 
 import unittest
 import numpy
@@ -7,10 +7,12 @@ import coordConv
 
 DeltaT = 0.01
 
+
 def refGetPos(pvt, t):
     """Reference implementation of PVT.getPos
     """
     return pvt.pos + (pvt.vel * (t - pvt.t))
+
 
 def refPolarFromXY(x, y, tai):
     """Reference implementation of PVT.polarFromXY
@@ -33,7 +35,9 @@ def refPolarFromXY(x, y, tai):
     thetaPVT.t = tai
     return atPole, rPVT, thetaPVT
 
+
 class TestPVT(unittest.TestCase):
+
     def testConstructors(self):
         """Test PVT constructors
         """
@@ -41,12 +45,12 @@ class TestPVT(unittest.TestCase):
         self.assertEquals(pvt.pos, 1.0)
         self.assertEquals(pvt.vel, 2.0)
         self.assertEquals(pvt.t, 3.0)
-        
+
         pvtCopy = coordConv.PVT(pvt)
         self.assertEquals(pvt.pos, pvtCopy.pos)
         self.assertEquals(pvt.vel, pvtCopy.vel)
-        self.assertEquals(pvt.t,   pvtCopy.t)
-    
+        self.assertEquals(pvt.t, pvtCopy.t)
+
     def testCopy(self):
         """Test PVT.copy() and PVT.copy(t)
         """
@@ -54,7 +58,7 @@ class TestPVT(unittest.TestCase):
         pvt2 = pvt1.copy()
         pvt3 = pvt1.copy(5.0)
 
-        pvt1 *= 2 # modify pvt1 and make sure pvt2 and pvt3 are not affected
+        pvt1 *= 2  # modify pvt1 and make sure pvt2 and pvt3 are not affected
         self.assertAlmostEqual(pvt1.pos, 2.0)
         self.assertAlmostEqual(pvt1.vel, -4.0)
         self.assertEqual(pvt1.t, 3.0)
@@ -83,7 +87,7 @@ class TestPVT(unittest.TestCase):
                 else:
                     self.assertTrue(pvt1 != pvt2)
                 self.assertNotEqual(pvt1 == pvt2, pvt1 != pvt2)
-    
+
     def testAddPVT(self):
         """Test pvt + pvt
         """
@@ -95,7 +99,6 @@ class TestPVT(unittest.TestCase):
         self.assertAlmostEqual(pvt3.vel, -1.0)
         self.assertAlmostEqual(pvt3.t, 3.0)
 
-    
     def testSubtractPVT(self):
         """Test pvt - pvt
         """
@@ -111,7 +114,7 @@ class TestPVT(unittest.TestCase):
         self.assertAlmostEqual(pvt1.pos, predPos3)
         self.assertAlmostEqual(pvt1.vel, 5.0)
         self.assertAlmostEqual(pvt1.t, 3.0)
-    
+
     def testUnaryMinus(self):
         """Test -pvt
         """
@@ -123,7 +126,7 @@ class TestPVT(unittest.TestCase):
             self.assertEqual(negPVT.t, pvt.t)
             self.assertEqual(negPVT.pos, -pvt.pos)
             self.assertEqual(negPVT.vel, -pvt.vel)
-    
+
     def testAddSubtractScalar(self):
         """Test pvt + scalar, pvt += scalar, pvt - scalar and pvt -= scalar
         """
@@ -136,7 +139,7 @@ class TestPVT(unittest.TestCase):
                 self.assertAlmostEqual(addPVT.pos, pvt.pos + val)
                 self.assertEqual(addPVT.vel, pvt.vel)
                 self.assertEqual(addPVT.t, pvt.t)
-                
+
                 inPlaceAddPVT = coordConv.PVT(pvt.pos, pvt.vel, pvt.t)
                 inPlaceAddPVT += val
                 self.assertEqual(inPlaceAddPVT.pos, addPVT.pos)
@@ -153,7 +156,7 @@ class TestPVT(unittest.TestCase):
                 self.assertEqual(inPlaceSubPVT.pos, subPVT.pos)
                 self.assertEqual(inPlaceSubPVT.vel, subPVT.vel)
                 self.assertEqual(inPlaceSubPVT.t, subPVT.t)
-    
+
     def testMultDivScalar(self):
         """Test pvt * scalar, pvt *= scalar, pvt / scalar and pvt /= scalar
         """
@@ -184,7 +187,7 @@ class TestPVT(unittest.TestCase):
                     self.assertEqual(inPlaceDivPVT.pos, divPVT.pos)
                     self.assertEqual(inPlaceDivPVT.vel, divPVT.vel)
                     self.assertEqual(inPlaceDivPVT.t, divPVT.t)
-            
+
     def testGetPos(self):
         """Test pvt.getPos
         """
@@ -192,12 +195,12 @@ class TestPVT(unittest.TestCase):
         for dt in (1235.5, -123.3):
             newt = pvt.t + dt
             self.assertAlmostEqual(pvt.getPos(newt), refGetPos(pvt, newt))
-    
+
     def testIsValid(self):
         """Test pvt.isfinite
         """
         pvt = coordConv.PVT(1, 2, 3)
-        
+
         self.assertTrue(pvt.isfinite())
         pvt.pos = numpy.nan
         self.assertFalse(pvt.isfinite())
@@ -208,12 +211,12 @@ class TestPVT(unittest.TestCase):
         self.assertFalse(pvt.isfinite())
         pvt.vel = 1.0
         self.assertTrue(pvt.isfinite())
-        
+
         pvt.t = numpy.nan
         self.assertFalse(pvt.isfinite())
         pvt.t = 0.0
         self.assertTrue(pvt.isfinite())
-    
+
     def testInvalidate(self):
         """Test pvt.invalidate
         """
@@ -260,13 +263,13 @@ class TestPVT(unittest.TestCase):
         """Test polarFromXY and xyFromPolar
         """
         for xPos, yPos, predAtPole in (
-            ( 1,  0, False),
-            (-1,  0, False),
-            ( 0,  1, False),
-            ( 0, -1, False),
-            ( 1,  1, False),
-            ( 1, -1, False),
-            (-1,  1, False),
+            (1, 0, False),
+            (-1, 0, False),
+            (0, 1, False),
+            (0, -1, False),
+            (1, 1, False),
+            (1, -1, False),
+            (-1, 1, False),
             (-1, -1, False),
             (-123.45, -123.45, False),
             (0, 0, True),

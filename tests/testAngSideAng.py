@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import unittest
 import numpy
@@ -8,7 +8,9 @@ from coordConv import angSideAng, sind, cosd, tand, atan2d
 Eps = 2e-16
 EpsTest = Eps * 1.001
 
+
 class TestAngSideAng(unittest.TestCase):
+
     def testSmallSideA(self):
         """
         a ~ 0, B = various, c various:
@@ -149,7 +151,7 @@ class TestAngSideAng(unittest.TestCase):
         for testInput, expectedOutput in [
             # 90/90/90 triangle
             ((90, 90, 90), (90, 90, 90)),
-    
+
             # inputs that might cause side_bb < 0, (but should not)
             ((45, 1, 45), (89.6464421219342, 0.707102293688337, 89.6464421219342)),
             ((45, -1, 45), (270.353557878066, 0.707102293688337, 270.353557878066)),
@@ -160,7 +162,7 @@ class TestAngSideAng(unittest.TestCase):
 
     def checkOne(self, testInput, expectedOutput):
         """Check one case
-        
+
         Inputs:
         - testInput: a vector of inputs (ang, side, ang)
         - expectedOutput: a vector of outputs;
@@ -178,14 +180,15 @@ class TestAngSideAng(unittest.TestCase):
         procExpected = processOutput(expectedOutput)
         procActual = processOutput(actualOutput)
         if not numpy.allclose(procExpected, procActual, rtol=1.0e-10, atol=1.0e-10):
-            self.fail("failed on input: %s; expected output = %s; actual output = %s" % \
-                (testInput, expectedOutput, actualOutput))
+            self.fail("failed on input: %s; expected output = %s; actual output = %s" %
+                      (testInput, expectedOutput, actualOutput))
         if actualOutput[1] < 0.0 or actualOutput[1] >= 360.0 \
-            or actualOutput[2] < 0.0 or actualOutput[2] >= 360.0 \
-            or actualOutput[3] < 0.0 or actualOutput[3] >= 360.0:
-            self.fail("failed on input %s; one or more output angles out of range: %s" % \
-                (testInput, actualOutput))
-    
+                or actualOutput[2] < 0.0 or actualOutput[2] >= 360.0 \
+                or actualOutput[3] < 0.0 or actualOutput[3] >= 360.0:
+            self.fail("failed on input %s; one or more output angles out of range: %s" %
+                      (testInput, actualOutput))
+
+
 def processOutput(outputVec):
     return (
         outputVec[0],
@@ -193,6 +196,7 @@ def processOutput(outputVec):
         outputVec[2],
         sind(outputVec[3]), cosd(outputVec[3]),
     )
+
 
 if __name__ == '__main__':
     unittest.main()

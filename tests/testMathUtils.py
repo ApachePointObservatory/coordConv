@@ -1,14 +1,16 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import unittest
 import math
 import numpy
 import coordConv
 
+
 class TestMathUtils(unittest.TestCase):
     """Test mathUtils except for the wrap functions (which are tested elsewhere)
     """
+
     def testRot2D(self):
         """Test rot2D using various obvious values
         """
@@ -33,14 +35,14 @@ class TestMathUtils(unittest.TestCase):
         ):
             out = coordConv.rot2D(*inArgs)
             self.assertTrue(numpy.allclose(out, predOut))
-    
+
     def testHypot(self):
         """Test hypot
         """
         for x in (0, 1e-45, 12.3, 3234.34):
             for y in (0, -2e-45, -3.3, 234.32):
                 self.assertTrue(numpy.allclose([coordConv.hypot(x, y)], [math.hypot(x, y)]))
-    
+
     def testTrig(self):
         """Test degrees-based trig functions
         """
@@ -51,12 +53,13 @@ class TestMathUtils(unittest.TestCase):
             self.assertAlmostEqual(coordConv.tand(ang), math.tan(angRad))
             self.assertAlmostEqual(coordConv.atand(ang) * coordConv.RadPerDeg, math.atan(ang))
             for ang2 in (0, 35, -364):
-                self.assertAlmostEqual(coordConv.atan2d(ang, ang2) * coordConv.RadPerDeg, math.atan2(ang, ang2))
-        
+                self.assertAlmostEqual(coordConv.atan2d(ang, ang2) *
+                                       coordConv.RadPerDeg, math.atan2(ang, ang2))
+
         for val in (-1, -0.34, 0, 0.67, 1):
             self.assertAlmostEqual(coordConv.asind(val) * coordConv.RadPerDeg, math.asin(val))
             self.assertAlmostEqual(coordConv.acosd(val) * coordConv.RadPerDeg, math.acos(val))
-    
+
     def testPolarFromXY(self):
         """Test polarFromXY and xyFromPolar
         """
@@ -78,6 +81,7 @@ class TestMathUtils(unittest.TestCase):
             self.assertTrue(numpy.allclose(pol[1:], predPol[1:]))
             compXY = coordConv.xyFromPolar(*pol[1:])
             self.assertTrue(numpy.allclose(xy, compXY))
+
 
 if __name__ == '__main__':
     unittest.main()

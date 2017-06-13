@@ -1,10 +1,12 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import coordConv
 """
 Determine how much delta-T is allowed before apparent geocentric data is too stale
 """
+
+
 def runOne(fromCoordSys, coord, site, errDict):
     for toDate in (2000, 2010, 2020):
         refAppGeoCoordSys = coordConv.AppGeoCoordSys(toDate)
@@ -17,12 +19,14 @@ def runOne(fromCoordSys, coord, site, errDict):
                 appGeoCoordSys = coordConv.AppGeoCoordSys(compDate)
                 appGeoCoord = appGeoCoordSys.convertFrom(fromCoordSys, coord, site)
                 fromCoord = fromCoordSys.convertFrom(appGeoCoordSys, coord, site)
-                angSep = max(refAppGeoCoord.angularSeparation(appGeoCoord), refFromCoord.angularSeparation(fromCoord))
+                angSep = max(refAppGeoCoord.angularSeparation(appGeoCoord),
+                             refFromCoord.angularSeparation(fromCoord))
                 dictKey = (dataAgeSec, ageMult)
                 oldAngSep = errDict.get(dictKey)
                 if oldAngSep is None or angSep > oldAngSep:
                     errDict[dictKey] = angSep
-    
+
+
 errDict = {}
 site = coordConv.Site(-105.822616, 32.780988, 2.788)
 for fromCoordSys in (coordConv.ICRSCoordSys(2010),):
@@ -31,13 +35,14 @@ for fromCoordSys in (coordConv.ICRSCoordSys(2010),):
             coord = coordConv.Coord(equatAng, polarAng)
             runOne(fromCoordSys, coord, site, errDict)
 
-print "Results (in arcsec) for fromCoordSys=", fromCoordSys.getName(), fromCoordSys.getDate(), "; coord=", coord.getSphPos()
+print("Results (in arcsec) for fromCoordSys=", fromCoordSys.getName(),
+      fromCoordSys.getDate(), "; coord=", coord.getSphPos())
 for ageAndMult in sorted(errDict.keys()):
-    print "%s: %0.4f" % (ageAndMult, errDict[ageAndMult] * 3600)
+    print("%s: %0.4f" % (ageAndMult, errDict[ageAndMult] * 3600))
 
 # based on these results, 200 seconds gives an error < 0.001 arcseconds,
 # and it is not so sensitive that it needs to be a constructor parameter
-# localhost$ tests/checkAppGeoTime.py 
+# localhost$ tests/checkAppGeoTime.py
 # Results (in arcsec) for fromCoordSys= icrs 2000.0 ; coord= [False, 44.99999999999999, 29.999999999999996]
 # (50, -1): 0.0002
 # (50, 1): 0.0002

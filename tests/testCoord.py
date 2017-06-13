@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import unittest
 import math
@@ -7,13 +7,15 @@ import numpy
 from coordConv import Coord, sind, cosd, wrapPos, wrapNear, angSideAng, distanceFromParallax, \
     DoubleEpsilon, MinParallax, RadPerDeg, ArcsecPerDeg, SecPerDay, DaysPerYear, KmPerAU
 
+
 class TestCoord(unittest.TestCase):
+
     def testBasics(self):
         """Check sph -> vec and back again for points not at the pole
-        
+
         The round trip test relies on the fact that the internal representation of a coord is vector,
         so simply retrieving the sph info again suffices to test a round trip.
-        
+
         Warning: the test of vector velocity is poor because the code is copied from the C++.
         However, two other tests will help:
         - Convert a coordinate system to itself with two different dates of observation
@@ -23,8 +25,8 @@ class TestCoord(unittest.TestCase):
         for equatAng in (0, 71, -123.4):
             for polarAng in (0, -75, -89.999999, 89.999999):
                 for parallax in (0, MinParallax / 0.9000001, MinParallax / 0.8999999, 5):
-                    for equatPM in (4,): # (0, 4):
-                        for polarPM in (-7,): # (0, -7):
+                    for equatPM in (4,):  # (0, 4):
+                        for polarPM in (-7,):  # (0, -7):
                             for radVel in (0, -34):
                                 coord = Coord(equatAng, polarAng, parallax, equatPM, polarPM, radVel)
                                 self.assertFalse(coord.atPole())
@@ -40,7 +42,7 @@ class TestCoord(unittest.TestCase):
                                     dist * sind(polarAng),
                                 )
                                 self.assertTrue(numpy.allclose(predVecPos, vecPos))
-                                
+
                                 # check vector proper motion
                                 vecPM = coord.getVecPM()
                                 RadPerYear_per_ArcsecPerCentury = RadPerDeg / (ArcsecPerDeg * 100.0)
@@ -58,11 +60,13 @@ class TestCoord(unittest.TestCase):
 
                                 # change units of radial velocity from km/sec to au/year
                                 radVelAUPerYear = radVel * AUPerYear_per_KmPerSec
-                                
+
                                 predVecPM = (
-                                    - (pmAUPerYear2 * sinPolar * cosEquat) - (pmAUPerYear1 * cosPolar * sinEquat) + (radVelAUPerYear * cosPolar * cosEquat),
-                                    - (pmAUPerYear2 * sinPolar * sinEquat) + (pmAUPerYear1 * cosPolar * cosEquat) + (radVelAUPerYear * cosPolar * sinEquat),
-                                    + (pmAUPerYear2 * cosPolar)                                                   + (radVelAUPerYear * sinPolar),
+                                    - (pmAUPerYear2 * sinPolar * cosEquat) - (pmAUPerYear1 *
+                                                                              cosPolar * sinEquat) + (radVelAUPerYear * cosPolar * cosEquat),
+                                    - (pmAUPerYear2 * sinPolar * sinEquat) + (pmAUPerYear1 *
+                                                                              cosPolar * cosEquat) + (radVelAUPerYear * cosPolar * sinEquat),
+                                    + (pmAUPerYear2 * cosPolar) + (radVelAUPerYear * sinPolar),
                                 )
                                 self.assertTrue(numpy.allclose(predVecPM, vecPM))
 
@@ -81,9 +85,10 @@ class TestCoord(unittest.TestCase):
 
                                 destRadVel = coord.getRadVel()
                                 self.assertAlmostEqual(radVel, destRadVel)
-                                
+
                                 coordCopy = Coord(coord)
                                 self.assertEqual(repr(coord), repr(coordCopy))
+
     def testEquality(self):
         """Test operator== and operator!=
         """
@@ -103,7 +108,7 @@ class TestCoord(unittest.TestCase):
                 else:
                     self.assertTrue(coord1 != coord2)
                 self.assertNotEqual(coord1 == coord2, coord1 != coord2)
-        
+
     def testAtPole(self):
         """Test atPole computation
         """
@@ -114,7 +119,7 @@ class TestCoord(unittest.TestCase):
                 fracXYMag = math.hypot(vec[0], vec[1]) / coord.getDistance()
                 predAtPole = fracXYMag**2 < DoubleEpsilon
                 self.assertEqual(predAtPole, coord.atPole())
-    
+
     def testDist(self):
         """Test distance
         """
@@ -122,7 +127,7 @@ class TestCoord(unittest.TestCase):
             adjParallax = max(parallax, MinParallax)
             predDist = distanceFromParallax(adjParallax)
             predAtInf = parallax < MinParallax / 0.9
-            for coord in ( # test one with space motion, one without
+            for coord in (  # test one with space motion, one without
                 Coord(43, 23, parallax),
                 Coord(-32, 89.99, parallax, 3, 5, 2),
             ):
@@ -131,13 +136,13 @@ class TestCoord(unittest.TestCase):
 
     def testOffsetSmall(self):
         """Test offset, angularSeparation and orientationTo for small offsets not too near the pole
-        
+
         In this regime delta-long = dist along long / cos(lat) is a reasonable approximation
         but I have no simple way to compute toOrient, except if dist very small then toOrient = fromOrient
         """
         for fromPolarAng in (-40.0, 0.43, 36.7):
             cosPolarAng = cosd(fromPolarAng)
-            for fromEquatAng in (0, 41.0): # should not matter
+            for fromEquatAng in (0, 41.0):  # should not matter
                 fromCoord = Coord(fromEquatAng, fromPolarAng)
                 for fromOrient in (-90, -72, -45.0, -30, 0.01, 12.5, 31, 47, 56, 68, 89):
                     cosFromOrient = cosd(fromOrient)
@@ -164,7 +169,8 @@ class TestCoord(unittest.TestCase):
                         predFromOrient = fromCoord.orientationTo(toCoord)
                         if numpy.isfinite(predFromOrient):
                             self.assertAlmostEqual(fromOrient, predFromOrient, places=orientPlaces)
-                            self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.orientationTo(fromCoord), toOrient), places=orientPlaces)
+                            self.assertAlmostEqual(toOrient, wrapNear(
+                                180 + toCoord.orientationTo(fromCoord), toOrient), places=orientPlaces)
                         else:
                             self.assertLess(dist, 1e-7)
                             self.assertAlmostEqual(fromEquatAng, toEquatAng)
@@ -175,7 +181,7 @@ class TestCoord(unittest.TestCase):
         """Test offset, angularSeparation and orientationTo for offsets over a wide range of angles
         """
         for fromPolarAng in (-87.1, -25.5, 0.43, 36.7, 87.0):
-            for fromEquatAng in (0, 41.0): # should not matter
+            for fromEquatAng in (0, 41.0):  # should not matter
                 fromCoord = Coord(fromEquatAng, fromPolarAng)
                 for fromOrient in (-89.9, -45.0, 0.01, 12.5, 89.0, 90.0):
                     for dist in (0.0001, 0.01, 0.13, 5.73):
@@ -197,7 +203,8 @@ class TestCoord(unittest.TestCase):
                         toCoord = Coord(toEquatAng, toPolarAng)
                         self.assertAlmostEqual(dist, fromCoord.angularSeparation(toCoord))
                         self.assertAlmostEqual(fromOrient, fromCoord.orientationTo(toCoord))
-                        self.assertAlmostEqual(toOrient, wrapNear(180 + toCoord.orientationTo(fromCoord), toOrient))
+                        self.assertAlmostEqual(toOrient, wrapNear(
+                            180 + toCoord.orientationTo(fromCoord), toOrient))
 
 
 if __name__ == '__main__':
