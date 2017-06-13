@@ -190,9 +190,6 @@ namespace coordConv {
         @param[in] coord1  coordinate at time tai + deltaT; proper motion and radial velocity are ignored
         @param[in] tai  initial TAI date of PVTCoord (MJD seconds)
         @param[in] deltaT  TAI of coord1 - TAI of coord0; must be nonzero
-        @param[in] defOrient  default orientation (deg); if the velocity is so low that orientation
-            cannot be computed then orientation=defOrient and vel=0
-            See Coord.offset for an explanation of orientation
         
         @throw std::runtime_error if:
         - deltaT = 0
