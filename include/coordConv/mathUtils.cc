@@ -53,14 +53,11 @@ namespace coordConv {
         double wrappedAng = refAng + wrapCtr(ang - refAng);
 
         // roundoff error can cause slightly out-of-range values; the following fixes those
-        // (and even seems to preserve ang - refAng < 180, though I'm not sure why)
         if (wrappedAng - refAng >= 180) {
             wrappedAng -= 360;
         }
-        // avoid if-else in case wrappedAng -= 360 results in wrappedAng - refAng slightly less than -180;
-        // maximum relative roundoff error for addition is 2 epsilon
-        if (wrappedAng - refAng < -180) {
-            wrappedAng -= wrappedAng * 2.0 * DoubleEpsilon;
+        if (wrappedAng - refAng < 180) {
+            wrappedAng += 360;
         }
         return wrappedAng;
     }

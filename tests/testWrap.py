@@ -46,16 +46,16 @@ class TestWrap(unittest.TestCase):
                     self.assertEqual(ctrPvt.t, pvt.t)
 
                     for refAngBase in (-180, 0, 180, 360):
-                        for refEpsMult in (-3, -2, -1, 0, 1, 2, 3):
-                            refAng = refAngBase
-                            refAng += refAng * refEpsMult * DoubleEpsilon
-                            nearAng = wrapNear(ang, refAng)
-                            self.assertGreaterEqual(nearAng - refAng, -180)
-                            self.assertLess(nearAng - refAng, 180)
-                            # prove that nearAng and ang are the same angle
-                            self.assertAlmostEqual(wrapCtr(nearAng - ang), 0)
-                            self.assertAlmostEqual(sind(nearAng), sinAng)
-                            self.assertAlmostEqual(cosd(nearAng), cosAng)
+                        for refAngWrap in range(-10, 11, 2):
+                            for refEpsMult in (-3, -2, -1, 0, 1, 2, 3):
+                                refAng = refAngBase * (1 + (DoubleEpsilon * refEpsMult)) + refAngWrap * 360.0
+                                nearAng = wrapNear(ang, refAng)
+                                self.assertGreaterEqual(nearAng - refAng, -180)
+                                self.assertLess(nearAng - refAng, 180)
+                                # prove that nearAng and ang are the same angle
+                                self.assertAlmostEqual(wrapCtr(nearAng - ang), 0)
+                                self.assertAlmostEqual(sind(nearAng), sinAng)
+                                self.assertAlmostEqual(cosd(nearAng), cosAng)
 
 
 if __name__ == '__main__':

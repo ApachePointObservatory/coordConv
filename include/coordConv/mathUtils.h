@@ -40,7 +40,10 @@ namespace coordConv {
     double wrapCtr(double ang);
     
     /**
-    Wrap one angle to be within 180 degrees of a reference angle: 180 <= wrapped ang - refAng < 180
+    Wrap one angle to be within 180 degrees of a reference angle
+
+    The returned angle is wrapped to approximately 180 <= wrapped ang - refAng <= 180
+    (due to roundoff error limits may be violated by a very small amount)
     
     @param[in] ang  angle to wrap (deg)
     @param[in] refAng  result is wrapped to be near this reference angle (deg)
