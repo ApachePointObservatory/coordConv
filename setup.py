@@ -5,28 +5,36 @@ import glob
 import sys
 from shutil import copyfile
 
+coordConvDir = os.getenv("COORDCONV_DIR")
+eigenDir = os.getenv("EIGEN_DIR")
+boostDir = os.getenv("BOOST_DIR")
+ndarrayDir = os.getenv("NDARRAY_DIR")
+pythonDir = os.getenv("CONDA_DIR")
+condaDir = os.getenv("CONDA_DIR")
+
+
+
 srcFiles = [
-    "/Users/csayres/installTCC/coordConv/python/coordConv/coordConvLib.i",
+    coordConvDir + "/python/coordConv/coordConvLib.i",
 ]
 
 # slalibFiles = glob.glob("/Users/csayres/installTCC/slalib_2013-04-25/src/*.c")
 
 # srcFiles += slalibFiles
 
-convFiles = glob.glob("/Users/csayres/installTCC/coordConv/src/*.cc")
+convFiles = glob.glob(coordConvDir + "/src/*.cc")
 srcFiles += convFiles
 
 includeList = [
-    "/Users/csayres/installTCC/coordConv/python",
-    "Users/csayres/installTCC/coordConv/include",
+    coordConvDir + "/python",
+    coordConvDir + "/include",
     numpy.get_include(),
-    "/Users/csayres/installTCC/ndarray/8.0.0.0+1/python",
-    "/Users/csayres/installTCC/ndarray/8.0.0.0+1/include",
-    "/Users/csayres/installTCC/coordConv/include",
-    "/Users/csayres/condatcc/include/python2.7",
-    "/Users/csayres/installTCC/eigen/3.1.1+2/include",
-    "/Users/csayres/installTCC/boost_1_55_0",
-    "/Users/csayres/installTCC/slalib_2013-04-25/install/include",
+    ndarrayDir + "/python",
+    ndarrayDir + "/include",
+    coordConvDir + "/include",
+    condaDir + "/include/python2.7",
+    eigenDir + "/include",
+    boostDir,
 ]
 
 extra_compile_args = ["--std=c++11", "-fPIC", "-v", "-O3"]
@@ -37,13 +45,13 @@ if sys.platform == 'darwin':
 
 swig_opts = [
     "-c++",
-    "-I/Users/csayres/installTCC/ndarray/8.0.0.0+1/python",
-    "-I/Users/csayres/installTCC/coordConv/include",
+    "-I/%s/python"%ndarrayDir,
+    "-I%s/include"%coordConvDir
 ]
 
 
 #################### to build coord conv ################
-# linkDirs = ["/Users/csayres/installTCC/coordConv/build/lib.macosx-10.7-x86_64-2.7"]
+# linkDirs = [coordConvDir + "/build/lib.macosx-10.7-x86_64-2.7"]
 linkDirs = ["/Users/csayres/installTCC/slalib_2013-04-25/install/lib"]
 # os.environ["CC"] = "clang++"
 module = Extension(
